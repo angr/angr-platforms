@@ -42,10 +42,22 @@ class SimEngineBF(SimEngine):
                 state.memory.store(state.regs.ptr, (state.memory.load[state.regs.ptr] + 1) % 256, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
-                pass
+                newstate = state.copy()
+                val_to_write = state.memory.load(state.regs.ptr)
+                # TODO: Something about the syscall register 'inout'
+                newstate.ip = state.ip + 1
+                successors.add_successor(new_state, not_taken_state.ip, val_at_ptr != 0, "Ijk_Syscall",
+                         add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                break
             elif inst == ',':
-                # Syscall: Write byte at mem to stdin
-                pass
+                # Syscall: Write byte from stdin to cell at ptr
+                newstate = state.copy()
+                val_to_write = state.memory.load(state.regs.ptr)
+                # TODO: Something about the syscall register 'inout'
+                newstate.ip = state.ip + 1
+                successors.add_successor(new_state, not_taken_state.ip, val_at_ptr != 0, "Ijk_Syscall",
+                         add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                break
             elif inst == '[':
                 # Jump to matching ] if value at ptr is 0
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
