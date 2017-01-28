@@ -23,12 +23,13 @@ class SimEngineBF(SimEngine):
         :return:
         """
         my_block = state.ip  # The start address of this basic block.  We'll need this later
-        successors = SimSuccessors(addr, state) # All the places we can go from this block.
+        successors = SimSuccessors(my_block, state) # All the places we can go from this block.
         while True:
             # Run through instructions, until we hit a branch.
             # Step 0: Fetch the next instruction
             inst = chr(state.mem_concrete(state.ip,1))
             # Step 1: Decode.  If it's a....
+            print repr(inst)
             if inst == '>':
                 # Increment ptr
                 state.regs.ptr = (state.regs.ptr + 1) % 256
@@ -37,9 +38,9 @@ class SimEngineBF(SimEngine):
                 pass
             elif inst == "-":
                 # Decrement the byte at ptr in memory
-                state.memory.store(state.regs.ptr, (state.memory.load[state.regs.ptr] + 1) % 256, 1)
+                state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) + 1) % 256, 1)
             elif inst == "+":
-                state.memory.store(state.regs.ptr, (state.memory.load[state.regs.ptr] + 1) % 256, 1)
+                state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) + 1) % 256, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
                 newstate = state.copy()
