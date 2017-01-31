@@ -65,21 +65,19 @@ class SimEngineBF(SimEngine):
                 state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) + 1) % 256, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
-                val_to_write = state.memory.load(state.regs.ptr)
                 newstate = state.copy()
-                val_to_write = state.memory.load(state.regs.ptr)
-                # TODO: Something about the syscall register 'inout'
+                newstate.regs.inout = 1  # Set this to 0 to cause a write syscall
                 newstate.ip = state.ip + 1
-                successors.add_successor(new_state, newstate.ip, claripy.true, "Ijk_Syscall",
+                successors.add_successor(newstate, newstate.ip, claripy.true, "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end a basic block.
                 break
             elif inst == ',':
-                # Syscall: Write byte from stdin to cell at ptr
-                newstate = state.copy()
-                # TODO: Something about the syscall register 'inout'
-                newstate.ip = state.ip + 1
-                successors.add_successor(new_state, newstate.ip, claripy.true, "Ijk_Syscall",
+                # Syscall: read byte from stdin to cell at ptr
+                new_state = state.copy()
+                state.regs.inout = 0  # This must be 0 when we do a syscall to get a read!
+                new_state.ip = state.ip + 1
+                successors.add_successor(new_state, new_state.ip, claripy.true, "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end the basic block
                 break

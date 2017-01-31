@@ -1,0 +1,99 @@
+from angr.simos import SimOS, register_simos
+from simuvex import SimCC, SimProcedure
+from simuvex.s_cc import register_syscall_cc
+from . import ArchBF
+
+
+class SimBF(SimOS):
+    """
+    Defines the "OS" of a BrainFuck program.
+
+    This means:
+    -  The memory layout (separate code and data)
+    -  The "syscalls" (read stdin and write stdout)
+
+    """
+    SYSCALL_TABLE = {
+        0: ('read_byte_to_ptr', 'read_byte_to_ptr'),
+        1: ('write_byte_at_ptr', 'write_byte_at_ptr'),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(SimBF, self).__init__(*args, name="BF", **kwargs)
+
+    def configure_project(self):
+        super(SimBF, self).configure_project()
+
+        self._load_syscalls(SimCGC.SYSCALL_TABLE, "bf")
+
+    def state_blank(self, fs=None, **kwargs):
+        s = super(SimCGC, self).state_blank(**kwargs)  # pylint:disable=invalid-name
+
+        # PTR starts halfway through memory
+        s.regs.ptr = 0xf0000000
+
+    def state_entry(self, **kwargs):
+        state = super(SimBF, self).state_entry(**kwargs)
+        # PTR starts halfway through memory
+        s.regs.ptr = 0xf0000000
+        return state
+
+
+class SimBFSyscall(SimCC):
+    """
+    This defines our syscall format.
+    Obviously this is pretty dumb, for BrainFuck
+    This is really just here to make the two simprocedures work.
+    """
+
+    # No need to pull the regs out, we always just want ptr straight up.
+    # THis is usually a list of string register names.
+    ARG_REGS = [ ]
+    # We never return anything to registers, but if we did, we'd use a RegArg object here.
+    RETURN_VAL = None
+    ARCH = ArchBF
+
+    @staticmethod
+    def _match(arch, args, sp_delta):   # pylint: disable=unused-argument
+        # doesn't appear anywhere but syscalls
+        return False
+
+    @staticmethod
+    def syscall_num(state):
+        return state.regs.rw
+
+
+class write_byte_at_ptr(SimProcedure):
+    """
+    Defines what to do for the "." instruction.
+    """
+
+
+    IS_SYSCALL = True
+
+    # pylint:disable=arguments-differ
+    def run(self, state):
+        fd = 1  # POSIX STDOUT
+        data = self.state.memory.load(self.state.regs.ptr, 1)
+        self.state.posix.write(fd, data, 1)
+        return self.state.se.BVV(0, self.state.arch.bits)
+
+
+class read_byte_to_ptr(SimProcedure):
+    """
+    Defines what to do for the "," instruction
+    """
+
+    IS_SYSCALL = True
+
+    # pylint:disable=arguments-differ
+
+    def run(self, state):
+        fd = 0 # Posix STDIN
+        read_length = self.state.posix.read(fd, state.regs.ptr, 1)
+        # NOTE: The behavior of EOF (this is zero) is undefined!!!
+        return self.state.se.BVV(0, self.state.arch.bits)
+
+
+register_simos('bf', SimBF)
+register_syscall_cc('BF','bf',SimBFSyscall)
