@@ -36,7 +36,6 @@ class SimEngineBF(SimEngine):
         :return:
         """
         my_block = state.ip  # The start address of this basic block.  We'll need this later
-        successors = SimSuccessors(my_block, state)  # All the places we can go from this block.
         while True:
             # Run through instructions, until we hit a branch.
             # Step 0: Fetch the next instruction
@@ -48,7 +47,7 @@ class SimEngineBF(SimEngine):
                 # ...except if it IS symbolic.  That means we ran off the memory.
                 # Drop the mic and go home.  We're done here.
                 the_end = state.copy()
-                successors.add_successor(the_end, state.ip, True, "Ijk_Exit", add_guard=True, exit_stmt_idx=-1,
+                successors.add_successor(the_end, state.ip, claripy.true, "Ijk_Exit", add_guard=False, exit_stmt_idx=-1,
                                          exit_ins_addr=state.ip, source=my_block)
                 break
             # Step 1: Decode.  If it's a....
@@ -66,59 +65,87 @@ class SimEngineBF(SimEngine):
                 state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) + 1) % 256, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
+                val_to_write = state.memory.load(state.regs.ptr)
                 newstate = state.copy()
                 val_to_write = state.memory.load(state.regs.ptr)
                 # TODO: Something about the syscall register 'inout'
                 newstate.ip = state.ip + 1
-                successors.add_successor(new_state, not_taken_state.ip, val_at_ptr != 0, "Ijk_Syscall",
-                         add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                successors.add_successor(new_state, newstate.ip, claripy.true, "Ijk_Syscall",
+                                         add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                # Syscalls, even fake ones like this, end a basic block.
                 break
             elif inst == ',':
                 # Syscall: Write byte from stdin to cell at ptr
                 newstate = state.copy()
-                val_to_write = state.memory.load(state.regs.ptr)
                 # TODO: Something about the syscall register 'inout'
                 newstate.ip = state.ip + 1
-                successors.add_successor(new_state, not_taken_state.ip, val_at_ptr != 0, "Ijk_Syscall",
-                         add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                successors.add_successor(new_state, newstate.ip, claripy.true, "Ijk_Syscall",
+                                         add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                # Syscalls, even fake ones like this, end the basic block
                 break
             elif inst == '[':
                 # Jump to matching ] if value at ptr is 0
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
                 # find the ].  This returns None if we don't find it (ran off the end)
-                dest = state.mem.find(state.ip, ']', max_symbolic_bytes=0, default=None)
+                offset = 1
+                jk = "Ijk_Boring"
+                while True:
+                    try:
+                        cell = chr(state.mem_concrete(state.ip + offset, 1))
+                    except SimValueError:
+                        # We ran off the program memory.  We're done
+                        jk = "Ijk_Exit"
+                        offset = 0
+                        break
+                    if cell == "]":
+                        break
+                    offset += 1
+
                 taken_state = state.copy()
-                taken_state.ip = dest
+                taken_state.ip = state.ip + offset
                 not_taken_state = state.copy()
                 not_taken_state.ip = state.ip + 1
-                if not dest:
-                    jk = "Ijk_Exit"
-                else:
-                    jk = "Ijk_Boring"
+
                 successors.add_successor(taken_state, taken_state.ip, val_at_ptr == 0, jk, add_guard=True,
                                          exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 successors.add_successor(not_taken_state, not_taken_state.ip, val_at_ptr != 0, "Ijk_Boring",
                                          add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                # This is a conditional, so this basic block is done!
+                break
             elif inst == ']':
                 # Jump backward to matching [ if value at ptr is non-zero
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
                 # find the [, or the beginning.  If we go there, it's over.
                 offset = -1
-                while state.ip + offset > 0:
-                    cell = chr(state.memory.load(state.ip + offset, 1))
-                    if cell == "[":
+                jk = "Ijk_Boring"
+                while True:
+                    try:
+                        cell = chr(state.mem_concrete(state.ip + offset, 1))
+                    except SimValueError:
+                        # We're done.  Get out
+                        offset = 0
+                        jk = "Ijk_Exit"
                         break
-                    offset -= 1
+                    if cell == "]":
+                        # Found it!
+                        break
+                    offset += 1
+
                 taken_state = state.copy()
                 taken_state.ip = state.ip + offset
                 not_taken_state = state.copy()
                 not_taken_state.ip = state.ip + 1
-                successors.add_successor(taken_state, taken_state.ip, val_at_ptr != 0, "Ijk_Boring", add_guard=True,
+                successors.add_successor(taken_state, taken_state.ip, val_at_ptr != 0, jk, add_guard=True,
                                          exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
-                successors.add_successor(not_taken_state, not_taken_state.ip, val_at_ptr == 0, "Ijk_Boring",
+                successors.add_successor(not_taken_state, not_taken_state.ip, val_at_ptr == 0, jk,
                                          add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
+                # This is a conditional, so this basic block is done!
+                break
             # Step 3: Increment PC!
             state.ip += 1
+
+        # Step 4: Set this flag to tell the rest of simuvex/angr that you finished processing the block
+        successors.processed = True
         return successors
 
     def _check(self, state, *args, **kwargs):
@@ -131,5 +158,5 @@ class SimEngineBF(SimEngine):
         :param kwargs:                 Keyword arguments that will be passed to process().
         :return:                       True if the state can be handled by the current engine, False otherwise.
         """
-        return not state.arch.name == 'BF'
+        return True
 

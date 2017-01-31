@@ -1,6 +1,6 @@
 from cle.backends import Blob, register_backend
 from archinfo import arch_from_id
-
+import re
 import logging
 l = logging.getLogger("cle.blob")
 
@@ -24,16 +24,16 @@ class BF(Blob):
                 custom_entry_point=0,
                 **kwargs)
 
-"""
+
     @staticmethod
     def is_compatible(stream):
-        bf_re = re.compile('[+-\<\>\.\,\[\]]+')
+        bf_re = re.compile('[+\-<>.,\[\]\n]+')
         stream.seek(0)
         stuff = stream.read(0x1000)
         if bf_re.match(stuff):
             return True
         return False
-"""
+
 """
     def _load(self, offset, size=None):
         """"""
