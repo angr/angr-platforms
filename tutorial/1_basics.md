@@ -1,16 +1,22 @@
 # Throwing a Tantrum: Extending angr with new architectures, engines, loaders, and more
+
 # Part 1: Basic angr internals
 
 
 In this n+1-part series, we will be exploring how you can extend [angr](http://angr.io/ "angr") with new features, without editing angr itself!
+
 angr is the popular framework for analyzing binary programs, from embedded firmware, to hardcore CTF challenges, all from the comfort of Python.
 angr's roots lie in the Valgrind VEX instrumentation framework, meaning it benefits from the multi-architecture support and community maintenanace.
 However, we live in a big world full of crazy things that aren't Intel or ARM-based Linux machines.
+
 What about microcontrollers?
+
 What about Android bytecode?
+
 What about Javascript?
 
-What about '''BrainFuck'''??
+What about ***BrainFuck***??
+
 (*gasp*! Not BrainFuck! Anything but BrainFuck!)
 
 If you find yourself asking any of those sorts of questions, this is the guide for you!
@@ -26,7 +32,7 @@ First, let's go over the components themselves, and how they fit together.
 
 ## The angr lifecycle
 
-** TODO: FIXME: BOUNTY: I'll pay $10 to the guy or gal that makes me a sweet diagram here **
+***TODO: FIXME: BOUNTY: I'll pay $10 to the guy or gal that makes me a sweet diagram here***
 
 If you've used angr before, you've probably done this:
 (blatantly stolen from angr-doc's fauxware example)
