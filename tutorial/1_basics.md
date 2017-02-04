@@ -32,7 +32,7 @@ First, let's go over the components themselves, and how they fit together.
 
 ## The angr lifecycle
 
-***TODO: FIXME: BOUNTY: I'll pay $10 to the guy or gal that makes me a sweet diagram here***
+***TODO: FIXME: BOUNTY: I'll pay $10 to the guy or gal that makes me a sweet diagram here*	**
 
 If you've used angr before, you've probably done this:
 (blatantly stolen from angr-doc's fauxware example)
