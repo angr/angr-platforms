@@ -13,12 +13,12 @@ class ArchBF(Arch):
         # self.cs_mode = capstone.CS_MODE_LITTLE_ENDIAN if endness == 'Iend_LE' else capstone.CS_MODE_BIG_ENDIAN
         # END
         # registers is a dictionary mapping register names, to a tuple of
-        # register number, and their width, in bytes
+        # register offset, and their width, in bytes
         self.registers = {}
-        self.registers["ip"] =       (0, 8)
-        self.registers["ptr"] =       (1, 8)
-        self.registers["inout"] =      (2, 1)
-        self.registers["ip_at_syscall"] =      (3, 8)
+        self.registers["ip"] = (0, 8)
+        self.registers["ptr"] = (8, 8)
+        self.registers["inout"] = (16, 1)
+        self.registers["ip_at_syscall"] = (24, 8)
 
         self.register_names = {}
         self.register_names[self.registers['ip'][0]] = 'pc'

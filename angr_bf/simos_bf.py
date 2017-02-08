@@ -33,7 +33,7 @@ class ReadByteToPtr(SimProcedure):
 
     def run(self, state):
         fd = 0 # Posix STDIN
-        read_length = self.state.posix.read(fd, state.regs.ptr, 1)
+        read_length = self.state.posix.read(fd, self.state.regs.ptr, 1)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
         return None
 
