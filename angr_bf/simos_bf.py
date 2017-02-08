@@ -4,6 +4,40 @@ from simuvex.s_cc import register_syscall_cc
 from . import ArchBF
 
 
+class WriteByteAtPtr(SimProcedure):
+    """
+    Defines what to do for the "." instruction.
+    """
+
+
+    IS_SYSCALL = True
+    NUM_ARGS = 0
+    num_args = 0
+    # pylint:disable=arguments-differ
+    def run(self, state):
+        fd = 1  # POSIX STDOUT
+        data = self.state.memory.load(self.state.regs.ptr, 1)
+        self.state.posix.write(fd, data, 1)
+        return None
+
+
+class ReadByteToPtr(SimProcedure):
+    """
+    Defines what to do for the "," instruction
+    """
+
+    IS_SYSCALL = True
+    num_args = 0
+    NUM_ARGS = 0
+    # pylint:disable=arguments-differ
+
+    def run(self, state):
+        fd = 0 # Posix STDIN
+        read_length = self.state.posix.read(fd, state.regs.ptr, 1)
+        # NOTE: The behavior of EOF (this is zero) is undefined!!!
+        return None
+
+
 class SimBF(SimOS):
     """
     Defines the "OS" of a BrainFuck program.
@@ -14,8 +48,8 @@ class SimBF(SimOS):
 
     """
     SYSCALL_TABLE = {
-        0: ('read_byte_to_ptr', 'read_byte_to_ptr'),
-        1: ('write_byte_at_ptr', 'write_byte_at_ptr'),
+        0: ('read_byte_to_ptr', ReadByteToPtr),
+        1: ('write_byte_at_ptr', WriteByteAtPtr),
     }
 
     def __init__(self, *args, **kwargs):
@@ -24,18 +58,18 @@ class SimBF(SimOS):
     def configure_project(self):
         super(SimBF, self).configure_project()
 
-        self._load_syscalls(SimCGC.SYSCALL_TABLE, "bf")
+        self._load_syscalls(SimBF.SYSCALL_TABLE, "bf")
 
     def state_blank(self, fs=None, **kwargs):
-        s = super(SimCGC, self).state_blank(**kwargs)  # pylint:disable=invalid-name
-
+        state = super(SimBF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
         # PTR starts halfway through memory
-        s.regs.ptr = 0xf0000000
+        state.regs.ptr = 0xf0000000
+        return state
 
     def state_entry(self, **kwargs):
         state = super(SimBF, self).state_entry(**kwargs)
         # PTR starts halfway through memory
-        s.regs.ptr = 0xf0000000
+        state.regs.ptr = 0xf0000000
         return state
 
 
@@ -48,9 +82,9 @@ class SimBFSyscall(SimCC):
 
     # No need to pull the regs out, we always just want ptr straight up.
     # THis is usually a list of string register names.
-    ARG_REGS = [ ]
+    ARG_REGS = [ 'ptr' ]
     # We never return anything to registers, but if we did, we'd use a RegArg object here.
-    RETURN_VAL = None
+    #RETURN_VAL = ""
     ARCH = ArchBF
 
     @staticmethod
@@ -60,40 +94,8 @@ class SimBFSyscall(SimCC):
 
     @staticmethod
     def syscall_num(state):
-        return state.regs.rw
-
-
-class write_byte_at_ptr(SimProcedure):
-    """
-    Defines what to do for the "." instruction.
-    """
-
-
-    IS_SYSCALL = True
-
-    # pylint:disable=arguments-differ
-    def run(self, state):
-        fd = 1  # POSIX STDOUT
-        data = self.state.memory.load(self.state.regs.ptr, 1)
-        self.state.posix.write(fd, data, 1)
-        return self.state.se.BVV(0, self.state.arch.bits)
-
-
-class read_byte_to_ptr(SimProcedure):
-    """
-    Defines what to do for the "," instruction
-    """
-
-    IS_SYSCALL = True
-
-    # pylint:disable=arguments-differ
-
-    def run(self, state):
-        fd = 0 # Posix STDIN
-        read_length = self.state.posix.read(fd, state.regs.ptr, 1)
-        # NOTE: The behavior of EOF (this is zero) is undefined!!!
-        return self.state.se.BVV(0, self.state.arch.bits)
+        return state.regs.inout
 
 
 register_simos('bf', SimBF)
-register_syscall_cc('BF','bf',SimBFSyscall)
+register_syscall_cc('BF','default',SimBFSyscall)

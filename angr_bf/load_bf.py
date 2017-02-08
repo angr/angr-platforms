@@ -17,13 +17,12 @@ class BF(Blob):
         :param path: The file path
         :param custom_offset: Skip this many bytes from the beginning of the file.
         """
-
         super(BF, self).__init__(path, *args,
                 custom_arch=arch_from_id("bf"),
                 custom_offset=custom_offset,
                 custom_entry_point=0,
                 **kwargs)
-
+        self.os = "bf"
 
     @staticmethod
     def is_compatible(stream):

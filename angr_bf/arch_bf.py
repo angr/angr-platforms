@@ -1,5 +1,5 @@
 from archinfo.arch import Arch
-from archinfo import register_arch
+from archinfo.arch import register_arch
 
 class ArchBF(Arch):
     def __init__(self, endness="Iend_LE"):
