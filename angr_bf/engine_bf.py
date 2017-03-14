@@ -59,10 +59,14 @@ class SimEngineBF(SimEngine):
             elif inst == "-":
                 # Decrement the byte at ptr in memory
                 # NOTE: We're doing the "wrap-around" variation of BF
-                state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) - 1) % 256, 1)
+                oldval = state.memory.load(state.regs.ptr, 1)
+                newval = (oldval - 1)
+                state.memory.store(state.regs.ptr, newval, 1)
             elif inst == "+":
                 # Increment the byte at ptr in memory
-                state.memory.store(state.regs.ptr, (state.memory.load(state.regs.ptr) + 1) % 256, 1)
+                oldval = state.memory.load(state.regs.ptr, 1)
+                newval = (oldval + 1)
+                state.memory.store(state.regs.ptr, newval, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
                 newstate = state.copy()
@@ -124,10 +128,10 @@ class SimEngineBF(SimEngine):
                         offset = 0
                         jk = "Ijk_Exit"
                         break
-                    if cell == "]":
+                    if cell == "[":
                         # Found it!
                         break
-                    offset += 1
+                    offset -= 1
 
                 taken_state = state.copy()
                 taken_state.ip = state.ip + offset
@@ -135,7 +139,7 @@ class SimEngineBF(SimEngine):
                 not_taken_state.ip = state.ip + 1
                 successors.add_successor(taken_state, taken_state.ip, val_at_ptr != 0, jk, add_guard=True,
                                          exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
-                successors.add_successor(not_taken_state, not_taken_state.ip, val_at_ptr == 0, jk,
+                successors.add_successor(not_taken_state, not_taken_state.ip, val_at_ptr == 0, "Ijk_Boring",
                                          add_guard=True, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # This is a conditional, so this basic block is done!
                 break
@@ -144,6 +148,9 @@ class SimEngineBF(SimEngine):
 
         # Step 4: Set this flag to tell the rest of simuvex/angr that you finished processing the block
         successors.processed = True
+        successors.artifacts['irsb_size'] = state.ip - my_block
+        successors.artifacts['irsb'] = None
+        successors.artifacts['irsb_direct_next'] = True
         return successors
 
     def _check(self, state, *args, **kwargs):

@@ -1,6 +1,6 @@
 from angr.simos import SimOS, register_simos
 from simuvex import SimCC, SimProcedure
-from simuvex.s_cc import register_syscall_cc
+from simuvex.s_cc import register_syscall_cc, register_default_cc, SimCCUnknown
 from . import ArchBF
 
 
@@ -63,13 +63,15 @@ class SimBF(SimOS):
     def state_blank(self, fs=None, **kwargs):
         state = super(SimBF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
         # PTR starts halfway through memory
-        state.regs.ptr = 0xf0000000
+        state.regs.ptr = 0x80000000
+        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
         return state
 
     def state_entry(self, **kwargs):
         state = super(SimBF, self).state_entry(**kwargs)
         # PTR starts halfway through memory
-        state.regs.ptr = 0xf0000000
+        state.regs.ptr = 0x80000000
+        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
         return state
 
 
@@ -99,3 +101,4 @@ class SimBFSyscall(SimCC):
 
 register_simos('bf', SimBF)
 register_syscall_cc('BF','default',SimBFSyscall)
+register_default_cc('BF',SimCCUnknown)
