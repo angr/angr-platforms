@@ -4,6 +4,8 @@ from simuvex.engines import SimEngine
 from simuvex import s_options as o
 from simuvex.s_state import SimState
 from simuvex.engines.successors import SimSuccessors
+from load_bf import BF
+from angr import register_default_engine
 import claripy
 
 l = logging.getLogger('simuvex.engines.SinEngineBF')
@@ -148,6 +150,8 @@ class SimEngineBF(SimEngine):
 
         # Step 4: Set this flag to tell the rest of simuvex/angr that you finished processing the block
         successors.processed = True
+
+        # TODO: HACK: FIXME: this just has to be here. This should not have to be here.
         successors.artifacts['irsb_size'] = state.ip - my_block
         successors.artifacts['irsb'] = None
         successors.artifacts['irsb_direct_next'] = True
@@ -164,4 +168,7 @@ class SimEngineBF(SimEngine):
         :return:                       True if the state can be handled by the current engine, False otherwise.
         """
         return True
+
+# Engine registration
+register_default_engine(BF, SimEngineBF, arch='any')
 

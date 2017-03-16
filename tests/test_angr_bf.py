@@ -1,19 +1,17 @@
 #!/usr/bin/env python
-
 import logging
 import simuvex
 import nose
 import os
-
 import angr
-import angr_bf
+from angr_bf import *
 
 def test_hello():
     """
     End-to-end Hello World path analysis
     :return:
     """
-    hellobf = os.path.join('..', 'test_programs', 'hello.bf')
+    hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/hello.bf'))
     p = angr.Project(hellobf)
     entry = p.factory.entry_state()
     pg = p.factory.path_group(entry)
@@ -25,7 +23,7 @@ def test_1bytecrackme_good():
     The world-famous 1-byte crackme (easy version)
     :return:
     """
-    crackme = os.path.join('..', 'test_programs', '1bytecrackme-good.bf')
+    crackme = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/1bytecrackme-good.bf'))
     bad_paths = lambda path: "-" in path.state.posix.dumps(1)
     p = angr.Project(crackme)
     entry = p.factory.entry_state(remove_options={simuvex.o.LAZY_SOLVES})
