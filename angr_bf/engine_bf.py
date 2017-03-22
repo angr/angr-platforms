@@ -44,9 +44,10 @@ class SimEngineBF(SimEngine):
         return jump_table
 
     def resolve_jump(self, state, addr):
-        jtable = self._build_jump_table(state)
+        if not hasattr(state.scratch,'jump_table'):
+            state.scratch.jump_table = self._build_jump_table(state)
         try:
-            return jtable[addr]
+            return state.scratch.jump_table[addr]
         except KeyError:
             raise ValueError("There is no entry in the jump table at address %d" % addr)
 
