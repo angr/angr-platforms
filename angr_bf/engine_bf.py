@@ -17,6 +17,39 @@ class SimEngineBF(SimEngine):
     :ivar callable check_failed: A callback that is called after _check() returns False.
     """
 
+    def _build_jump_table(self, state):
+        jump_table = {}
+        jstack = []
+        addr = 0
+        while True:
+            try:
+                inst = chr(state.mem_concrete(addr, 1))
+            except SimValueError:
+                break
+            except KeyError:
+                break
+            if inst == '[':
+                jstack.append(addr)
+            elif inst == ']':
+                try:
+                    src = jstack.pop()
+                    dest = addr
+                    jump_table.update({src: dest})
+                    jump_table.update({dest: src})
+                except IndexError:
+                    raise ValueError("Extra ] at offset %d" % inst)
+            addr += 1
+        if jstack:
+            raise ValueError("Unmatched [s at: " + ",".join(jstack))
+        return jump_table
+
+    def resolve_jump(self, state, addr):
+        jtable = self._build_jump_table(state)
+        try:
+            return jtable[addr]
+        except KeyError:
+            raise ValueError("There is no entry in the jump table at address %d" % addr)
+
     def _process(self, state, successors, *args, **kwargs):
         """
         This function executes one "basic block" of BrainFuck.
@@ -91,22 +124,10 @@ class SimEngineBF(SimEngine):
                 # Jump to matching ] if value at ptr is 0
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
                 # find the ].  This returns None if we don't find it (ran off the end)
-                offset = 1
                 jk = "Ijk_Boring"
-                while True:
-                    try:
-                        cell = chr(state.mem_concrete(state.ip + offset, 1))
-                    except SimValueError:
-                        # We ran off the program memory.  We're done
-                        jk = "Ijk_Exit"
-                        offset = 0
-                        break
-                    if cell == "]":
-                        break
-                    offset += 1
-
+                dest = self.resolve_jump(state, state.se.any_int(state.ip))
                 taken_state = state.copy()
-                taken_state.ip = state.ip + offset
+                taken_state.ip = dest
                 not_taken_state = state.copy()
                 not_taken_state.ip = state.ip + 1
 
@@ -120,23 +141,10 @@ class SimEngineBF(SimEngine):
                 # Jump backward to matching [ if value at ptr is non-zero
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
                 # find the [, or the beginning.  If we go there, it's over.
-                offset = -1
                 jk = "Ijk_Boring"
-                while True:
-                    try:
-                        cell = chr(state.mem_concrete(state.ip + offset, 1))
-                    except SimValueError:
-                        # We're done.  Get out
-                        offset = 0
-                        jk = "Ijk_Exit"
-                        break
-                    if cell == "[":
-                        # Found it!
-                        break
-                    offset -= 1
-
                 taken_state = state.copy()
-                taken_state.ip = state.ip + offset
+                dest = self.resolve_jump(state, state.se.any_int(state.ip))
+                taken_state.ip = dest
                 not_taken_state = state.copy()
                 not_taken_state.ip = state.ip + 1
                 successors.add_successor(taken_state, taken_state.ip, val_at_ptr != 0, jk, add_guard=True,
