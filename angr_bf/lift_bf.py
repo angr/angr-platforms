@@ -5,11 +5,68 @@ from pyvex.expr import *
 from pyvex.lift import Lifter, register
 from pyvex.lift.util.vex_helper import *
 from pyvex.lift.util.irsb_postprocess import irsb_postproc_flatten
+from arch_bf import ArchBF
 import sys
 import os
+import claripy
+from simuvex.engines.vex import ccall
+from simuvex import SimValueError
 
 # This is actually a BrainFuck lifter for pyVEX.  I'm not joking.
 # Created by edg on 1/14/2017
+
+# TODO: FIXME: We need to refactor CCall
+
+def _build_jump_table(state):
+    jump_table = {}
+    jstack = []
+    addr = 0
+    while True:
+        try:
+            inst = chr(state.mem_concrete(addr, 1))
+        except SimValueError:
+            break
+        except KeyError:
+            break
+        if inst == '[':
+            jstack.append(addr)
+        elif inst == ']':
+            try:
+                src = jstack.pop()
+                dest = addr
+                jump_table.update({src: dest})
+                jump_table.update({dest: src})
+            except IndexError:
+                raise ValueError("Extra ] at offset %d" % inst)
+        addr += 1
+    if jstack:
+        raise ValueError("Unmatched [s at: " + ",".join(jstack))
+    return jump_table
+
+
+def bf_resolve_jump(state):
+    """
+    Resolve the jump at the current IP of the state.
+    :param state:
+    :return:
+    """
+    real_ip = state.se.any_int(state.ip)
+    offset = 0
+    while True:
+        inst = chr(state.mem_concrete(real_ip + offset, 1))
+        if inst == "]" or inst == '[':
+            addr = real_ip + offset
+            break
+        offset += 1
+    jtable = _build_jump_table(state)
+    real_ip = state.se.any_int(addr)
+    try:
+        return (claripy.BVV(jtable[real_ip], 64), [])
+    except KeyError:
+        raise ValueError("There is no entry in the jump table at " + repr(real_ip))
+# This is really dirty and I feel bad about it.
+setattr(ccall,'bf_resolve_jump',bf_resolve_jump)
+
 
 class InstructionEncoding:
     def __init__(self, name, op, rewriter):
@@ -35,31 +92,34 @@ class LifterBF(Lifter):
         IRSB.
 
         """
+        Lifter.__init__(self, irsb, data, num_inst, num_bytes, bytes_offset, traceflags)
+        self.logger = logging.getLogger('pyvex')
         self.irsb = irsb
         self.data = data
         self.num_inst = num_inst
         self.num_bytes = num_bytes
         self.bytes_offset = bytes_offset
         self._error = None  # TODO: Update this
-        self.arch = archinfo.ArchBF()
+        self.arch = ArchBF()
         self.decode_only=decode_only
 
     def lift(self):
         next_addr = self.irsb._addr
         idx = self.bytes_offset
         count = 0
-        while idx < len(self.data) and count < self.num_bytes and count < self.num_inst:
+        while count < self.num_bytes:
             prev_addr = next_addr
             self.irsb,next_addr = self.decode_instruction(self.irsb, next_addr, self.data[idx], decode_only=self.decode_only, return_next=True)
             idx += next_addr - prev_addr
             if not self.decode_only and self.irsb.jumpkind != JumpKind.Invalid:
-                return
+                # The block is over, get out
+                return self.irsb
         if not self.decode_only and self.irsb.jumpkind == JumpKind.Invalid:
+            # The program is over, get out
             self.irsb.next = Const(U64(addr + 1))
-            self.irsb.jumpkind = JumpKind.Boring
-        return True
+            self.irsb.jumpkind = JumpKind.Exit
+        return self.irsb
 
-    
     #################################
     #        Some helper wrappers   #
     #################################
@@ -84,6 +144,7 @@ class LifterBF(Lifter):
         """
         No-op
         """
+        irsb_c.noop()
         return irsb_c.irsb
 
     @normal_instruction
@@ -141,9 +202,15 @@ class LifterBF(Lifter):
         irsb_c.imark(addr, 1, 0)
         tmp_val = irsb_c.mktmp(Load("Iend_LE", Type.byte, Get(self.arch.registers['ptr'][0], Type.int_64)))
         tmp_zero = irsb_c.mktmp(make_const(Type.byte, 0))
-        tmp_result = irsb_c.mktmp(irsb_c.op_cmp_eq(RdTmp(tmp_val),RdTmp(tmp_zero)))
-        irsb_c.irsb.next = pyvex.expr.ITE(RdTmp(tmp_result), Const(U64(addr + 1)), Const(U64(addr + 2)))
+        cmp = irsb_c.op_cmp("NE", RdTmp(tmp_val),RdTmp(tmp_zero))
+        # find the ]
+        dst = irsb_c.mktmp(irsb_c.op_ccall(Type.int_64, "bf_resolve_jump", []))
+        jk = JumpKind.Boring
+        irsb_c.add_exit(cmp, U64(addr + 1), jk, addr)
+        irsb_c.irsb.next = RdTmp(dst)
         irsb_c.irsb.jumpkind = JumpKind.Boring
+        if not irsb_c.irsb.typecheck():
+            irsb_c.irsb.pp()
         assert irsb_c.irsb.typecheck()
         return irsb_c.irsb
 
@@ -151,16 +218,20 @@ class LifterBF(Lifter):
         irsb_c.imark(addr, 1, 0)
         tmp_val = irsb_c.mktmp(Load("Iend_LE", Type.byte, Get(self.arch.registers['ptr'][0], Type.int_64)))
         tmp_zero = irsb_c.mktmp(make_const(Type.byte, 0))
-        tmp_result = irsb_c.mktmp(irsb_c.op_cmp("NE", RdTmp(tmp_val), RdTmp(tmp_zero)))
-
-        irsb_c.irsb.next = pyvex.expr.ITE(RdTmp(tmp_result), Const(U64(addr + 1)), Const(U64(addr + 2)))
+        cmp = irsb_c.op_cmp_eq(RdTmp(tmp_val), RdTmp(tmp_zero))
+        dst = irsb_c.mktmp(irsb_c.op_ccall(Type.int_64, "bf_resolve_jump", []))
+        jk = JumpKind.Boring
+        irsb_c.add_exit(cmp, U64(addr + 1), jk, addr)
+        irsb_c.irsb.next = RdTmp(dst)
         irsb_c.irsb.jumpkind = JumpKind.Boring
+        if not irsb_c.irsb.typecheck():
+            irsb_c.irsb.pp()
         assert irsb_c.irsb.typecheck()
         return irsb_c.irsb
 
     def _in(self, op, irsb_c, addr, args):
         irsb_c.imark(addr, 1, 0)
-        tmp_one = irsb_c.mktmp(make_const(Type.byte, 0))
+        tmp_one = irsb_c.mktmp(make_const(Type.byte, 1))
         irsb_c.put(RdTmp(tmp_one), self.arch.registers['inout'][0])
         irsb_c.irsb.next = Const(U64(addr + 1))
         irsb_c.irsb.jumpkind = JumpKind.Syscall
@@ -202,7 +273,7 @@ class LifterBF(Lifter):
 
     def decode_instruction(self, irsb, addr, bytes_buf, endness=None, decode_only=False, return_next=False):
         """
-        Decode an AVR instruction
+        Decode a BF instruction
 
         :param irsb: an IRSB to decode into
         :type irsb: pyvex.block.IRSB
@@ -213,20 +284,29 @@ class LifterBF(Lifter):
         :param decode_only: Just print out the decoded instructions
         :parse return_next: Return the next addr to decode, too
         """
-
-        val = bytes_buf[0]
+        if isinstance(bytes_buf,int):
+            val = chr(bytes_buf)
+        else:
+            val = bytes_buf
         found_op = None
+        args = {}
         for encoding in self.known_instruction_encodings:
             if val != encoding.op:
                 continue
 
             assert found_op is None, "Why does {} match both {} and {}???? Ambiguous opcode definitions!".format(hex(val), found_op, encoding)
             found_op = encoding
-
+        next_addr = addr + 1
+        if val == '\0':
+            # we're done
+            self.logger.debug("Program ended at " + hex(addr))
+            rewriter_ = LifterBF._nop
+            irsb = rewriter_(self, found_op, IRSBCustomizer(irsb), addr, args)
+            irsb.jumpkind = JumpKind.Exit
+            return irsb, next_addr
         if found_op is None:
-            raise ValueError("Invalid instruction at " + hex(addr))
-        next_addr = addr+1
-        args = {}
+            self.logger.debug("Replacing invalid instruction with NOP at " + hex(addr))
+            rewriter_ = LifterBF._nop
         rewriter_ = found_op.rewriter
         if decode_only:
             rewriter_ = LifterBF._pp
