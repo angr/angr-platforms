@@ -34,8 +34,8 @@ def _build_jump_table(state):
             try:
                 src = jstack.pop()
                 dest = addr
-                jump_table.update({src: dest})
-                jump_table.update({dest: src})
+                jump_table.update({src: dest + 1})
+                jump_table.update({dest: src + 1})
             except IndexError:
                 raise ValueError("Extra ] at offset %d" % inst)
         addr += 1
@@ -82,7 +82,7 @@ class InstructionEncoding:
 
 class LifterBF(Lifter):
 
-    def __init__(self, irsb, data, num_inst, num_bytes, bytes_offset, traceflags, decode_only=False):
+    def __init__(self, irsb, data, num_inst, num_bytes, bytes_offset, opt_level=None, traceflags=None, allow_lookback=None, decode_only=False):
         """
         This is a "gymrat" out-of-VEX lifter for BrainFuck.
 
@@ -92,7 +92,7 @@ class LifterBF(Lifter):
         IRSB.
 
         """
-        Lifter.__init__(self, irsb, data, num_inst, num_bytes, bytes_offset, traceflags)
+        Lifter.__init__(self, irsb, data, num_inst, num_bytes, bytes_offset, opt_level, traceflags, allow_lookback)
         self.logger = logging.getLogger('pyvex')
         self.irsb = irsb
         self.data = data
