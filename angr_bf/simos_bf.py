@@ -1,7 +1,7 @@
 from angr.simos import SimOS, register_simos
 from simuvex import SimCC, SimProcedure
 from simuvex.s_cc import register_syscall_cc, register_default_cc, SimCCUnknown
-from . import ArchBF
+from arch_bf import ArchBF
 
 
 class WriteByteAtPtr(SimProcedure):
