@@ -242,7 +242,7 @@ class LifterBF(Lifter):
         irsb_c.imark(addr, 1, 0)
         tmp_zero = irsb_c.mktmp(make_const(Type.byte, 0))
         irsb_c.put(RdTmp(tmp_zero), self.arch.registers['inout'][0])
-        irsb_c.irsb.next = Const(U64(addr + 2))
+        irsb_c.irsb.next = Const(U64(addr + 1))
         irsb_c.irsb.jumpkind = JumpKind.Syscall
         assert irsb_c.irsb.typecheck()
         return irsb_c.irsb
