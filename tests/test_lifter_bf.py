@@ -16,7 +16,6 @@ def test_hello():
     entry = p.factory.entry_state()
     pg = p.factory.path_group(entry)
     pg.explore()
-    import IPython; IPython.embed()
     nose.tools.assert_equals(pg.deadended[0].state.posix.dumps(1), 'Hello World!\n')
 
 def test_1bytecrackme_good():
