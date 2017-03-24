@@ -20,14 +20,14 @@ The data pointer starts at cell 0.
 
 BrainFuck has only 8 instructions:
 
-`>`: Move the pointer to the right (increment)
-`<`: Move the pointer to the left (decrement)
-`+`: Increment the cell under the pointer
-`-`: Decrement the cell under the pointer
-`[`: If the value at the pointer is zero, skip to the next `]`
-`]`: If the value at the pointer is non-zero, skip to the previous `[`
-`.`: Output (print to stdout) the cell at the pointer
-',': Input (get character at stdin) to the cell at ptr
+`>`: Move the pointer to the right (increment)  
+`<`: Move the pointer to the left (decrement)  
+`+`: Increment the cell under the pointer  
+`-`: Decrement the cell under the pointer  
+`[`: If the value at the pointer is zero, skip to the next `]`  
+`]`: If the value at the pointer is non-zero, skip to the previous `[`  
+`.`: Output (print to stdout) the cell at the pointer  
+`,`: Input (get character at stdin) to the cell at ptr  
 
 ## Defining our architecture
 
@@ -95,7 +95,7 @@ Finally, we need to tell archinfo about our new arch:
 ```python
 register_arch(['bf|brainfuck'], 64, 'any', ArchBF)
 ```
-The first argument is a List of regular expressions that match the name of our architecture.  (Note, as of this writing, you can assume input is lowercase).  Next, the bit-width of our arch, which is 64.
+The first argument is a list of regular expressions that match the name of our architecture.  (Note, as of this writing, you can assume input is lowercase).  Next, the bit-width of our arch, which is 64.
 The third argument is the `endness`, which can either be "Iend_LE", "Iend_BE", or "any".  (_these constants come from VEX, if you're curious_) 'any' means this Arch will match for either endness.
 
 This is used by `archinfo.arch_from_id()` to look up the Arch for a given set of parameters.  Given the various circumstances under which this is needed, we deliberately make this super flexible, and encourage you to make your mappings flexible too.
