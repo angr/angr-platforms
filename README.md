@@ -5,7 +5,7 @@ You simply create classes that implement the correct interface, register them wi
 The various components are designed to integrate seamlessly with the rest of angr, such that they are used automatically
 when needed.
 
-In this repository, we show off these new feature by extending angr to support the BrainFuck esoteric programming language.
+In this repository, we show off these new features by extending angr to support the BrainFuck esoteric programming language.
 
 Yep.  Not joking.
 
