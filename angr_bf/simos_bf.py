@@ -60,18 +60,15 @@ class SimBF(SimOS):
 
         self._load_syscalls(SimBF.SYSCALL_TABLE, "bf")
 
-    def state_blank(self, fs=None, **kwargs):
+    def state_blank(self, fs=None, data_region_size=0x8000, **kwargs):
         state = super(SimBF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
         # PTR starts halfway through memory
         state.regs.ptr = 0x80000000
-        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
+        state.memory.map_region(state.regs.ptr, data_region_size, 3, init_zero=True)
         return state
 
     def state_entry(self, **kwargs):
         state = super(SimBF, self).state_entry(**kwargs)
-        # PTR starts halfway through memory
-        state.regs.ptr = 0x80000000
-        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
         return state
 
 
