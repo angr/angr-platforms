@@ -9,8 +9,8 @@ from arch_bf import ArchBF
 import sys
 import os
 import claripy
-from simuvex.engines.vex import ccall
-from simuvex import SimValueError
+from angr.engines.vex import ccall
+from angr import SimValueError
 
 # This is actually a BrainFuck lifter for pyVEX.  I'm not joking.
 # Created by edg on 1/14/2017
@@ -23,14 +23,14 @@ from simuvex import SimValueError
 # 4) the end of the program
 #
 # We need to build an IRSB, a grouping of VEX code, and associated metadata representing one block.
-# This is then used by SimuVEX to interpret the program, and angr itself to perform static analysis.
+# This is then used by angr to interpret the program, and angr itself to perform static analysis.
 
 ##
 # These helper functions are how we resolve jumps in BF.
 # Because they require scanning the actual code to resolve, they require a global view of the program's memory.
 # Lifters in pyvex only get block-at-a-time access to memory, so we solve this by using a "CCall", which tells VEX
-# /SimuVEX to execute a side-effect-less function and put the result in a variable.
-# We therefore let SimuVEX resolve all jumps at "run"-time.
+# /angr to execute a side-effect-less function and put the result in a variable.
+# We therefore let angr resolve all jumps at "run"-time.
 # TODO: FIXME: We need to refactor CCall to be more friendly to adding CCalls.  I will document the process
 # here as best I can.
 
@@ -91,7 +91,7 @@ def bf_resolve_jump(state):
         return (claripy.BVV(jtable[real_ip], 64), [])
     except KeyError:
         raise ValueError("There is no entry in the jump table at " + repr(real_ip))
-# Add the ccall to the module, so SimuVEX knows how to find it.  THis is dirty, I know.
+# Add the ccall to the module, so angr knows how to find it.  THis is dirty, I know.
 setattr(ccall,'bf_resolve_jump',bf_resolve_jump)
 
 
@@ -377,7 +377,7 @@ class LifterBF(Lifter):
 
     def lift(self):
         """
-        This is the method called by pyvex and simuvex to convert the bytes in self.data into
+        This is the method called by pyvex and angr to convert the bytes in self.data into
         the VEX code in self.irsb.statements.
 
         :return:

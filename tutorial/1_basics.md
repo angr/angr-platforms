@@ -65,7 +65,7 @@ Either way, it makes a guess, and uses it to fetch an `Arch` object from the arc
 This contains a map of the register file, bit width, usual endian-ness, and so on.
 Literally everything else relies on this, as you can imagine.
 
-### SimuVEX, the simulated executer
+### SimEngine, the simulated executer
 Next, angr will locate an execution engine capable of dealing with the code it just loaded.
 Engines are responsible for interpreting the code in some meaningful way.
 Fundamentally, they take a program's _state_-- a snapshot of the registers, memory, and so on-- do some thing to it, usually a basic block's worth of instructions, and produce a set of _successors_, coresponding to all the possible program states that can be reached by executing the current block.

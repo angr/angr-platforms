@@ -1,6 +1,6 @@
 from angr.simos import SimOS, register_simos
-from simuvex import SimCC, SimProcedure
-from simuvex.s_cc import register_syscall_cc, register_default_cc, SimCCUnknown
+from angr import SimProcedure
+from angr.calling_conventions import SimCC, register_syscall_cc, register_default_cc, SimCCUnknown
 from angr_bf.arch_bf import ArchBF
 
 

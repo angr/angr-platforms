@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import logging
-import simuvex
 import nose
 import os
 import angr
@@ -26,7 +25,7 @@ def test_1bytecrackme_good():
     crackme = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/1bytecrackme-good.bf'))
     bad_paths = lambda path: "-" in path.state.posix.dumps(1)
     p = angr.Project(crackme)
-    entry = p.factory.entry_state(remove_options={simuvex.o.LAZY_SOLVES})
+    entry = p.factory.entry_state(remove_options={angr.options.LAZY_SOLVES})
     pg = p.factory.path_group(entry)
     pg.step(until=lambda lpg: len(lpg.active) == 0)
     pg.stash(from_stash="deadended", to_stash="bad", filter_func=bad_paths)

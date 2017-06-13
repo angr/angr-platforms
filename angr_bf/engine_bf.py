@@ -1,14 +1,11 @@
 import logging
-from simuvex import SimValueError
-from simuvex.engines import SimEngine
-from simuvex import s_options as o
-from simuvex.s_state import SimState
-from simuvex.engines.successors import SimSuccessors
-from load_bf import BF
+from angr import SimValueError
+from angr.engines import SimEngine
+from .load_bf import BF
 from angr import register_default_engine
 import claripy
 
-l = logging.getLogger('simuvex.engines.SinEngineBF')
+l = logging.getLogger('angr.engines.SinEngineBF')
 
 
 class SimEngineBF(SimEngine):
@@ -157,7 +154,7 @@ class SimEngineBF(SimEngine):
             # Step 3: Increment PC!
             state.ip += 1
 
-        # Step 4: Set this flag to tell the rest of simuvex/angr that you finished processing the block
+        # Step 4: Set this flag to tell the rest of angr that you finished processing the block
         successors.processed = True
 
         # TODO: HACK: FIXME: this just has to be here. This should not have to be here.
@@ -171,7 +168,7 @@ class SimEngineBF(SimEngine):
         Check if this engine can be used for execution on the current state. A callback `check_failure` is called upon
         failed checks. Note that the execution can still fail even if check() returns True.
 
-        :param simuvex.SimState state: The state with which to execute.
+        :param SimState state: The state with which to execute.
         :param args:                   Positional arguments that will be passed to process().
         :param kwargs:                 Keyword arguments that will be passed to process().
         :return:                       True if the state can be handled by the current engine, False otherwise.
@@ -180,4 +177,3 @@ class SimEngineBF(SimEngine):
 
 # Engine registration
 register_default_engine(BF, SimEngineBF, arch='any')
-
