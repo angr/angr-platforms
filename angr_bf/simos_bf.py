@@ -1,7 +1,7 @@
 from angr.simos import SimOS, register_simos
 from simuvex import SimCC, SimProcedure
 from simuvex.s_cc import register_syscall_cc, register_default_cc, SimCCUnknown
-from arch_bf import ArchBF
+from angr_bf.arch_bf import ArchBF
 
 
 class WriteByteAtPtr(SimProcedure):
@@ -15,6 +15,7 @@ class WriteByteAtPtr(SimProcedure):
     num_args = 0
     # pylint:disable=arguments-differ
     def run(self, state):
+        # pylint:disable=unused-argument
         fd = 1  # POSIX STDOUT
         data = self.state.memory.load(self.state.regs.ptr, 1)
         self.state.posix.write(fd, data, 1)
@@ -33,7 +34,7 @@ class ReadByteToPtr(SimProcedure):
 
     def run(self, state):
         fd = 0 # Posix STDIN
-        read_length = self.state.posix.read(fd, self.state.regs.ptr, 1)
+        self.state.posix.read(fd, self.state.regs.ptr, 1)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
         return None
 
@@ -60,18 +61,16 @@ class SimBF(SimOS):
 
         self._load_syscalls(SimBF.SYSCALL_TABLE, "bf")
 
-    def state_blank(self, fs=None, **kwargs):
+    def state_blank(self, data_region_size=0x8000, **kwargs):
+        # pylint:disable=arguments-differ
         state = super(SimBF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
         # PTR starts halfway through memory
         state.regs.ptr = 0x80000000
-        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
+        state.memory.map_region(state.regs.ptr, data_region_size, 3, init_zero=True)
         return state
 
     def state_entry(self, **kwargs):
         state = super(SimBF, self).state_entry(**kwargs)
-        # PTR starts halfway through memory
-        state.regs.ptr = 0x80000000
-        state.memory.store(state.regs.ptr,0,0xffffffff - state.regs.ptr)
         return state
 
 
