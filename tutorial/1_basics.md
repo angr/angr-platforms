@@ -78,9 +78,9 @@ As an alternative to creating your own engine for a new architecture, if it is s
 We will explore both Lifters and Engines in this guide.
 
 ## Claripy, the solver
-Every action an engine erforms, even something as simple as incrementing the program counter, is not necessarily an operation on a concrete value.
+Every action an engine performs, even something as simple as incrementing the program counter, is not necessarily an operation on a concrete value.
 The value could instead be a complex expression, that when computed on, should actually result in an even bigger expression.
-Creating, composing, and eventually solving ghese is Claripy's job.
+Creating, composing, and eventually solving these is Claripy's job.
 Claripy uses a SMT-solver, currently Microsoft's Z3, to do all of this heavy-lifting.
 Thankfully, we won't need to delve into that in this series, as SMT-solving is some serious black magic.
 
@@ -89,7 +89,7 @@ If we just view the engine's work on a program from the states it provides, we'r
 Where is stdin? What the heck do I do with files? Network? Are you kidding?
 These higher-level abstractions are provided by the OS, and don't exist at the bare machine level.
 Therefore, SimOS' job is to provide all of that to angr, so that it can be reasoned about without all the pain of interpreting just what the fake hardware would do.
-Based on a guess from CLE, a SimOS is created (ex. SimLinux), which defines the OS-specific embellishments on the initial state of the program, all its system calls, and convenient symbolic summaries of what syscalls and common library functions do, known as *SimProcedures*
+Based on a guess from CLE, a SimOS is created (ex. SimLinux), which defines the OS-specific embellishments on the initial state of the program, all its system calls, and convenient symbolic summaries of what syscalls and common library functions do, known as *SimProcedures*.
 These make angr dramatically faster and more compatible, as symbolically executing libc itself is, to say the least, insanely painful.
 
 ### angr, the real deal
