@@ -41,7 +41,7 @@ class SimEngineBF(SimEngine):
         return jump_table
 
     def resolve_jump(self, state, addr):
-        if not hasattr(state.scratch,'jump_table'):
+        if not hasattr(state.scratch, 'jump_table'):
             state.scratch.jump_table = self._build_jump_table(state)
         try:
             return state.scratch.jump_table[addr]
@@ -64,6 +64,9 @@ class SimEngineBF(SimEngine):
 
         :param state:
         :type state: SimState
+        :param successors: The SimSuccessors for this block.  In other words, where the program can go from here, and
+        under what circumstances
+        :type successors: angr.SimSuccessors
         :param args:
         :param kwargs:
         :return:
