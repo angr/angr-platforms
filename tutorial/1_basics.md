@@ -40,10 +40,9 @@ If you've used angr before, you've probably done this:
 import angr
 p = angr.Project("crackme")
 state = p.factory.entry_state()
-path = p.factory.path(state)
-pathgroup = p.factory.path_group(path)
-pathgroup.step(until=lambda lpg: len(lpg.active) > 1)
-input_0 = pathgroup.active[0].state.posix.dumps(0)
+sm = p.factory.simgr(state)
+sm.step(until=lambda lpg: len(lpg.active) > 1)
+input_0 = sm.active[0].posix.dumps(0)
 ```
 
 That's only a few lines, but there's a whole lot going on here.
