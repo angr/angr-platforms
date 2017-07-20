@@ -14,7 +14,6 @@ def test_hello():
     p = angr.Project(hellobf)
     entry = p.factory.entry_state()
     smgr = p.factory.simgr(entry)
-    angr.manager.l.setLevel(logging.DEBUG)
     smgr.explore()
     nose.tools.assert_equals(smgr.deadended[0].posix.dumps(1), 'Hello World!\n')
 

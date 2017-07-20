@@ -42,8 +42,8 @@ class ReadByteToPtr(SimProcedure):
 
 
 P['bf'] = {}
-P['bf']['write_byte_at_ptr'] = ReadByteToPtr
-P['bf']['read_byte_to_ptr'] = WriteByteAtPtr
+P['bf']['write_byte_at_ptr'] = WriteByteAtPtr
+P['bf']['read_byte_to_ptr'] = ReadByteToPtr
 
 syscall_lib = SimSyscallLibrary()
 syscall_lib.set_library_names('brainfuck')
