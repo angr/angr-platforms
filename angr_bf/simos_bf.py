@@ -1,6 +1,8 @@
 from angr.simos import SimOS, register_simos
-from simuvex import SimCC, SimProcedure
-from simuvex.s_cc import register_syscall_cc, register_default_cc, SimCCUnknown
+from angr.procedures import SIM_PROCEDURES as P, SIM_LIBRARIES as L
+from angr.procedures.definitions import SimSyscallLibrary
+from angr import SimProcedure
+from angr.calling_conventions import SimCC, register_syscall_cc, register_default_cc, SimCCUnknown
 from angr_bf.arch_bf import ArchBF
 
 
@@ -9,11 +11,11 @@ class WriteByteAtPtr(SimProcedure):
     Defines what to do for the "." instruction.
     """
 
-
     IS_SYSCALL = True
     NUM_ARGS = 0
     num_args = 0
     # pylint:disable=arguments-differ
+
     def run(self, state):
         # pylint:disable=unused-argument
         fd = 1  # POSIX STDOUT
@@ -39,6 +41,16 @@ class ReadByteToPtr(SimProcedure):
         return None
 
 
+P['bf'] = {}
+P['bf']['write_byte_at_ptr'] = WriteByteAtPtr
+P['bf']['read_byte_to_ptr'] = ReadByteToPtr
+
+syscall_lib = SimSyscallLibrary()
+syscall_lib.set_library_names('brainfuck')
+syscall_lib.add_all_from_dict(P['bf'])
+syscall_lib.add_number_mapping_from_dict('BF', {0 : 'read_byte_to_ptr',
+                                                1 : 'write_byte_at_ptr'})
+
 class SimBF(SimOS):
     """
     Defines the "OS" of a BrainFuck program.
@@ -48,18 +60,14 @@ class SimBF(SimOS):
     -  The "syscalls" (read stdin and write stdout)
 
     """
-    SYSCALL_TABLE = {
-        0: ('read_byte_to_ptr', ReadByteToPtr),
-        1: ('write_byte_at_ptr', WriteByteAtPtr),
-    }
 
     def __init__(self, *args, **kwargs):
         super(SimBF, self).__init__(*args, name="BF", **kwargs)
 
+        self.syscall_library = L['brainfuck']
+
     def configure_project(self):
         super(SimBF, self).configure_project()
-
-        self._load_syscalls(SimBF.SYSCALL_TABLE, "bf")
 
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ

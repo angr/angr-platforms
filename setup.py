@@ -7,7 +7,6 @@ setup(
     packages=['angr_bf'],
     install_requires=[
         'angr',
-        'simuvex',
         'cle',
         'archinfo',
         'pyvex',

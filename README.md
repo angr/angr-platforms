@@ -12,7 +12,7 @@ Yep.  Not joking.
 This includes:
 * `load_bf`: A loader for BF using CLE's new modular backends
 * `arch_bf`: An architecture description implementing a 64-bit BF-compatible machine using Archinfo's new modular architectures
-* `lift_bf`: A lifter from BrainFuck instructions to the VEX IR angr uses, which can then be executed with SimuVEX and analyzed statically.  Uses pyvex's new modular lifters system, and a new suite of helpers for writing your own VEX lifters
+* `lift_bf`: A lifter from BrainFuck instructions to the VEX IR angr uses, which can then be executed and analyzed.  Uses pyvex's new modular lifters system, and a new suite of helpers for writing your own VEX lifters
 * `simos_bf`: A SimOS for a BF environment, implementing the two syscalls ('.' and ',')
 * `engine_bf`: A completely custom SimEngine, for executing BF code without using VEX at all
 
@@ -42,7 +42,7 @@ pg.deadended[0].state.posix.dumps(1)
 
 The loader, when registered will put the BF program into memory, and tag it with the architecture and OS `BF`.
 The lifter declares that any code passed to pyvex using the 'BF' architecture should be directed to it.
-This produces regular VEX code, which is interpreted by SimuVEX the same way as if it originated with a regular
+This produces regular VEX code, which is interpreted by angr the same way as if it originated with a regular
 binary program.
 
 However, this may not always be desirable.  VEX's instructions are geared towards certain kinds of
@@ -71,7 +71,7 @@ You can even solve crackmes with it! Here's a silly one-byte example (provided i
 # We're wrong if we print a '-'
 bad_paths = lambda path: "-" in path.state.posix.dumps(1)
 p = angr.Project(crackme)
-entry = p.factory.entry_state(remove_options={simuvex.o.LAZY_SOLVES})
+entry = p.factory.entry_state(remove_options={angr.o.LAZY_SOLVES})
 pg = p.factory.path_group(entry)
 pg.step(until=lambda lpg: len(lpg.active) == 0)
 pg.stash(from_stash="deadended", to_stash="bad", filter_func=bad_paths)

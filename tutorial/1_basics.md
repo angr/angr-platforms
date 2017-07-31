@@ -40,10 +40,9 @@ If you've used angr before, you've probably done this:
 import angr
 p = angr.Project("crackme")
 state = p.factory.entry_state()
-path = p.factory.path(state)
-pathgroup = p.factory.path_group(path)
-pathgroup.step(until=lambda lpg: len(lpg.active) > 1)
-input_0 = pathgroup.active[0].state.posix.dumps(0)
+sm = p.factory.simgr(state)
+sm.step(until=lambda lpg: len(lpg.active) > 1)
+input_0 = sm.active[0].posix.dumps(0)
 ```
 
 That's only a few lines, but there's a whole lot going on here.
@@ -65,7 +64,7 @@ Either way, it makes a guess, and uses it to fetch an `Arch` object from the arc
 This contains a map of the register file, bit width, usual endian-ness, and so on.
 Literally everything else relies on this, as you can imagine.
 
-### SimuVEX, the simulated executer
+### SimEngine, the simulated executer
 Next, angr will locate an execution engine capable of dealing with the code it just loaded.
 Engines are responsible for interpreting the code in some meaningful way.
 Fundamentally, they take a program's _state_-- a snapshot of the registers, memory, and so on-- do some thing to it, usually a basic block's worth of instructions, and produce a set of _successors_, coresponding to all the possible program states that can be reached by executing the current block.
