@@ -2,7 +2,7 @@ from angr.simos import SimOS, register_simos
 from angr.procedures import SIM_PROCEDURES as P, SIM_LIBRARIES as L
 from angr.procedures.definitions import SimSyscallLibrary
 from angr import SimProcedure
-from angr.calling_conventions import SimCC, register_syscall_cc, register_default_cc, SimCCUnknown
+from angr.calling_conventions import SimCC, register_syscall_cc, register_default_cc, SimCCUnknown, SimRegArg
 from angr_bf.arch_bf import ArchBF
 
 
@@ -34,7 +34,7 @@ class ReadByteToPtr(SimProcedure):
     NUM_ARGS = 0
     # pylint:disable=arguments-differ
 
-    def run(self, state):
+    def run(self):
         fd = 0 # Posix STDIN
         self.state.posix.read(fd, self.state.regs.ptr, 1)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
@@ -66,9 +66,6 @@ class SimBF(SimOS):
 
         self.syscall_library = L['brainfuck']
 
-    def configure_project(self):
-        super(SimBF, self).configure_project()
-
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ
         state = super(SimBF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
@@ -95,6 +92,7 @@ class SimBFSyscall(SimCC):
     # We never return anything to registers, but if we did, we'd use a RegArg object here.
     #RETURN_VAL = ""
     ARCH = ArchBF
+    RETURN_ADDR = SimRegArg('ip_at_syscall', 8)
 
     @staticmethod
     def _match(arch, args, sp_delta):   # pylint: disable=unused-argument

@@ -55,7 +55,7 @@ For this, it turns to the loader, CLE (CLE Loads Everythig) to come up with an e
 CLE supports a set of "backends", that service various formats, such as ELF, PE, and CGC.
 For the common cases, this means loading an ELF, which brings with it the complicated mess of header parsing, library resolution, and strange memory layouts you both require and expect.
 It also supports the exact opposite of this, pure binary blobs, with a backend that just takes the bytes, and puts them in the right place in memory.
-The result is a Loader object, which has the memory of the main program itself (`Loader.main_bin`) and any libraries.
+The result is a Loader object, which has the memory of the main program itself (`Loader.main_object`) and any libraries.
 
 ### Archinfo, the architecture DB
 During CLE's loading, it takes a guess as to what architecture the program is for. 
@@ -96,10 +96,3 @@ Finally, with a Loader, an Engine, an Arch, and a SimOS, we can get to work!
 All of this is packaged into a Project, and offered to the higher-level analyses, such as Control-flow Graph reconstruction, program slicing, and path-based reasoning, as in the earlier example.
 
 In the next part, we'll intro our chosen architecture, BrainFuck, and discuss the implementation of additional architectures.
-
-
-
-
-
-
-
