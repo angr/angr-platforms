@@ -74,7 +74,7 @@ def bf_resolve_jump(state):
     :return:
     """
     # CCall won't give us the addr of the current instruction, so we have to figure that out.  Ugh.
-    real_ip = state.se.any_int(state.ip)
+    real_ip = state.se.eval(state.ip)
     offset = 0
     while True:
         inst = chr(state.mem_concrete(real_ip + offset, 1))
@@ -86,7 +86,7 @@ def bf_resolve_jump(state):
     # the full table each time instead of doing a scan back/forward.
     # Some day, if we ever get a nice place to put this, this should only be computed once.
     jtable = _build_jump_table(state)
-    real_ip = state.se.any_int(addr)
+    real_ip = state.se.eval(addr)
     try:
         return (claripy.BVV(jtable[real_ip], 64), [])
     except KeyError:
