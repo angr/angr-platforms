@@ -1,4 +1,4 @@
-from angr.simos import SimOS, register_simos
+from angr.simos import SimUserland, register_simos
 from angr.procedures import SIM_PROCEDURES as P, SIM_LIBRARIES as L
 from angr.procedures.definitions import SimSyscallLibrary
 from angr import SimProcedure
@@ -51,7 +51,7 @@ syscall_lib.add_all_from_dict(P['bf'])
 syscall_lib.add_number_mapping_from_dict('BF', {0 : 'read_byte_to_ptr',
                                                 1 : 'write_byte_at_ptr'})
 
-class SimBF(SimOS):
+class SimBF(SimUserland):
     """
     Defines the "OS" of a BrainFuck program.
 
@@ -61,10 +61,8 @@ class SimBF(SimOS):
 
     """
 
-    def __init__(self, *args, **kwargs):
-        super(SimBF, self).__init__(*args, name="BF", **kwargs)
-
-        self.syscall_library = L['brainfuck']
+    def __init__(self, project, **kwargs):
+        super(SimBF, self).__init__(project, syscall_library=L['brainfuck'], name="BF", **kwargs)
 
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ
