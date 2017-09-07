@@ -2,8 +2,8 @@
 import logging
 import nose
 import os
+from angr_platforms.bf import *
 import angr
-from angr_bf import *
 
 def test_hello():
     """
