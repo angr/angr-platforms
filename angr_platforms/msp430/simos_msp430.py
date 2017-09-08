@@ -22,7 +22,7 @@ class SimMSP430(SimOS):
 
 
     def __init__(self, *args, **kwargs):
-        super(SimMSP430, self).__init__(*args, name="MSP430", disable_externs=True, **kwargs)
+        super(SimMSP430, self).__init__(*args, name="MSP430", **kwargs)
 
     def configure_project(self):
         super(SimMSP430, self).configure_project()
