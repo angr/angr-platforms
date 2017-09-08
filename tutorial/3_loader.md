@@ -12,6 +12,30 @@ It serves as a logical implementation of the Linux loader first and foremost, bu
 CLE is given, by angr, a path to the "main binary".  This is the argument to angr.Project().
 It's CLE's job to open it, figure out what it is, figure out what architecture it is (unless the user overrides), figure out where in memory it's supposed to go, and load any dependencies, such as shared libraries, that it may depend on.
 
+## Shortcut: What if my architecture uses ELF files?
+
+You don't need to do anything; CLE will load your binary just fine.  However, you will need to tell angr which sorts of ELF files map to the correct SimOS environment model, described in section 6.  These are tracked by the content of their EI_OSABI field.
+
+If you have pyelftools installed, you can identify this simply like this:
+```
+% readelf.py -h switchLeds.elf
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 ff 00 00 00 00 00 00 00 00
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            Standalone App
+  ABI Version:                       0
+```
+
+To register this with our MSP430 environment model, we would simply do:
+```
+from angr.simos import register_simos
+register_simos('Standalone App', SimMSP430)
+```
+
+Were your binaries made by orcs instead? Read on.
+
 ## Defining the BF backend
 
 For BrainFuck, we really just need to read the program in, and put it in memory, rather straight-up, at address 0.
