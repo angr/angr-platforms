@@ -80,13 +80,13 @@ class MSP430Instruction(Instruction):
             raise ParseError("Invalid opcode, expected %s, got %s" % (self.opcode, data['o']))
         return True
 
-    def parse(self, bitstrm):
+    def parse(self, bitstrm, endianness):
         """
         MSP430 instructions can have one or two extension words for 16 bit immediates
         We therefore extend the normal parsing so that we make sure we can
         get another word if we have to.
         """
-        data = Instruction.parse(self, bitstrm)
+        data = Instruction.parse(self, bitstrm, endianness)
         data['S'] = None
         data['D'] = None
         # We don't always have a source or destination.
@@ -104,21 +104,6 @@ class MSP430Instruction(Instruction):
                 data['D'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
         return data
 
-    def lift(self):
-        # The basic flow of an MSP430 instruction:
-        # 0. Always do this:
-        self.mark_instruction_start()
-        # 1. Figure out what our operands are.
-        inputs = self.fetch_operands()
-        # 2. Do the actual instruction's "meat", and commit the result
-        retval = self.compute_result(*inputs)
-        args = inputs + (retval, )
-        # 3. Update the flags:
-        self.compute_flags(*args)
-        # 4. Commit
-        if retval is not None and self.commit_func is not None:
-            self.commit_func(retval)
-        
     def compute_flags(self, *args):
         """
         Compute the flags touched by each instruction
@@ -569,7 +554,7 @@ class Instruction_RETI(Type1Instruction):
     name = 'reti'
 
     def disassemble(self):
-        return self, self.name, []
+        return self.addr, self.name, []
 
     def compute_result(self, src):
         # Pop the saved SR
