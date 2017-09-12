@@ -3,6 +3,10 @@ from arch_msp430 import ArchMSP430
 from pyvex.lift.util import *
 import bitstring
 from bitstring import Bits
+import logging
+l = logging.getLogger("msp430")
+l.setLevel(logging.DEBUG)
+
 
 REGISTER_TYPE = Type.int_16
 BYTE_TYPE = Type.int_8
@@ -73,6 +77,10 @@ class MSP430Instruction(Instruction):
     def get_overflow(self):
         return self.get_sr()[OVERFLOW_BIT_IND]
 
+    def commit_result(self, res):
+        if self.commit_func:
+            self.commit_func(res)
+
     def match_instruction(self, data, bitstrm):
         # NOTE: The matching behavior for instructions is a "try-them-all-until-it-fits" approach.
         # Static bits are already checked, so we just look for the opcode.
@@ -93,6 +101,7 @@ class MSP430Instruction(Instruction):
         # Theoretically I could put these in the TypeXInstruction classes, but
         # I'm lazy. Note that we resolve these here, as opposed to later, due to
         # needing to fiddle with the bitstream.
+        l.debug(data)
         if 's' in data:
             src_mode = int(data['A'], 2)
             if (src_mode == ArchMSP430.Mode.INDEXED_MODE and data['s'] != '0011') \
@@ -558,6 +567,7 @@ class Instruction_RETI(Type1Instruction):
 
     def compute_result(self, src):
         # Pop the saved SR
+        import ipdb; ipdb.set_trace(context=30)
         sp = self.get(1, REGISTER_TYPE)
         sr = self.get_sr()
         sp += 2
@@ -619,7 +629,7 @@ class Instruction_MOV(Type3Instruction):
 class Instruction_ADD(Type3Instruction):
     # Add src + dst, set carry
     opcode = '0101'
-    opcode = 'add'
+    name = 'add'
 
     def compute_result(self, src, dst):
         return src + dst
