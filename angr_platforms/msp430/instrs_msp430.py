@@ -125,6 +125,7 @@ class MSP430Instruction(Instruction):
 
     def set_flags(self, z, n, c, o):
         # TODO: FIXME: This isn't actually efficient.
+        print
         if not z and not o and not c and not n:
             return
         flags = [(z, ZERO_BIT_IND, 'Z'),
@@ -359,9 +360,9 @@ class MSP430Instruction(Instruction):
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
             if ty == Type.int_16:
-                incconst = self.constant(16, ty)
+                incconst = self.constant(2, ty)
             else:
-                incconst = self.constant(8, ty)
+                incconst = self.constant(1, ty)
             # Do the increment, now
             self.put(reg_vv + incconst, reg_num)
             # Now load it.
