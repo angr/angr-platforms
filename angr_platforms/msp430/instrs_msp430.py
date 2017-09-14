@@ -57,10 +57,7 @@ class MSP430Instruction(Instruction):
         return self.get(2, REGISTER_TYPE)
 
     def get_pc(self):
-        return self.get(0, REGISTER_TYPE)
-
-    def put_pc(self, val):
-        return self.put(val, 0)
+        return self.get('pc', Type.int_16)
 
     def put_sr(self, val):
         return self.put(val, 2)
@@ -88,13 +85,13 @@ class MSP430Instruction(Instruction):
             raise ParseError("Invalid opcode, expected %s, got %s" % (self.opcode, data['o']))
         return True
 
-    def parse(self, bitstrm, endianness):
+    def parse(self, bitstrm):
         """
         MSP430 instructions can have one or two extension words for 16 bit immediates
         We therefore extend the normal parsing so that we make sure we can
         get another word if we have to.
         """
-        data = Instruction.parse(self, bitstrm, endianness)
+        data = Instruction.parse(self, bitstrm)
         data['S'] = None
         data['D'] = None
         # We don't always have a source or destination.
@@ -107,10 +104,12 @@ class MSP430Instruction(Instruction):
             if (src_mode == ArchMSP430.Mode.INDEXED_MODE and data['s'] != '0011') \
                     or (data['s'] == '0000' and src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE):
                 data['S'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
+                self.bitwidth += 16
         if 'd' in data:
             dst_mode = int(data['a'], 2)
             if dst_mode == ArchMSP430.Mode.INDEXED_MODE:
                 data['D'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
+                self.bitwidth += 16
         return data
 
     def compute_flags(self, *args):
@@ -126,7 +125,7 @@ class MSP430Instruction(Instruction):
 
     def set_flags(self, z, n, c, o):
         # TODO: FIXME: This isn't actually efficient.
-        if not self.zero and not self.overflow and not self.carry and not self.negative:
+        if not z and not o and not c and not n:
             return
         flags = [(z, ZERO_BIT_IND, 'Z'),
                  (n, NEGATIVE_BIT_IND, 'N'),
@@ -262,7 +261,7 @@ class MSP430Instruction(Instruction):
             src_vv = self.constant(bits_to_signed_int(imm_bits), ty)
         # Symbolic mode: Add the immediate to the PC
         elif src_mode == ArchMSP430.Mode.SYMBOLIC_MODE:
-            src_vv = self.get(src_num, Type.int_16) + bits_to_signed_int(imm_bits)
+            src_vv = self.get(src_num, Type.int_16) + bits_to_signed_int(imm_bits) + 2
         else:
             # Register mode can write-out to the source for one-operand, so set the writeout
             src_vv, writeout = self.fetch_reg(src_num, src_mode, src_imm, ty)
@@ -355,8 +354,8 @@ class MSP430Instruction(Instruction):
             writeout = lambda v: self.store(v, val)
         # Indirect mode; fetch address in register; store is a write there.
         elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-            val = self.load(reg_num, ty)
-            writeout = lambda v: self.store(v, regvv)
+            val = self.load(reg_vv, ty)
+            writeout = lambda v: self.store(v, reg_vv)
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
             if ty == Type.int_16:
@@ -402,7 +401,7 @@ class Type1Instruction(MSP430Instruction):
     def fetch_operands(self):
         ty = Type.int_16 if self.data['b'] == '0' else Type.int_8
         src, self.commit_func = self.fetch_src(self.data['s'], self.data['A'], self.data['S'], ty)
-        return src
+        return (src, )
 
 
 class Type2Instruction(MSP430Instruction):
@@ -478,9 +477,9 @@ class Instruction_SWPB(Type1Instruction):
     name = 'swpb'
 
     def compute_result(self, src):
-        low_half = src[:8]
-        high_half = src[8:]
-        return high_half + (low_half << 8)
+        low_half = src.cast_to(Type.int_8).cast_to(Type.int_16) << self.constant(8, Type.int_8) # FIXME: TODO:
+        high_half = src >> 8
+        return high_half | low_half
 
 
 class Instruction_RRA(Type1Instruction):
@@ -508,7 +507,7 @@ class Instruction_SXT(Type1Instruction):
     opcode = '011'
     name = 'sxt'
 
-    def compute_result(self, src, writeout):
+    def compute_result(self, src):
         return src.cast_to(Type.int_16, signed=True)
 
 
@@ -524,7 +523,7 @@ class Instruction_PUSH(Type1Instruction):
         # Store src at SP
         self.store(src, sp)
         # Store SP.  No write-out.
-        self.put(sp, 1)
+        self.put(sp, 'sp')
 
     # No flags.
     def negative(self, src, ret):
@@ -540,12 +539,12 @@ class Instruction_CALL(Type1Instruction):
     # Call src.  Pushes PC. No flags.
 
     def compute_result(self, src):
-        # Push PC
-        pc = self.get_pc()
-        sp = self.get(1, Type.int_16)
-        sp -= 2
+        # Push the next instruction's address
+        pc = self.get_pc() + self.bytewidth
+        sp = self.get('sp', Type.int_16)
+        sp = sp - 2
         self.store(pc, sp)
-        self.put_pc(src)
+        self.put(sp, 'sp')
         # This ends the BB, update the IRSB
         self.jump(None, src, jumpkind=JumpKind.Call)
 
@@ -576,7 +575,6 @@ class Instruction_RETI(Type1Instruction):
         sp += 2
         # Store the popped values
         self.put_sr(sr)
-        self.put_pc(newpc)
         # Jump to PC (setting the jumpkind)
         self.jump(None, newpc, jumpkind=JumpKind.Ret)
 
@@ -596,6 +594,12 @@ class Instruction_MOV(Type3Instruction):
     opcode = '0100'
     name = 'mov'
 
+    def fetch_operands(self):
+        if self.data['s'] == '0001' and self.data['d'] == '0000':
+            return None, None
+        else:
+            return Type3Instruction.fetch_operands(self)
+
     def disassemble(self):
         # support useful pseudo-ops for disassembly
         addr, name, args = Type3Instruction.disassemble(self)
@@ -613,10 +617,14 @@ class Instruction_MOV(Type3Instruction):
         # VEX would like it very much if you set the jumpkind.
         if self.data['d'] == '0000':
             if self.data['s'] == '0001':
-                self.jump(None, src, jumpkind=JumpKind.Ret)
+                sp = self.get('sp', REGISTER_TYPE)
+                newpc = self.load(sp, REGISTER_TYPE)
+                sp = sp + 2
+                self.put(sp, 'sp')
+                self.jump(None, newpc, jumpkind=JumpKind.Ret)
             else:
                 # If we're setting PC, but not from SP+, it's a BR instead
-                self.jump(None, self.const(self.addr, REGISTER_TYPE))
+                self.jump(None, self.constant(self.addr, REGISTER_TYPE))
         return src
 
     def negative(self, src, dst, ret):
@@ -642,14 +650,16 @@ class Instruction_ADD(Type3Instruction):
             ret17 = src17 + dst17
             c = ret17[16]
             o = (ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])
+            retval = ret17
         else:
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
             ret9 = src9 + dst9
             c = ret9[8]
             o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_1)
-        z = self.zero(src, dst, writeout, retval)
-        n = self.negative(src, dst, writeout, retval)
+            retval = ret9
+        z = self.zero(src, dst, retval)
+        n = self.negative(src, dst, retval)
         self.set_flags(z, n, c, o)
             
 
@@ -658,10 +668,10 @@ class Instruction_ADDC(Type3Instruction):
     opcode = '0110'
     name = 'addc'
 
-    def compute_result(self, src, dst, writeout):
-        return src + dst + self.get_carry()
+    def compute_result(self, src, dst):
+        return src + dst + self.carry()
 
-    def compute_flags(self, src, dst, writeout, retval):
+    def compute_flags(self, src, dst, retval):
         carryin = self.get_carry()
         if self.data['b'] == '0':
             src17 = src.cast_to(Type.int_17)
@@ -670,14 +680,16 @@ class Instruction_ADDC(Type3Instruction):
             ret17 = src17 + dst17 + ci17
             c = ret17[16]
             o = ((ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])).cast_to(Type.int_16)
+            retval = ret17
         else:  # self.data['b'] == '1':
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
             ret9 = src9 + dst9
             c = ret9[8]
             o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_16)
-        z = self.zero(src, dst, writeout, retval)
-        n = self.negative(src, dst, writeout, retval)
+            retva= ret9
+        z = self.zero(src, dst, retval)
+        n = self.negative(src, dst, retval)
         self.set_flags(z, n, c, o)
 
 
@@ -747,7 +759,7 @@ class Instruction_DADD(Type3Instruction):
     opcode = '1010'
     name = 'dadd'
 
-    def compute_result(self, src, dst, writeout):
+    def compute_result(self, src, dst):
         # Ya know... fuck this...
         srcs = []
         dsts = []

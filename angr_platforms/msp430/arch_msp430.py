@@ -4,15 +4,16 @@ class ArchMSP430(Arch):
     def __init__(self, endness="Iend_LE"):
         super(ArchMSP430, self).__init__(endness)
         # TODO: Define function prologs
-        # ip_offset = 136
-        # sp_offset = 124
+        self.ip_offset = 0
+        self.sp_offset = 2
         # bp_offset = 128
         # ret_offset = 16
         # lr_offset = 132
         # syscall_num_offset = 16
-        # call_pushes_ret = False
-        # stack_change = -4
-        # branch_delay_slot = True
+        self.call_pushes_ret = True
+        self.stack_change = -2
+        self.branch_delay_slot = False
+
     sizeof = {'short': 16, 'int': 16, 'long': 32, 'long long': 64}
     function_prologs = {}
     function_epilogs = {}

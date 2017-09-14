@@ -18,8 +18,8 @@ if __name__ == '__main__':
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
     arch = ArchMSP430()
-    irsb = pyvex.IRSB('\xcf\x43\x00\x02', 0, arch)
-    l = LifterMSP430(irsb, '\xcf\x43\x00\x02', 1, 1, 0)
-    irsb = l.lift()
+    irsb = pyvex.IRSB('\x0f\x43', 0, arch)
+    #l = LifterMSP430(irsb, '\x0f\x43', 1, 1, 0)
+    #irsb = l.lift()
     print irsb.statements
     irsb.pp()
