@@ -11,9 +11,37 @@ from arch_msp430 import ArchMSP430
 class SimCCMSP430(SimCC):
     ARG_REGS = [ 'r15', 'r14', 'r13', 'r12' ]
     FP_ARG_REGS = []    # TODO: ???
+    STACKARG_SP_DIFF = 2
     RETURN_ADDR = SimStackArg(0, 2)
     RETURN_VAL = SimRegArg('r15', 2)
     ARCH = ArchMSP430
+
+class MCstopexec(SimProcedure):
+    
+    NO_RET = True
+    def run(self):
+        self.exit(0)
+
+class MCgetsn(SimProcedure):
+    """
+    Microcorruption's getsn:
+    Args: R15 has an address to write to.
+          R14 has the max number of bytes to read
+
+    """
+
+    IS_SYSCALL = False
+    num_args = 2
+    NUM_ARGS = 2
+    # pylint:disable=arguments-differ
+
+    def run(self, ptr, maxbytes):
+        fd = 0 # Posix STDIN
+        #import IPython; IPython.embed()
+        self.state.posix.read(fd, ptr, maxbytes)
+        # NOTE: The behavior of EOF (this is zero) is undefined!!!
+        return self.state.se.Unconstrained('getsn', self.state.arch.bits)
+
 
 
 class SimMSP430(SimOS):

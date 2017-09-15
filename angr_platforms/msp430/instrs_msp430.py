@@ -730,30 +730,12 @@ class Instruction_SUB(Type3Instruction):
         return dst > src
 
 
-class Instruction_CMP(Type3Instruction):
+class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
     name = 'cmp'
-
-    def compute_result(self, src, dst):
-        # Compute once, save for flags, don't commit
-        self.ret = src - dst
-
-    def zero(self, src, dst, ret):
-        return self.ret == self.constant(0, self.ret.ty)
-
-    def negative(self, src, dst, ret):
-        return self.ret[15] if self.data['b'] == '0' else self.ret[7]
-
-    def carry(self, src, dst, ret):
-        return dst > src
-
-    def overflow(self, src, dst, ret):
-        if self.data['b'] == '0':
-            # FIXME: this is probably wrong
-            return (self.ret[15] ^ src[15]) & (self.ret[15] ^ dst[15])
-        else:  # self.data['b'] == '1':
-            # add.b
-            return (self.ret[7] ^ src[7]) & (self.ret[7] ^ dst[7])
+    
+    def commit_result(self, res):
+        pass
 
 
 class Instruction_DADD(Type3Instruction):
@@ -870,7 +852,7 @@ class Instruction_JNE(Type2Instruction):
     name = 'jne'
 
     def compute_result(self, dst):
-        self.jump(self.get_zero() != 0, dst)
+        self.jump(self.get_zero() == 0, dst)
 
 
 class Instruction_JEQ(Type2Instruction):
@@ -878,7 +860,7 @@ class Instruction_JEQ(Type2Instruction):
     name = 'jeq'
 
     def compute_result(self, dst):
-        self.jump(self.get_zero() == 0, dst)
+        self.jump(self.get_zero() != 0, dst)
 
 
 class Instruction_JNC(Type2Instruction):
