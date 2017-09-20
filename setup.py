@@ -10,5 +10,6 @@ setup(
         'cle',
         'archinfo',
         'pyvex',
+        'clint'
     ],
 )

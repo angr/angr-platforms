@@ -1,0 +1,3 @@
+The password must be eight characters long and terminated by a null byte
+
+Answer: aaaaaaaa
