@@ -1,3 +1,5 @@
+#! /usr/bin/env python2
+
 import elffile
 import subprocess
 import re
@@ -12,6 +14,9 @@ str_rgx = re.compile(r'"(.*?)"')
 bad_str_rgx = re.compile(r'(#.*?)".*?"')
 strln_rgx = re.compile(r'[0-9A-Fa-f]{4}: ".*?"')
 strarg_rgx = re.compile(r'#.*?".*?"')
+clr_rgx = re.compile(r'clr r\d\d?')
+post_process_rgx = re.compile(r'    [0-9A-Fa-f]{4}:')
+needs_padding_rgx = re.compile(r'^    [0-9A-Fa-f]{4}:\s+00 00\s+beq\s*$')
 
 with open(filename, 'r') as disassembly:
     lines = [l.strip() for l in disassembly.readlines()]
@@ -49,40 +54,69 @@ try:
             add_line(addr, '%s: ' % label_name)
             labels.append(label_name)
         else: # We are an instruction
+            num_bytes = len(line[7:22].split()) * 2
             instruction_stuff = line[22:]
             if jmp_rgx.match(instruction_stuff):
                 sometag_ind = instruction_stuff.find('<')
-                # print hex(addr), instruction_stuff.split()
                 instruction = instruction_stuff.split()[0]
                 operand = int(instruction_stuff.split()[1][3:], 16)
                 if instruction != 'call' and instruction != 'br':
-                    operand -= addr
-                if operand < 0:
-                    operand_str = '-0x%x' % (-1 * operand)
+                    if operand > addr:
+                        operand -= (addr + 2)
+                    else:
+                        operand -= addr
+                    if operand < 0:
+                        operand_str = '-0x%x' % (-1 * operand)
+                    else:
+                        operand_str = '0x%x' % operand
                 else:
-                    operand_str = '0x%x' % operand
+                    operand_str = '#0x%x' % operand
                 add_line(addr, '%s %s' % (instruction, operand_str))
             else:
                 strings_removed = re.sub(str_rgx, '', instruction_stuff)
                 add_line(addr, strings_removed)
+
 except IndexError:
     pass
 
+def dump_to_file(name):
+    with open(name, 'w') as outfile:
+        for label in labels:
+            outfile.write('.global %s\n' % label)
+        outfile.write('\n.text\n')
+        for addr, line in sorted(processed_lines.iteritems()):
+            outfile.write('.org 0x%x\n' % addr)
+            outfile.write(line + '\n')
 assemblefile_name = sys.argv[2]
-with open(assemblefile_name, 'w') as outfile:
-    for label in labels:
-        outfile.write('.global %s\n' % label)
-    outfile.write('\n.text\n')
-    for addr, line in sorted(processed_lines.iteritems()):
-        outfile.write('.org 0x%x\n' % addr)
-        outfile.write(line + '\n')
+dump_to_file(assemblefile_name)
 
+def assemble(aname, oname):
+    if subprocess.call(['/opt/ti/mspgcc/bin/msp430-elf-as', aname, '-o', oname]) != 0:
+        raise Exception('Could not assemble.')
 outfile_name = sys.argv[3]
-if not subprocess.call(['/opt/ti/mspgcc/bin/msp430-elf-as', assemblefile_name, '-o', outfile_name]):
+assemble(assemblefile_name, outfile_name)
+
+def fix_beqs(elffile, asmfile):
+    disassembly = subprocess.check_output(['/opt/ti/mspgcc/bin/msp430-elf-objdump', '-d', elffile])
+    for line in disassembly.split('\n'):
+        if not post_process_rgx.match(line):
+            continue
+
+        if needs_padding_rgx.match(line):
+            address = int(line[4:8], 16)
+            add_line(address, 'nop')
+    dump_to_file(asmfile)
+    assemble(asmfile, elffile)
+fix_beqs(outfile_name, assemblefile_name)
+
+
+
+
+
+
+def postprocess():
     eo = elffile.open(name=outfile_name)
     eo.fileHeader.entry = 0x4400
     eo.fileHeader.type = 2
     with open(outfile_name, 'wb') as ofile:
         ofile.write(eo.pack())
-else:
-    raise Exception('Could not assemble.')
