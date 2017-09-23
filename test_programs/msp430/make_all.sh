@@ -1,7 +1,8 @@
 #! /bin/bash
 
-DIRS=("microcorruption_tutorial" "microcorruption_new_orleans" "microcorruption_sydney")
+DIRS=("tutorial" "new_orleans" "sydney" "hanoi" "cusco")
 
 for DIR in "${DIRS[@]}"; do
-	python convert_microcorruption.py "$DIR/micro.s" "$DIR/processed.s" "$DIR/out.elf"
+	MICRODIR="microcorruption_$DIR"
+	python convert_microcorruption.py "$MICRODIR/micro.s" "$MICRODIR/processed.s" "$MICRODIR/out.elf"
 done

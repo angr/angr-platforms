@@ -17,10 +17,14 @@ class SimCCMSP430(SimCC):
     ARCH = ArchMSP430
 
 class MCstopexec(SimProcedure):
-    
+
     NO_RET = True
     def run(self):
         self.exit(0)
+
+class MCputs(SimProcedure):
+    def run(self):
+        return 1
 
 class MCgetsn(SimProcedure):
     """
@@ -85,4 +89,3 @@ class SimMSP430Syscall(SimCC):
 register_simos('Standalone App', SimMSP430)
 register_syscall_cc('MSP430', 'default', SimMSP430Syscall)
 register_default_cc('MSP430', SimCCMSP430)
-

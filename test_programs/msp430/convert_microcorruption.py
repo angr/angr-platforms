@@ -109,14 +109,10 @@ def fix_beqs(elffile, asmfile):
     assemble(asmfile, elffile)
 fix_beqs(outfile_name, assemblefile_name)
 
-
-
-
-
-
-def postprocess():
-    eo = elffile.open(name=outfile_name)
+def postprocess(name):
+    eo = elffile.open(name=name)
     eo.fileHeader.entry = 0x4400
     eo.fileHeader.type = 2
-    with open(outfile_name, 'wb') as ofile:
+    with open(name, 'wb') as ofile:
         ofile.write(eo.pack())
+postprocess(outfile_name)

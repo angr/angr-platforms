@@ -4,9 +4,7 @@ from pyvex.lift.util import *
 import bitstring
 from bitstring import Bits
 import logging
-l = logging.getLogger("msp430")
-l.setLevel(logging.DEBUG)
-
+l = logging.getLogger(__name__)
 
 REGISTER_TYPE = Type.int_16
 BYTE_TYPE = Type.int_8
@@ -125,7 +123,6 @@ class MSP430Instruction(Instruction):
 
     def set_flags(self, z, n, c, o):
         # TODO: FIXME: This isn't actually efficient.
-        print
         if not z and not o and not c and not n:
             return
         flags = [(z, ZERO_BIT_IND, 'Z'),
@@ -219,7 +216,7 @@ class MSP430Instruction(Instruction):
         # Load the immediate word
         src_imm = None
         if imm_bits:
-            src_imm = self.constant(bits_to_signed_int(imm_bits), ty)
+            src_imm = bits_to_signed_int(imm_bits)
         # Symbolic and Immediate modes use the PC as the source.
         if src_name == 'pc':
             if src_mode == ArchMSP430.Mode.INDEXED_MODE:
@@ -303,7 +300,7 @@ class MSP430Instruction(Instruction):
         if dst_name == 'sr' and dst_mode == ArchMSP430.Mode.INDEXED_MODE:
             dst_mode = ArchMSP430.Mode.ABSOLUTE_MODE
         if imm_bits:
-            dst_imm = self.constant(int(imm_bits, 2), ty)
+            dst_imm = int(imm_bits, 2)
 
         # two-op instructions always have a dst and a writeout
         val, writeout = self.fetch_reg(dst_num, dst_mode, dst_imm, ty)
@@ -333,42 +330,50 @@ class MSP430Instruction(Instruction):
             raise Exception('Unknown mode found')
         return reg_str
 
-    def fetch_reg(self, reg_num, reg_mode, imm_vv, ty):
+    def fetch_reg(self, reg_num, reg_mode, imm, ty):
         """
         Resolve the operand for register-based modes.
         :param reg_num: The Register Number
         :param reg_mode: The Register Mode
-        :param imm_vv: The immediate word, if any
+        :param imm: The immediate word, if any
         :param ty: The Type (byte or word)
         :return: The VexValue of the operand, and the writeout function, if any.
         """
-        # Fetch the register
-        reg_vv = self.get(reg_num, ty)
         # Boring register mode.  A write is just a Put.
         if reg_mode == ArchMSP430.Mode.REGISTER_MODE:
+            # Fetch the register
+            reg_vv = self.get(reg_num, ty)
             val = reg_vv
-            writeout = lambda v: self.put(v, reg_num)
+            writeout = lambda v: self.put(v.cast_to(REGISTER_TYPE), reg_num)
         # Indexed mode, add the immediate to the register
         # A write here is a store to reg + imm
         elif reg_mode == ArchMSP430.Mode.INDEXED_MODE:
-            val = reg_vv + imm_vv
-            writeout = lambda v: self.store(v, val)
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
+            addr_val = reg_vv + imm
+            val = self.load(addr_val, ty)
+            writeout = lambda v: self.store(v, addr_val)
         # Indirect mode; fetch address in register; store is a write there.
         elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
             val = self.load(reg_vv, ty)
             writeout = lambda v: self.store(v, reg_vv)
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
             if ty == Type.int_16:
-                incconst = self.constant(2, ty)
+                incconst = self.constant(2, REGISTER_TYPE)
             else:
-                incconst = self.constant(1, ty)
+                incconst = self.constant(1, REGISTER_TYPE)
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
             # Do the increment, now
             self.put(reg_vv + incconst, reg_num)
             # Now load it.
             val = self.load(reg_vv, ty)
             writeout = lambda v: self.store(v, reg_num)
         elif reg_mode == ArchMSP430.Mode.ABSOLUTE_MODE:
+            imm_vv = self.constant(imm, REGISTER_TYPE)
             val = self.load(imm_vv, ty)
             writeout = lambda v: self.store(v, imm_vv)
         else:
@@ -551,7 +556,7 @@ class Instruction_CALL(Type1Instruction):
 
     def negative(self, src, ret):
         pass
-    
+
     def zero(self, src, ret):
         pass
 
@@ -630,7 +635,7 @@ class Instruction_MOV(Type3Instruction):
 
     def negative(self, src, dst, ret):
         pass
-    
+
     def zero(self, src, dst, ret):
         pass
 
@@ -662,7 +667,7 @@ class Instruction_ADD(Type3Instruction):
         z = self.zero(src, dst, retval)
         n = self.negative(src, dst, retval)
         self.set_flags(z, n, c, o)
-            
+
 
 class Instruction_ADDC(Type3Instruction):
     # dst = src + dst + C
@@ -717,7 +722,7 @@ class Instruction_SUB(Type3Instruction):
     name = "sub"
 
     def compute_result(self, src, dst):
-        return src - dst
+        return dst - src
 
     def overflow(self, src, dst, ret):
         # TODO: This is probably wrong
@@ -733,7 +738,7 @@ class Instruction_SUB(Type3Instruction):
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
     name = 'cmp'
-    
+
     def commit_result(self, res):
         pass
 
