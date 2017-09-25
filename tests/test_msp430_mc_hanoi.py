@@ -1,26 +1,17 @@
-import logging
-from action_pp import action_pp
-logging.basicConfig()
-l = logging.getLogger(__name__)
-l.setLevel(logging.DEBUG)
-linspect = logging.getLogger('angr.state_plugins.inspect')
-linspect.setLevel(logging.ERROR)
-logging.getLogger("claripy.backends.backend_z3").setLevel(logging.WARNING)
-logging.getLogger("angr.engines.vex.expressions").setLevel(logging.WARNING)
-logging.getLogger('pyvex.lift.util.lifter_helper').setLevel(logging.WARNING)
-logging.getLogger('angr_platforms.msp430.instrs_msp430').setLevel(logging.WARNING)
-from angr_platforms.msp430 import simos_msp430
-from angr import options as o
+from angr_platforms.msp430 import *
 import angr
+import nose
 
-p = angr.Project("../test_programs/msp430/microcorruption_hanoi/out.elf", load_options={'rebase_granularity': 8})
-p.hook_symbol('getsn', simos_msp430.MCgetsn())
-p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())
-p.hook_symbol('puts', simos_msp430.MCputs())
-state = p.factory.entry_state()
-state.options.update(o.refs)
-# state.posix.files[0].content.store(0, 'AAAAAAAA' + '\x00')
-simgr = p.factory.simgr(state)
-simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
-stdin_contents = simgr.found[0].posix.dumps(0)
-print 'Password (in hex):', stdin_contents.encode('hex')
+
+def test_hanoi():
+    p = angr.Project("../test_programs/msp430/microcorruption_hanoi/out.elf", load_options={'rebase_granularity': 8})
+    p.hook_symbol('getsn', simos_msp430.MCgetsn())
+    p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())
+    p.hook_symbol('puts', simos_msp430.MCputs())
+    simgr = p.factory.simgr()
+    simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
+    stdin_contents = simgr.found[0].posix.dumps(0)
+    nose.tools.assert_equals(stdin_contents.encode('hex'), '00000000000000000000000000000000960000000000000000000000')
+
+if __name__ == '__main__':
+    test_hanoi()

@@ -1,5 +1,4 @@
 import logging
-from action_pp import action_pp
 logging.basicConfig()
 l = logging.getLogger(__name__)
 l.setLevel(logging.DEBUG)
@@ -9,7 +8,7 @@ logging.getLogger("claripy.backends.backend_z3").setLevel(logging.WARNING)
 logging.getLogger("angr.engines.vex.expressions").setLevel(logging.WARNING)
 logging.getLogger('pyvex.lift.util.lifter_helper').setLevel(logging.WARNING)
 logging.getLogger('angr_platforms.msp430.instrs_msp430').setLevel(logging.WARNING)
-from angr_platforms.msp430 import simos_msp430
+from angr_platforms.msp430 import *
 from angr import options as o
 import angr
 
