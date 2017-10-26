@@ -36,63 +36,6 @@ log = logging.getLogger("LifterBF")
 # here as best I can.
 
 
-def _build_jump_table(state):
-    """
-    This is the standard stack algorithm for bracket-matching, which is also how we resolve jumps in BF
-    :param state:
-    :return:
-    """
-    jump_table = {}
-    jstack = []
-    addr = 0
-    while True:
-        try:
-            inst = chr(state.mem_concrete(addr, 1))
-        except SimValueError:
-            break
-        except KeyError:
-            break
-        if inst == '[':
-            jstack.append(addr)
-        elif inst == ']':
-            try:
-                src = jstack.pop()
-                dest = addr
-                jump_table.update({src: dest + 1})
-                jump_table.update({dest: src + 1})
-            except IndexError:
-                raise ValueError("Extra ] at offset %d" % inst)
-        addr += 1
-    if jstack:
-        raise ValueError("Unmatched [s at: " + ",".join(jstack))
-    return jump_table
-
-
-def bf_resolve_jump(state):
-    """
-    Resolve the jump at the current IP of the state.
-    :param state:
-    :return:
-    """
-    # CCall won't give us the addr of the current instruction, so we have to figure that out.  Ugh.
-    real_ip = state.se.eval(state.ip)
-    offset = 0
-    while True:
-        inst = chr(state.mem_concrete(real_ip + offset, 1))
-        if inst == "]" or inst == '[':
-            addr = real_ip + offset
-            break
-        offset += 1
-    # We don't have a persistent place to compute the jump table, and because brackets can be nested, we must construct
-    # the full table each time instead of doing a scan back/forward.
-    # Some day, if we ever get a nice place to put this, this should only be computed once.
-    jtable = _build_jump_table(state)
-    real_ip = state.se.eval(addr)
-    try:
-        return (claripy.BVV(jtable[real_ip], 64), [])
-    except KeyError:
-        raise ValueError("There is no entry in the jump table at " + repr(real_ip))
-
 # For the sake of my sanity, the ptr is 64 bits wide.
 # By the spec, cells are 8 bits, and do all the usual wrapping stuff.
 PTR_TYPE = Type.int_64
@@ -105,9 +48,9 @@ class Instruction_NOP(Instruction):
     # Convert everything that's not an instruction into a No-op to meet the BF spec
     bin_format = 'xxxxxxxx' # We don't care, match it all
 
-    def parse(self, bitstrm):
+    def parse(self, bitstrm, endianness):
         self.last_instruction = False
-        data = Instruction.parse(self, bitstrm)
+        data = Instruction.parse(self, bitstrm, endianness)
         try:
             bitstrm.peek(8)
         except bitstring.ReadError:
@@ -140,8 +83,7 @@ class Instruction_INCPTR(Instruction):
 
 
 class Instruction_DECPTR(Instruction):
-    #bin_format = bin(ord("<"))[2:].zfill(8)
-    bin_format = '00111100'
+    bin_format = bin(ord("<"))[2:].zfill(8)
 
     def compute_result(self, *args):
         """
@@ -184,9 +126,26 @@ class Instruction_DEC(Instruction):
         self.store(val, ptr)
 
 
-class Instruction_SKZ(Instruction):
+class BracketInstruction(Instruction):
+    def calculate_jump(self, relevant_instructions):
+        bracket_stack = [self]
+        for instr in relevant_instructions:
+            if isinstance(instr, self.__class__):
+                bracket_stack.append(instr)
+            elif isinstance(instr, self.closing):
+                bracket_stack.pop()
+                if len(bracket_stack) == 0:
+                    return instr.addr
+        if len(bracket_stack) > 0:
+            raise Exception('Missing matching %s for %s at address %d' % (self.closing.name, self.name, self.addr))
+
+class Instruction_SKZ(BracketInstruction):
     bin_format = bin(ord("["))[2:].zfill(8)
     name = 'skz'
+
+    def lift(self, irsb_c, past_instructions, future_instructions):
+        self.jump_addr = self.calculate_jump(future_instructions)
+        BracketInstruction.lift(self, irsb_c, past_instructions, future_instructions)
 
     def compute_result(self, *args):
         """
@@ -199,19 +158,20 @@ class Instruction_SKZ(Instruction):
         # NOTE: VEX doesn't support non-constant values for conditional exits.
         # What we do to avoid this is to make the default exit of this block the conditional one,
         # and make the other take us to the next instruction.  Therefore, we invert the comparison.
-        # We use a "CCall" to let VEX resolve these at "run"-time, since we may not be able to see the ]
-        # This uses the above helper functions to find the matching ]
-        dst = self.ccall(PTR_TYPE, bf_resolve_jump, [])
         # Go to the next instruction if *ptr != 0
         next_instr = self.constant(self.addr + 1, PTR_TYPE)
         self.jump(val != 0, next_instr)
         # And go to the next ] if *ptr == 0
-        self.jump(None, dst)
+        self.jump(None, self.jump_addr)
 
 
-class Instruction_SKNZ(Instruction):
+class Instruction_SKNZ(BracketInstruction):
     bin_format = bin(ord("]"))[2:].zfill(8)
     name = 'sknz'
+
+    def lift(self, irsb_c, past_instructions, future_instructions): # TODO make sure matching brackets has same jump target
+        self.jump_addr = self.calculate_jump(past_instructions)
+        BracketInstruction.lift(self, irsb_c, past_instructions, future_instructions)
 
     def compute_result(self, *args):
         """
@@ -220,10 +180,12 @@ class Instruction_SKNZ(Instruction):
         """
         ptr = self.get(PTR_REG, PTR_TYPE)
         val = self.load(ptr, CELL_TYPE)
-        dst = self.ccall(PTR_TYPE, bf_resolve_jump, [])
         next_instr = self.constant(self.addr + 1, PTR_TYPE)
         self.jump(val == 0, next_instr)
-        self.jump(None, dst)
+        self.jump(None, self.jump_addr) # TODO will this break when stuff is split across blocks?
+
+Instruction_SKZ.closing = Instruction_SKNZ
+Instruction_SKNZ.closing = Instruction_SKZ
 
 
 class Instruction_IN(Instruction):
@@ -286,11 +248,11 @@ if __name__ == '__main__':
     irsb_ = pyvex.IRSB(None, 0, arch=archinfo.arch_from_id('bf'))
     test1 = '<>+-[].,'
     test2 = '<>+-[].,'
-    lifter = LifterBF(irsb_, test1,len(test1) , len(test1), 0, None,  decode_only=True)
+    lifter = LifterBF(irsb_, test1,len(test1) , len(test1), 0, None)
     lifter.lift()
+    lifter.irsb.pp()
+
     irsb_ = pyvex.IRSB(None, 0, arch=ArchBF())
     lifter = LifterBF(irsb_, test2, len(test2),len(test2),0,  None)
     lifter.lift()
     lifter.irsb.pp()
-
-    i = pyvex.IRSB(test1, 0x0, arch=ArchBF())

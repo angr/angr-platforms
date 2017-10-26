@@ -14,12 +14,10 @@ register(LifterMSP430)
 
 
 if __name__ == '__main__':
-    import logging
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
     arch = ArchMSP430()
-    irsb = pyvex.IRSB('\xcf\x43\x00\x02', 0, arch)
-    l = LifterMSP430(irsb, '\xcf\x43\x00\x02', 1, 1, 0)
-    irsb = l.lift()
+    irsb = pyvex.IRSB('\xf8\x23', 0, arch)
+    l = LifterMSP430(irsb, '\xf8\x23', 1, 1, 0)
+    print l.disassemble()
+    #irsb = l.lift()
     print irsb.statements
     irsb.pp()
