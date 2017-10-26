@@ -3,6 +3,8 @@ from arch_msp430 import ArchMSP430
 from pyvex.lift.util import *
 import bitstring
 from bitstring import Bits
+import logging
+l = logging.getLogger(__name__)
 
 REGISTER_TYPE = Type.int_16
 BYTE_TYPE = Type.int_8
@@ -53,10 +55,7 @@ class MSP430Instruction(Instruction):
         return self.get(2, REGISTER_TYPE)
 
     def get_pc(self):
-        return self.get(0, REGISTER_TYPE)
-
-    def put_pc(self, val):
-        return self.put(val, 0)
+        return self.get('pc', Type.int_16)
 
     def put_sr(self, val):
         return self.put(val, 2)
@@ -72,6 +71,10 @@ class MSP430Instruction(Instruction):
 
     def get_overflow(self):
         return self.get_sr()[OVERFLOW_BIT_IND]
+
+    def commit_result(self, res):
+        if self.commit_func:
+            self.commit_func(res)
 
     def match_instruction(self, data, bitstrm):
         # NOTE: The matching behavior for instructions is a "try-them-all-until-it-fits" approach.
@@ -93,32 +96,20 @@ class MSP430Instruction(Instruction):
         # Theoretically I could put these in the TypeXInstruction classes, but
         # I'm lazy. Note that we resolve these here, as opposed to later, due to
         # needing to fiddle with the bitstream.
+        l.debug(data)
         if 's' in data:
             src_mode = int(data['A'], 2)
             if (src_mode == ArchMSP430.Mode.INDEXED_MODE and data['s'] != '0011') \
                     or (data['s'] == '0000' and src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE):
                 data['S'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
+                self.bitwidth += 16
         if 'd' in data:
             dst_mode = int(data['a'], 2)
             if dst_mode == ArchMSP430.Mode.INDEXED_MODE:
                 data['D'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
+                self.bitwidth += 16
         return data
 
-    def lift(self):
-        # The basic flow of an MSP430 instruction:
-        # 0. Always do this:
-        self.mark_instruction_start()
-        # 1. Figure out what our operands are.
-        inputs = self.fetch_operands()
-        # 2. Do the actual instruction's "meat", and commit the result
-        retval = self.compute_result(*inputs)
-        args = inputs + (retval, )
-        # 3. Update the flags:
-        self.compute_flags(*args)
-        # 4. Commit
-        if retval is not None and self.commit_func is not None:
-            self.commit_func(retval)
-        
     def compute_flags(self, *args):
         """
         Compute the flags touched by each instruction
@@ -132,7 +123,7 @@ class MSP430Instruction(Instruction):
 
     def set_flags(self, z, n, c, o):
         # TODO: FIXME: This isn't actually efficient.
-        if not self.zero and not self.overflow and not self.carry and not self.negative:
+        if not z and not o and not c and not n:
             return
         flags = [(z, ZERO_BIT_IND, 'Z'),
                  (n, NEGATIVE_BIT_IND, 'N'),
@@ -225,7 +216,7 @@ class MSP430Instruction(Instruction):
         # Load the immediate word
         src_imm = None
         if imm_bits:
-            src_imm = self.constant(bits_to_signed_int(imm_bits), ty)
+            src_imm = bits_to_signed_int(imm_bits)
         # Symbolic and Immediate modes use the PC as the source.
         if src_name == 'pc':
             if src_mode == ArchMSP430.Mode.INDEXED_MODE:
@@ -268,7 +259,7 @@ class MSP430Instruction(Instruction):
             src_vv = self.constant(bits_to_signed_int(imm_bits), ty)
         # Symbolic mode: Add the immediate to the PC
         elif src_mode == ArchMSP430.Mode.SYMBOLIC_MODE:
-            src_vv = self.get(src_num, Type.int_16) + bits_to_signed_int(imm_bits)
+            src_vv = self.get(src_num, Type.int_16) + bits_to_signed_int(imm_bits) + 2
         else:
             # Register mode can write-out to the source for one-operand, so set the writeout
             src_vv, writeout = self.fetch_reg(src_num, src_mode, src_imm, ty)
@@ -309,7 +300,7 @@ class MSP430Instruction(Instruction):
         if dst_name == 'sr' and dst_mode == ArchMSP430.Mode.INDEXED_MODE:
             dst_mode = ArchMSP430.Mode.ABSOLUTE_MODE
         if imm_bits:
-            dst_imm = self.constant(int(imm_bits, 2), ty)
+            dst_imm = int(imm_bits, 2)
 
         # two-op instructions always have a dst and a writeout
         val, writeout = self.fetch_reg(dst_num, dst_mode, dst_imm, ty)
@@ -339,42 +330,50 @@ class MSP430Instruction(Instruction):
             raise Exception('Unknown mode found')
         return reg_str
 
-    def fetch_reg(self, reg_num, reg_mode, imm_vv, ty):
+    def fetch_reg(self, reg_num, reg_mode, imm, ty):
         """
         Resolve the operand for register-based modes.
         :param reg_num: The Register Number
         :param reg_mode: The Register Mode
-        :param imm_vv: The immediate word, if any
+        :param imm: The immediate word, if any
         :param ty: The Type (byte or word)
         :return: The VexValue of the operand, and the writeout function, if any.
         """
-        # Fetch the register
-        reg_vv = self.get(reg_num, ty)
         # Boring register mode.  A write is just a Put.
         if reg_mode == ArchMSP430.Mode.REGISTER_MODE:
+            # Fetch the register
+            reg_vv = self.get(reg_num, ty)
             val = reg_vv
-            writeout = lambda v: self.put(v, reg_num)
+            writeout = lambda v: self.put(v.cast_to(REGISTER_TYPE), reg_num)
         # Indexed mode, add the immediate to the register
         # A write here is a store to reg + imm
         elif reg_mode == ArchMSP430.Mode.INDEXED_MODE:
-            val = reg_vv + imm_vv
-            writeout = lambda v: self.store(v, val)
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
+            addr_val = reg_vv + imm
+            val = self.load(addr_val, ty)
+            writeout = lambda v: self.store(v, addr_val)
         # Indirect mode; fetch address in register; store is a write there.
         elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-            val = self.load(reg_num, ty)
-            writeout = lambda v: self.store(v, regvv)
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
+            val = self.load(reg_vv, ty)
+            writeout = lambda v: self.store(v, reg_vv)
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
             if ty == Type.int_16:
-                incconst = self.constant(16, ty)
+                incconst = self.constant(2, REGISTER_TYPE)
             else:
-                incconst = self.constant(8, ty)
+                incconst = self.constant(1, REGISTER_TYPE)
+            # Fetch the register
+            reg_vv = self.get(reg_num, REGISTER_TYPE)
             # Do the increment, now
             self.put(reg_vv + incconst, reg_num)
             # Now load it.
             val = self.load(reg_vv, ty)
             writeout = lambda v: self.store(v, reg_num)
         elif reg_mode == ArchMSP430.Mode.ABSOLUTE_MODE:
+            imm_vv = self.constant(imm, REGISTER_TYPE)
             val = self.load(imm_vv, ty)
             writeout = lambda v: self.store(v, imm_vv)
         else:
@@ -408,7 +407,7 @@ class Type1Instruction(MSP430Instruction):
     def fetch_operands(self):
         ty = Type.int_16 if self.data['b'] == '0' else Type.int_8
         src, self.commit_func = self.fetch_src(self.data['s'], self.data['A'], self.data['S'], ty)
-        return src
+        return (src, )
 
 
 class Type2Instruction(MSP430Instruction):
@@ -484,9 +483,9 @@ class Instruction_SWPB(Type1Instruction):
     name = 'swpb'
 
     def compute_result(self, src):
-        low_half = src[:8]
-        high_half = src[8:]
-        return high_half + (low_half << 8)
+        low_half = src.cast_to(Type.int_8).cast_to(Type.int_16) << self.constant(8, Type.int_8) # FIXME: TODO:
+        high_half = src >> 8
+        return high_half | low_half
 
 
 class Instruction_RRA(Type1Instruction):
@@ -514,7 +513,7 @@ class Instruction_SXT(Type1Instruction):
     opcode = '011'
     name = 'sxt'
 
-    def compute_result(self, src, writeout):
+    def compute_result(self, src):
         return src.cast_to(Type.int_16, signed=True)
 
 
@@ -530,7 +529,7 @@ class Instruction_PUSH(Type1Instruction):
         # Store src at SP
         self.store(src, sp)
         # Store SP.  No write-out.
-        self.put(sp, 1)
+        self.put(sp, 'sp')
 
     # No flags.
     def negative(self, src, ret):
@@ -546,18 +545,18 @@ class Instruction_CALL(Type1Instruction):
     # Call src.  Pushes PC. No flags.
 
     def compute_result(self, src):
-        # Push PC
-        pc = self.get_pc()
-        sp = self.get(1, Type.int_16)
-        sp -= 2
+        # Push the next instruction's address
+        pc = self.get_pc() + self.bytewidth
+        sp = self.get('sp', Type.int_16)
+        sp = sp - 2
         self.store(pc, sp)
-        self.put_pc(src)
+        self.put(sp, 'sp')
         # This ends the BB, update the IRSB
         self.jump(None, src, jumpkind=JumpKind.Call)
 
     def negative(self, src, ret):
         pass
-    
+
     def zero(self, src, ret):
         pass
 
@@ -569,10 +568,11 @@ class Instruction_RETI(Type1Instruction):
     name = 'reti'
 
     def disassemble(self):
-        return self, self.name, []
+        return self.addr, self.name, []
 
     def compute_result(self, src):
         # Pop the saved SR
+        import ipdb; ipdb.set_trace(context=30)
         sp = self.get(1, REGISTER_TYPE)
         sr = self.get_sr()
         sp += 2
@@ -581,7 +581,6 @@ class Instruction_RETI(Type1Instruction):
         sp += 2
         # Store the popped values
         self.put_sr(sr)
-        self.put_pc(newpc)
         # Jump to PC (setting the jumpkind)
         self.jump(None, newpc, jumpkind=JumpKind.Ret)
 
@@ -601,6 +600,12 @@ class Instruction_MOV(Type3Instruction):
     opcode = '0100'
     name = 'mov'
 
+    def fetch_operands(self):
+        if self.data['s'] == '0001' and self.data['d'] == '0000':
+            return None, None
+        else:
+            return Type3Instruction.fetch_operands(self)
+
     def disassemble(self):
         # support useful pseudo-ops for disassembly
         addr, name, args = Type3Instruction.disassemble(self)
@@ -618,15 +623,19 @@ class Instruction_MOV(Type3Instruction):
         # VEX would like it very much if you set the jumpkind.
         if self.data['d'] == '0000':
             if self.data['s'] == '0001':
-                self.jump(None, src, jumpkind=JumpKind.Ret)
+                sp = self.get('sp', REGISTER_TYPE)
+                newpc = self.load(sp, REGISTER_TYPE)
+                sp = sp + 2
+                self.put(sp, 'sp')
+                self.jump(None, newpc, jumpkind=JumpKind.Ret)
             else:
                 # If we're setting PC, but not from SP+, it's a BR instead
-                self.jump(None, self.const(self.addr, REGISTER_TYPE))
+                self.jump(None, self.constant(self.addr, REGISTER_TYPE))
         return src
 
     def negative(self, src, dst, ret):
         pass
-    
+
     def zero(self, src, dst, ret):
         pass
 
@@ -634,7 +643,7 @@ class Instruction_MOV(Type3Instruction):
 class Instruction_ADD(Type3Instruction):
     # Add src + dst, set carry
     opcode = '0101'
-    opcode = 'add'
+    name = 'add'
 
     def compute_result(self, src, dst):
         return src + dst
@@ -647,26 +656,28 @@ class Instruction_ADD(Type3Instruction):
             ret17 = src17 + dst17
             c = ret17[16]
             o = (ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])
+            retval = ret17
         else:
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
             ret9 = src9 + dst9
             c = ret9[8]
             o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_1)
-        z = self.zero(src, dst, writeout, retval)
-        n = self.negative(src, dst, writeout, retval)
+            retval = ret9
+        z = self.zero(src, dst, retval)
+        n = self.negative(src, dst, retval)
         self.set_flags(z, n, c, o)
-            
+
 
 class Instruction_ADDC(Type3Instruction):
     # dst = src + dst + C
     opcode = '0110'
     name = 'addc'
 
-    def compute_result(self, src, dst, writeout):
-        return src + dst + self.get_carry()
+    def compute_result(self, src, dst):
+        return src + dst + self.carry()
 
-    def compute_flags(self, src, dst, writeout, retval):
+    def compute_flags(self, src, dst, retval):
         carryin = self.get_carry()
         if self.data['b'] == '0':
             src17 = src.cast_to(Type.int_17)
@@ -675,14 +686,16 @@ class Instruction_ADDC(Type3Instruction):
             ret17 = src17 + dst17 + ci17
             c = ret17[16]
             o = ((ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])).cast_to(Type.int_16)
+            retval = ret17
         else:  # self.data['b'] == '1':
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
             ret9 = src9 + dst9
             c = ret9[8]
             o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_16)
-        z = self.zero(src, dst, writeout, retval)
-        n = self.negative(src, dst, writeout, retval)
+            retva= ret9
+        z = self.zero(src, dst, retval)
+        n = self.negative(src, dst, retval)
         self.set_flags(z, n, c, o)
 
 
@@ -709,7 +722,7 @@ class Instruction_SUB(Type3Instruction):
     name = "sub"
 
     def compute_result(self, src, dst):
-        return src - dst
+        return dst - src
 
     def overflow(self, src, dst, ret):
         # TODO: This is probably wrong
@@ -722,37 +735,19 @@ class Instruction_SUB(Type3Instruction):
         return dst > src
 
 
-class Instruction_CMP(Type3Instruction):
+class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
     name = 'cmp'
 
-    def compute_result(self, src, dst):
-        # Compute once, save for flags, don't commit
-        self.ret = src - dst
-
-    def zero(self, src, dst, ret):
-        return self.ret == self.constant(0, self.ret.ty)
-
-    def negative(self, src, dst, ret):
-        return self.ret[15] if self.data['b'] == '0' else self.ret[7]
-
-    def carry(self, src, dst, ret):
-        return dst > src
-
-    def overflow(self, src, dst, ret):
-        if self.data['b'] == '0':
-            # FIXME: this is probably wrong
-            return (self.ret[15] ^ src[15]) & (self.ret[15] ^ dst[15])
-        else:  # self.data['b'] == '1':
-            # add.b
-            return (self.ret[7] ^ src[7]) & (self.ret[7] ^ dst[7])
+    def commit_result(self, res):
+        pass
 
 
 class Instruction_DADD(Type3Instruction):
     opcode = '1010'
     name = 'dadd'
 
-    def compute_result(self, src, dst, writeout):
+    def compute_result(self, src, dst):
         # Ya know... fuck this...
         srcs = []
         dsts = []
@@ -862,7 +857,7 @@ class Instruction_JNE(Type2Instruction):
     name = 'jne'
 
     def compute_result(self, dst):
-        self.jump(self.get_zero() != 0, dst)
+        self.jump(self.get_zero() == 0, dst)
 
 
 class Instruction_JEQ(Type2Instruction):
@@ -870,7 +865,7 @@ class Instruction_JEQ(Type2Instruction):
     name = 'jeq'
 
     def compute_result(self, dst):
-        self.jump(self.get_zero() == 0, dst)
+        self.jump(self.get_zero() != 0, dst)
 
 
 class Instruction_JNC(Type2Instruction):
