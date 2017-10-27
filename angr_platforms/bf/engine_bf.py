@@ -115,7 +115,7 @@ class SimEngineBF(SimEngine):
             elif inst == ',':
                 # Syscall: read byte from stdin to cell at ptr
                 new_state = state.copy()
-                state.regs.inout = 0  # This must be 0 when we do a syscall to get a read!
+                new_state.regs.inout = 0  # This must be 0 when we do a syscall to get a read!
                 new_state.ip = state.ip + 1
                 successors.add_successor(new_state, new_state.ip, claripy.true, "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
