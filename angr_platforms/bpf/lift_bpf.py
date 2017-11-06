@@ -262,7 +262,7 @@ class Inst_NEG(Inst_Arithmetic):
 
     def compute_result(self, x):
         a = self.get('A', Type.int_32)
-        self.put(~a, 'A')
+        self.put(-a, 'A')
 
 
 class Inst_RSH(Inst_Arithmetic):
