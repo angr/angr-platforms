@@ -21,6 +21,7 @@ class ArchMSP430(Arch):
 
     bits = 16
     name = "MSP430"
+    instruction_endness = "Iend_LE" # Yep.  MSP's instructions are endy-flipped when stored relative to the ISA.
     ida_processor = 'msp430'
     max_inst_bytes = 6
     ret_instruction = "\x98\x00"
