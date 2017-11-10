@@ -19,7 +19,7 @@ class ArchBPF(Arch):
         self.instruction_endness = 'Iend_BE'
         self.memory_endness = 'Iend_LE'
 
-        self.registers = {}
+        self.registers = { }
         self.registers['A'] = (0, 4)
         self.registers['X'] = (4, 4)
         self.registers['pc'] = (8, 4)
