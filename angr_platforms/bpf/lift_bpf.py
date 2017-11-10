@@ -1,21 +1,12 @@
 
-import bitstring
-import sys
-import os
 import logging
 
 import archinfo
-import pyvex
 from pyvex.lift.util import *
 from pyvex.lift import register
-import claripy
-from angr import SimValueError
+
 
 log = logging.getLogger("lift_bpf")
-
-
-DATA_BASE = 0x800000
-TEMP_BASE = 0x900000
 
 arch_bpf = archinfo.arch_from_id('BPF')
 
@@ -161,8 +152,6 @@ class Inst_RET(Instruction):
 
     def compute_result(self):
 
-        print "!!! RET !!!"
-
         ret = switch_endianness(int(self.data['r'], 2))
 
         if ret == 0x7fff0000:
@@ -214,9 +203,6 @@ class Inst_ADD(Inst_Arithmetic):
     bin_format = bin(0x4)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
-
-        print "ADD %d" % x
-
         a = self.get('A', Type.int_32)
         self.put(a + self.constant(x, Type.int_32), 'A')
 
@@ -238,9 +224,6 @@ class Inst_MUL(Inst_Arithmetic):
     bin_format = bin(0x24)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
-
-        print "MUL %d" % x
-
         a = self.get('A', Type.int_32)
         self.put(a * self.constant(x, Type.int_32), 'A')
 
