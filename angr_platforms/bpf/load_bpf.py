@@ -23,7 +23,12 @@ class BPF(Blob):
 
     @staticmethod
     def is_compatible(stream):
-        # FIXME
+        """
+        A BPF file is simply a binary blob. So it is compatible with anything.
+
+        :param stream:
+        :return:
+        """
         return True
 
 
