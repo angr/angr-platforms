@@ -24,6 +24,7 @@ def switch_endianness(n):
 
 
 class Inst_LDDATA(Instruction):
+    name = "loaddata"
     bin_format = bin(0x20)[2:].zfill(8) + '0' * 24 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -37,6 +38,7 @@ class Inst_LDDATA(Instruction):
 
 
 class Inst_LDCONST(Instruction):
+    name = "loadconst"
     bin_format = '0' * 32 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -49,6 +51,7 @@ class Inst_LDCONST(Instruction):
 
 
 class Inst_LDXCONST(Instruction):
+    name = "loadxconst"
     bin_format = bin(0x1)[2:].zfill(8) + '0' * 24 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -61,6 +64,7 @@ class Inst_LDXCONST(Instruction):
 
 
 class Inst_LDTEMP(Instruction):
+    name = "loadtemp"
     bin_format = bin(0x60)[2:].zfill(8) + '0' * 24 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -74,6 +78,7 @@ class Inst_LDTEMP(Instruction):
 
 
 class Inst_LDXTEMP(Instruction):
+    name = "loadxtemp"
     bin_format = bin(0x61)[2:].zfill(8) + '0' * 24 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -87,6 +92,7 @@ class Inst_LDXTEMP(Instruction):
 
 
 class Inst_SDTEMP(Instruction):
+    name = "storetemp"
     bin_format = bin(0x2)[2:].zfill(8) + (bin(0)[2:].zfill(8)) * 3 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -100,6 +106,7 @@ class Inst_SDTEMP(Instruction):
 
 
 class Inst_SDXTEMP(Instruction):
+    name = "storextemp"
     bin_format = bin(0x3)[2:].zfill(8) + (bin(0)[2:].zfill(8)) * 3 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -113,6 +120,7 @@ class Inst_SDXTEMP(Instruction):
 
 
 class Inst_JEQ(Instruction):
+    name = "jeq"
     bin_format = bin(0x15)[2:].zfill(8) + '0' * 8 + 't' * 8 + 'f' * 8 + 'n' * 32
 
     def parse(self, bitstrm):
@@ -148,6 +156,7 @@ class Inst_JEQ(Instruction):
 
 
 class Inst_RET(Instruction):
+    name = "return"
     bin_format = bin(0x6)[2:].zfill(8) + '0' * 24 + 'r' * 32
 
     def compute_result(self):
@@ -172,6 +181,7 @@ class Inst_RET(Instruction):
 
 
 class Inst_TAX(Instruction):
+    name = "tax"
     bin_format = bin(0x7)[2:].zfill(8) + '0' * 56
 
     def compute_result(self):
@@ -181,6 +191,7 @@ class Inst_TAX(Instruction):
 
 
 class Inst_TXA(Instruction):
+    name = "txa"
     bin_format = bin(0x87)[2:].zfill(8) + '0' * 56
 
     def compute_result(self):
@@ -199,6 +210,7 @@ class Inst_Arithmetic(Instruction):
 
 class Inst_ADD(Inst_Arithmetic):
     # opcode: 0x4
+    name = "add"
     bin_format = bin(0x4)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
@@ -211,6 +223,7 @@ class Inst_ADD(Inst_Arithmetic):
 
 class Inst_ADDX(Inst_Arithmetic):
     # opcode: 0xc
+    name = "addx"
     bin_format = bin(0xc)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, unused):
@@ -221,6 +234,7 @@ class Inst_ADDX(Inst_Arithmetic):
 
 
 class Inst_MUL(Inst_Arithmetic):
+    name = "mul"
     bin_format = bin(0x24)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
@@ -232,6 +246,7 @@ class Inst_MUL(Inst_Arithmetic):
 
 
 class Inst_DIV(Inst_Arithmetic):
+    name = "div"
     bin_format = bin(0x34)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
@@ -240,6 +255,7 @@ class Inst_DIV(Inst_Arithmetic):
 
 
 class Inst_AND(Inst_Arithmetic):
+    name = "and"
     bin_format = bin(0x54)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
@@ -248,6 +264,7 @@ class Inst_AND(Inst_Arithmetic):
 
 
 class Inst_XORX(Inst_Arithmetic):
+    name = "xorx"
     bin_format = bin(0xac)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, unused):
@@ -258,6 +275,7 @@ class Inst_XORX(Inst_Arithmetic):
 
 
 class Inst_NEG(Inst_Arithmetic):
+    name = "neg"
     bin_format = bin(0x84)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
@@ -266,6 +284,7 @@ class Inst_NEG(Inst_Arithmetic):
 
 
 class Inst_RSH(Inst_Arithmetic):
+    name = "rsh"
     bin_format = bin(0x74)[2:].zfill(8) + '0' * 24 + 'x' * 32
 
     def compute_result(self, x):
