@@ -8,6 +8,7 @@ from pyvex.lift import register
 
 log = logging.getLogger("lift_bpf")
 
+MAX_INSTR_ID = 4096
 arch_bpf = archinfo.arch_from_id('BPF')
 
 def switch_endianness(n):
@@ -163,10 +164,9 @@ class Inst_RET(Instruction):
         else:
             raise Exception('OUCH not supported')
 
-        # TODO: temporarily disabled
-        #self.jump(0, self.constant(0x4096 * 8, Type.int_32),  # TODO: FIXME
-        #          JumpKind.Ret
-        #          )
+        self.jump(0, self.constant(MAX_INSTR_ID * 8, Type.int_32),  # TODO: FIXME
+                  JumpKind.Ret
+                  )
 
 
 class Inst_TAX(Instruction):
