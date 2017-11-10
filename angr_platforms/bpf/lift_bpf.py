@@ -32,7 +32,7 @@ class Inst_LDDATA(Instruction):
         self.n = switch_endianness(int(data['n'], 2))
 
     def compute_result(self):
-        addr = self.constant(DATA_BASE + self.n, Type.int_32)
+        addr = self.constant(arch_bpf.DATA_BASE + self.n, Type.int_32)
         val = self.load(addr, Type.int_32)
         self.put(val, 'A')
 
@@ -72,7 +72,7 @@ class Inst_LDTEMP(Instruction):
         self.n = switch_endianness(int(data['n'], 2))
 
     def compute_result(self):
-        addr = self.constant(TEMP_BASE + self.n * 4, Type.int_32)
+        addr = self.constant(arch_bpf.TEMP_BASE + self.n * 4, Type.int_32)
         val = self.load(addr, Type.int_32)
         self.put(val, 'A')
 
@@ -86,7 +86,7 @@ class Inst_LDXTEMP(Instruction):
         self.n = switch_endianness(int(data['n'], 2))
 
     def compute_result(self):
-        addr = self.constant(TEMP_BASE + self.n * 4, Type.int_32)
+        addr = self.constant(arch_bpf.TEMP_BASE + self.n * 4, Type.int_32)
         val = self.load(addr, Type.int_32)
         self.put(val, 'X')
 
@@ -100,7 +100,7 @@ class Inst_SDTEMP(Instruction):
         self.n = switch_endianness(int(data['n'], 2))
 
     def compute_result(self):
-        addr = self.constant(TEMP_BASE + self.n * 4, Type.int_32)
+        addr = self.constant(arch_bpf.TEMP_BASE + self.n * 4, Type.int_32)
         val = self.get('A', Type.int_32)
         self.store(val, addr)
 
@@ -114,7 +114,7 @@ class Inst_SDXTEMP(Instruction):
         self.n = switch_endianness(int(data['n'], 2))
 
     def compute_result(self):
-        addr = self.constant(TEMP_BASE + self.n * 4, Type.int_32)
+        addr = self.constant(arch_bpf.TEMP_BASE + self.n * 4, Type.int_32)
         val = self.get('X', Type.int_32)
         self.store(val, addr)
 

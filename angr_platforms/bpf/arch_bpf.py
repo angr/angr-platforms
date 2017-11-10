@@ -4,6 +4,12 @@ from archinfo.arch import register_arch
 
 
 class ArchBPF(Arch):
+
+    # The beginning address of the data variables
+    DATA_BASE = 0x800000
+    # The beginning address of the temporary variables
+    TEMP_BASE = 0x900000
+
     def __init__(self, endness="Iend_LE"):
         super(ArchBPF, self).__init__('Iend_LE')
 
