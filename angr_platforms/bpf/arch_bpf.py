@@ -10,6 +10,7 @@ class ArchBPF(Arch):
         self.bits = 32
         self.vex_arch = None
         self.name = "BPF"
+        self.instruction_endness = 'Iend_BE'
         self.memory_endness = 'Iend_LE'
 
         self.registers = {}
