@@ -263,7 +263,11 @@ class Inst_NEG(Inst_Arithmetic):
 
     def compute_result(self, x):
         a = self.get('A', Type.int_32)
-        self.put(-a, 'A')
+        # Minus one
+        a -= 1
+        # Invert each bit
+        a = ~a
+        self.put(a, 'A')
 
 
 class Inst_RSH(Inst_Arithmetic):
@@ -280,7 +284,7 @@ class Inst_RSH(Inst_Arithmetic):
 
 class Inst_FANCYXOR(Instruction):
 
-    # It's equivalent to (A % 65537) - 1
+    # It's equivalent to (A % 65537)
 
     bin_format = bin(0x34)[2:].zfill(8) + '0' * 24 + bin(switch_endianness(65537))[2:].zfill(32) + \
                  bin(0x24)[2:].zfill(8) + '0' * 24 + bin(switch_endianness(65537))[2:].zfill(32) + \
@@ -311,8 +315,8 @@ class Inst_FANCYITE(Instruction):
 
 
 all_instrs = [
-    Inst_FANCYXOR,
-    Inst_FANCYITE,
+    #Inst_FANCYXOR,
+    #Inst_FANCYITE,
     Inst_LDDATA,
     Inst_LDCONST,
     Inst_LDXCONST,
