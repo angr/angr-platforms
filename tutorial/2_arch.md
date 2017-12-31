@@ -84,7 +84,7 @@ You can also assign aliases, like `pc` for `ip`.
 ```python
         self.register_names = {}
         self.register_names[self.registers['ip'][0]] = 'pc'
-        self.register_names[self.registers['ip'][1]] = 'ip'
+        self.register_names[self.registers['ip'][0]] = 'ip'
         self.ip_offset = self.registers["ip"][0]
 ```
 
