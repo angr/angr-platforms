@@ -86,7 +86,31 @@ class ArchSH4(Arch):
     default_symbolic_registers = [ 'r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8'
                                   'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15', 'pc'
                                   'pr', 'gbr', 'vbr', 'mach', 'macl', 'sr', 'fpul', 'fr0' ]
-
+    register_index = [
+        'r0',
+        'r1',
+        'r2',
+        'r3',
+        'r4',
+        'r5',
+        'r6',
+        'r7',
+        'r8',
+        'r9',
+        'r10',
+        'r11',
+        'r12',
+        'r13',
+        'r14',
+        'r15',
+        'pc',
+        'pr',
+        'gbr',
+        'vbr',
+        'mach',
+        'macl',
+        'sr'
+    ]
     register_names = {
         8: 'r0',
         12: 'r1',
