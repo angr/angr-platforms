@@ -1,0 +1,7 @@
+Sources for the angr lifecycle diagram:
+
+<div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+From https://www.shareicon.net/computer-processor-computer-hardware-technology-microprocessor-computer-chip-651514
+From http://clipground.com/image-post/70942-dead-lift-clipart-11.jpg.html
+From http://moziru.com/explore/Binary%20clipart%20computer%20file/#gal_post_4505_binary-clipart-computer-file-6.png

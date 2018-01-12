@@ -64,7 +64,7 @@ class BF(Blob):
 Normally, to use the Blob loader, you must specify an entry point and arch *manually*.
 We want to be able to just use angr.Project() on a BF program and have it work, so we subclass the Blob loader, and give it this information.
 
-Next, we need to tell CLE when this loader will work on the given file, so that it can pick the right backend.  
+Next, we need to tell CLE when this loader will work on the given file, so that it can pick the right backend.
 Technically, by many definitions of BF, you can have other non-instruction characters in a file and still have it be valid.  For the ease of demonstration, let's keep it simple and support the "non-compatible" BF syntax of only the instructions and newlines.
 
 ```python
@@ -78,7 +78,7 @@ Technically, by many definitions of BF, you can have other non-instruction chara
         return False
 ```
 
-Don't forget to seek the stream to 0!! Some other is_compatible, or the rest of CLE, is going to use it later.  As they used to say when I was a kid, "Be kind, rewind" :)
+Don't forget to seek the stream to 0!! Some other `is_compatible`, or the rest of CLE, is going to use it later.  As they used to say when I was a kid, "Be kind, rewind" :)
 
 Last but not least, we need to tell CLE about our backend.
 
