@@ -2,7 +2,7 @@
 
 In order for angr to perform any sort of analysis on binary code, we need to first translate, or lift, this code into an intermediate representation (IR) that angr uses, called VEX.
 
-VEX is the IR used by the Valgrind analysis tools. angr lises the libvex library also used by Valgrind, etc to lift code, and uses its `pyvex` package to provide a pythonic interface to the resulting IR objects.
+VEX is the IR used by the Valgrind analysis tools. angr uses the libvex library also used by Valgrind, etc. to lift code, and uses its `pyvex` package to provide a pythonic interface to the resulting IR objects.
 
 However, libvex and Valgrind were tailor-made for doing what they do best: analyzing lots of desktop-ish programs.  What if we want to do something super non-traditional? Like Brainfuck? Or even something a bit more reasonable like MSP430.
 
@@ -40,10 +40,10 @@ Here we will introduce briefly the primary classes used to write a lifter using 
 All of the following are contained in `pyvex.util`:
 
 ### GymratLifter
-This is the actual lifter class used by `pyvex`
+This is the actual lifter class used by `pyvex`.
 You will need to make a subclass of this, and provide a property `instrs` containing a list of possible instruction classes.
-GymratLifters are provided with a block of code to lift in their constructor, and when lift() is called, will iterate through the code, matching insturction classes to the bytes, and populating an IRSB object (IR Super Block) with the appropriate VEX instructions. This IRSB gets returned eventually to angr, and used for its analyses.
-By default, GymratLifter will try using every instruction contained in `instrs` until one succeeds. 
+`GymratLifter`s are provided with a block of code to lift in their constructor, and when `lift()` is called, will iterate through the code, matching instruction classes to the bytes, and populating an IRSB object (IR Super Block) with the appropriate VEX instructions. This IRSB gets returned eventually to angr, and used for its analyses.
+By default, GymratLifter will try using every instruction contained in `instrs` until one succeeds.
 Don't forget to call `pyvex.lift.register()` to tell pyvex that your new lifter exists.
 
 ### Type
@@ -77,7 +77,7 @@ Instruction also contains a few important methods meant to be called by its subc
 
 ### VexValue
 What are all these 'temprary values'? How do I actually specify what instructions do? That's the magic of `VexValue`.
-In VEX, you cannot do operations directly on registers or memory.  They must be first loaded into a temporary register, operated on, and then written back to the registers or memory.  We wanted the lifter author to think as little about this as possible, so VexValue makes this whole process a snap.
+In VEX, you cannot do operations directly on registers or memory.  They must be first loaded into a temporary variable, operated on, and then written back to the registers or memory.  We wanted the lifter author to think as little about this as possible, so VexValue makes this whole process a snap.
 
 A VexValue can be created in two different ways: by loading it out of the machine's state using `get()` or `put()`, or by creating a constant value with `constant()`.  You can then do normal python operations to them like any other value!
 VexValues have a set `Type` when they are created; you can cast to a new type using the `cast_to(ty)` method.
@@ -121,8 +121,8 @@ Finally, we will create a class for each instruction, subclassing the appropriat
 
 While we aimed these features to spare the user from thinking about an IR as much as possible (did you notice we told you almost nothing about how the IR actually works?), there's no magical formula for getting totally shredded, or for lifting every architecture.  CPU architecutres, like human bodies, are different, and have their own quirks, so the best thing we can do is give you really in-depth examples.
 
-Our fully commented example, which lifts MSP430 binary code into VEX, can be found at (TODO: PROVIDE LINK HERE) You can also find the, much simpler, BF lifter here: (TODO: Link)
+Our fully commented example, which lifts MSP430 binary code into VEX, can be found [here](https://github.com/angr/angr-platforms/blob/master/angr_platforms/msp430/instrs_msp430.py). You can also find the, much simpler, BF lifter [here](https://github.com/angr/angr-platforms/blob/master/angr_platforms/bf/lift_bf.py).
 
-Built a really rad lifter? Let us know on Slack: http://angr.io/invite.html
+Built a really rad lifter? [Let us know on Slack](http://angr.io/invite.html)
 
 Next time, we get to talk about execution engines! Better get fueled up.

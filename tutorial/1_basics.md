@@ -6,7 +6,7 @@
 In this n+1-part series, we will be exploring how you can extend [angr](http://angr.io/ "angr") with new features, without editing angr itself!
 
 angr is the popular framework for analyzing binary programs, from embedded firmware, to hardcore CTF challenges, all from the comfort of Python.
-angr's roots lie in the Valgrind VEX instrumentation framework, meaning it benefits from the multi-architecture support and community maintenanace.
+angr's roots lie in the Valgrind VEX instrumentation framework, meaning it benefits from the multi-architecture support and community maintenance.
 However, we live in a big world full of crazy things that aren't Intel or ARM-based Linux machines.
 
 What about microcontrollers?
@@ -28,14 +28,14 @@ In order to not overcomplicate things, and make the core ideas clear, we're goin
 Sorry, that BrainFuck thing was not a joke.
 In this guide, we're going to build the most insanely overkill BrainFuck analysis platform ever constructed.  By the time you're done here, you'll be able to totally obliterate any of the Brainfuck crack-me programs that I hear may even actually exist.
 
-First, let's go over the components themselves, and how they fit together. 
+First, let's go over the components themselves, and how they fit together.
 
 ## The angr lifecycle
 
-***TODO: FIXME: BOUNTY: I'll pay $10 to the guy or gal that makes me a sweet diagram here*	**
+![The angr lifecycle](res/angr.png)
 
 If you've used angr before, you've probably done this:
-(blatantly stolen from angr-doc's fauxware example)
+(blatantly stolen from [angr-doc's fauxware example](https://github.com/angr/angr-doc/tree/master/examples/fauxware))
 ```python
 import angr
 p = angr.Project("crackme")
@@ -51,16 +51,16 @@ In that little snippet, we load a binary, lift it from machine-code to an interm
 ### CLE, the loader
 
 The first thing that happens when you create an angr project is angr has to figure out what the heck you just told it to load.
-For this, it turns to the loader, CLE (CLE Loads Everythig) to come up with an educated guess, extract the executable code and data from whatever format it's in, take a guess as what architecture it's for, and create a representation of the program's memory map, as if the real loader had been used.
-CLE supports a set of "backends", that service various formats, such as ELF, PE, and CGC.
+For this, it turns to the loader, CLE (CLE Loads Everythig) to come up with an educated guess, extract the executable code and data from whatever format it's in, take a guess as what architecture it's for, and create a representation of the program's memory map as if the real loader had been used.
+CLE supports a set of "backends" that service various formats, such as ELF, PE, and CGC.
 For the common cases, this means loading an ELF, which brings with it the complicated mess of header parsing, library resolution, and strange memory layouts you both require and expect.
-It also supports the exact opposite of this, pure binary blobs, with a backend that just takes the bytes, and puts them in the right place in memory.
+It also supports the exact opposite of this, pure binary blobs, with a backend that just takes the bytes and puts them in the right place in memory.
 The result is a Loader object, which has the memory of the main program itself (`Loader.main_object`) and any libraries.
 
 ### Archinfo, the architecture DB
-During CLE's loading, it takes a guess as to what architecture the program is for. 
+During CLE's loading, it takes a guess as to what architecture the program is for.
 This is usually via either a header (as in ELFs) or some simple heuristic.
-Either way, it makes a guess, and uses it to fetch an `Arch` object from the archinfo package corresponding to it.
+Either way, it makes a guess, and uses it to fetch an `Arch` object from the `archinfo` package corresponding to it.
 This contains a map of the register file, bit width, usual endian-ness, and so on.
 Literally everything else relies on this, as you can imagine.
 
@@ -68,17 +68,17 @@ Literally everything else relies on this, as you can imagine.
 Next, angr will locate an execution engine capable of dealing with the code it just loaded.
 Engines are responsible for interpreting the code in some meaningful way.
 Fundamentally, they take a program's _state_-- a snapshot of the registers, memory, and so on-- do some thing to it, usually a basic block's worth of instructions, and produce a set of _successors_, coresponding to all the possible program states that can be reached by executing the current block.
-When branches are encountered, they collect _constraints_ on the state, that influence how to take each path of the branch.
-In aggregate, this is what gives angr it's reasoning power.
+When branches are encountered, they collect _constraints_ on the state which capture the conditions needed to take each path of the branch.
+In aggregate, this is what gives angr its reasoning power.
 
 ### PyVEX, the lifter
 angr's default engine, SimEngineVEX, supports many architectures, simply because it doesn't run on their machine code directly. It uses an intermediate representation, known as VEX, which machine code is translated (*lifted*) into.
-As an alternative to creating your own engine for a new architecture, if it is similar enough to a "normal" PC architecture, the faster solution is to simply create a Lifter for it, allowing SimEngineVEX to take care of therest.
+As an alternative to creating your own engine for a new architecture, if it is similar enough to a "normal" PC architecture, the faster solution is to simply create a Lifter for it, allowing SimEngineVEX to take care of the rest.
 We will explore both Lifters and Engines in this guide.
 
 ## Claripy, the solver
 Every action an engine performs, even something as simple as incrementing the program counter, is not necessarily an operation on a concrete value.
-The value could instead be a complex expression, that when computed on, should actually result in an even bigger expression.
+The value could instead be a complicated expression, that when computed on, should actually result in an even bigger expression.
 Creating, composing, and eventually solving these is Claripy's job.
 Claripy uses a SMT-solver, currently Microsoft's Z3, to do all of this heavy-lifting.
 Thankfully, we won't need to delve into that in this series, as SMT-solving is some serious black magic.
@@ -95,4 +95,4 @@ These make angr dramatically faster and more compatible, as symbolically executi
 Finally, with a Loader, an Engine, an Arch, and a SimOS, we can get to work!
 All of this is packaged into a Project, and offered to the higher-level analyses, such as Control-flow Graph reconstruction, program slicing, and path-based reasoning, as in the earlier example.
 
-In the next part, we'll intro our chosen architecture, BrainFuck, and discuss the implementation of additional architectures.
+In the next part, we'll introduce our chosen architecture, BrainFuck, and discuss the implementation of additional architectures.
