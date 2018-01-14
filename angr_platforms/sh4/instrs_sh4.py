@@ -33,18 +33,7 @@ def bits_to_signed_int(s):
 class SH4Instruction(Instruction):
 
     # Default flag handling
-    def zero(self, *args):
-        retval = args[-1]
-        return retval == self.constant(0, retval.ty)
-
-    def negative(self, *args):
-        retval = args[-1]
-        return retval[31]
-
     def carry(self, *args):
-        return None
-
-    def overflow(self, *args):
         return None
 
     # Some common stuff we use around
@@ -78,6 +67,15 @@ class SH4Instruction(Instruction):
         # TODO: please check this out to make sure I compute it correctly
         sreg = sreg & ~(1 << offset) | (flag.cast_to(REGISTER_TYPE) << offset).cast_to(sreg.ty)
         self.put_sr(sreg)
+
+    def resolve_reg(self, src_bit, dst_bit):
+        src_bits = src_bit
+        dst_bits = dst_bit
+        src_num = int(src_bits, 2)
+        dst_num = int(dst_bits, 2)
+        src_name = ArchSH4.register_index[src_num]
+        dst_name = ArchSH4.register_index[dst_num]
+        return src_name, dst_name
 
     @abc.abstractmethod
     def fetch_operands(self):
@@ -131,12 +129,7 @@ class Instruction_MOV_Rm_Rn(SH4Instruction):
             self.name + ".l"
         else:
             self.name = self.name
-        src_bits = self.data['m']
-        dst_bits = self.data['n']
-        src_num = int(src_bits, 2)
-        dst_num = int(dst_bits, 2)
-        src_name = ArchSH4.register_index[src_num]
-        dst_name = ArchSH4.register_index[dst_num]
+        src_name, dst_name = self.resolve_reg(self.data['m'], self.data['n'])
         if self.data['a'] == '00':
             if self.data['c'] == '00':
                 # mov.x Rm, @Rn
@@ -242,6 +235,277 @@ class Instruction_MOV_Rm_Rn(SH4Instruction):
                 # (Rn-size) <- Rm
                 writeout = lambda v: self.store(v, val)
         return src_vv, val, writeout
+
+
+class Instruction_XOR_Rm_Rn(SH4Instruction):
+    bin_format = '0010nnnnmmmm1010'
+    name = 'xor'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        self.commit_result = lambda v: self.put(v, dst_name)
+        return src, dst
+
+    def disassemle(self):
+        src, dst = self.resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src, dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        return src ^ dst
+
+
+class Instruction_XOR_imm(SH4Instruction):
+
+    bin_format = '1100ss10iiiiiiii'
+    name = 'xor'
+
+    def fetch_operands(self):
+        # Get #imm value
+        src = int(self.data['i'], 2)
+        # Fetch the register
+        r0 = self.get('r0', REGISTER_TYPE)
+        # (R0 + GBR) ^ (zero extend)imm -> (R0 + GBR)
+        if self.data['s'] == '11':
+            # Fetch the register
+            gbr_vv = self.get('gbr', REGISTER_TYPE)
+            adr = gbr_vv + r0
+            # Load byte from memory
+            adr_val = self.load(adr, BYTE_TYPE)
+            dst = adr_val
+        elif self.data['s'] == '10':
+            dst = r0
+        self.commit_result = lambda v: self.store(v, 'r0')
+        return src, dst
+
+    def disassemle(self):
+        self.name = self.name if self.data['s'] == '10' else self.name + '.b'
+        return self.addr. self.name, ['#imm', 'R0']
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        ret = src ^ dst
+        # Write_8 (GBR + R[0], temp) -> narrow_int just to make sure it's 8-bit
+        return ret if self.data['s'] == '10' else self.op_narrow_int(ret, BYTE_TYPE)
+
+
+class Instruction_TST(SH4Instruction):
+    # perform test-and-set operation on contents of Rm, Rn
+    bin_format = '0010nnnnmmmm1000'
+    name = 'tst'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        return src, dst
+
+    def disassemle(self):
+        src, dst = self.resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src, dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        # ((R[n] & R[m]), T <- 0, T <- 1)
+        return src & dst
+
+    # decide on the value of T-bit in SR reg
+    def carry(self, src, dst, ret):
+        return True if ret == 0 else False
+
+
+class Instruction_TST_imm(SH4Instruction):
+    # I defined this based on my own intuition
+    # s: 10 -> tst, 11 -> tst.b
+    bin_format = '1100ss00iiiiiiii'
+    name = 'tst'
+
+    def fetch_operands(self):
+        # Get #imm value
+        imm_vv = int(self.data['i'], 2)
+        src = imm_vv
+        # Fetch the register
+        r0_vv = self.get('r0', REGISTER_TYPE)
+        if self.data['s'] == '10':
+            dst = r0_vv
+        elif self.data['s'] == '11':
+            # Fetch the register
+            gbr_vv = self.get('gbr', REGISTER_TYPE)
+            adr = gbr_vv + r0_vv
+            # Load byte from memory
+            adr_val = self.load(adr, BYTE_TYPE)
+            dst = adr_val
+        return src, dst
+
+    def disassemle(self):
+        self.name = self.name if self.data['s'] == '10' else self.name + '.b'
+        return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        # (R0 & (0x000000FF & (long)#imm)), T <- 0, T <- 1)
+        ret = src & dst
+        return ret
+
+    # decide on the value of T-bit in SR reg
+    def carry(self, src, dst, ret):
+        return True if ret == 0 else False
+
+
+class Instruction_OR(SH4Instruction):
+    bin_format = '0010nnnnmmmm1011'
+    name = 'or'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        self.commit_result = lambda v: self.put(v, dst_name)
+        return src, dst
+
+    def disassemle(self):
+        src, dst = resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src , dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        ret = src | dst
+        return ret
+
+
+class Instruction_OR_imm(SH4Instruction):
+    # I defined this based on my own intuition
+    # s: 10 -> or, 11 -> or.b
+    bin_format = '1100ss00iiiiiiii'
+    name = 'or'
+
+    def fetch_operands(self):
+        # Get #imm value
+        imm_vv = int(self.data['i'], 2)
+        src = imm_vv
+        # Fetch the register
+        r0_vv = self.get('r0', REGISTER_TYPE)
+        if self.data['s'] == '10':
+            dst = r0_vv
+        elif self.data['s'] == '11':
+            # Fetch the register
+            gbr_vv = self.get('gbr', REGISTER_TYPE)
+            adr = gbr_vv + r0_vv
+            # Load byte from memory
+            adr_val = self.load(adr, BYTE_TYPE)
+            dst = adr_val
+        self.commit_func = lambda v: self.store(v, dst) if self.data['s'] == '10'\
+                                                    else self.put(v, dst)
+        return src, dst
+
+    def disassemle(self):
+        self.name = self.name if self.data['s'] == '10' else self.name + '.b'
+        return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        # R0 | (0x000000FF & (long)#imm)
+        ret = src | dst
+        return ret
+
+
+class Instruction_AND(SH4Instruction):
+    bin_format = '0010nnnnmmmm1001'
+    name = 'and'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        self.commit_result = lambda v: self.put(v, dst_name)
+        return src, dst
+
+    def disassemle(self):
+        src, dst = resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src , dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        ret = src & dst
+        return ret
+
+
+class Instruction_AND_imm(SH4Instruction):
+    # I defined this based on my own intuition
+    # s: 10 -> and, 11 -> and.b
+    bin_format = '1100ss00iiiiiiii'
+    name = 'and'
+
+    def fetch_operands(self):
+        # Get #imm value
+        imm_vv = int(self.data['i'], 2)
+        src = imm_vv
+        # Fetch the register
+        r0_vv = self.get('r0', REGISTER_TYPE)
+        if self.data['s'] == '10':
+            dst = r0_vv
+        elif self.data['s'] == '11':
+            # Fetch the register
+            gbr_vv = self.get('gbr', REGISTER_TYPE)
+            adr = gbr_vv + r0_vv
+            # Load byte from memory
+            adr_val = self.load(adr, BYTE_TYPE)
+            dst = adr_val
+        self.commit_func = lambda v: self.store(v, dst) if self.data['s'] == '10'\
+                                                    else self.put(v, dst)
+        return src, dst
+
+    def disassemle(self):
+        self.name = self.name if self.data['s'] == '10' else self.name + '.b'
+        return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        # R0 & (0x000000FF & (long)#imm)
+        ret = src & dst
+        return ret
+
+
+class Instruction_SUB(SH4Instruction):
+    bin_format = ''
+    name = 'sub'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        self.commit_result = lambda v: self.put(v, dst_name)
+        return src, dst
+
+    def disassemle(self):
+        src, dst = resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src , dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        ret = src | dst
+        return ret
+
 
 class Instruction_RRC(Type1Instruction):
     # Rotate Right logical with carry-in.
@@ -603,9 +867,8 @@ class Instruction_BIT(Type3Instruction):
         return ret != self.constant(0, ret.ty)
 
 
-class Instruction_XOR(Type3Instruction):
+class Instruction_XOR(SH4Instruction):
     # Exclusive Or
-    opcode = "1110"
     name = 'xor'
 
     def compute_result(self, src, dst):
