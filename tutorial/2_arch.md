@@ -9,9 +9,9 @@ Before we can talk about how to add a new architecture, let's talk about our tar
 
 ## Our Arch: BrainFuck.
 
-We're going to implement BrainFuck in angr, because it's one of the simplest possible architectures that exists, but yet is far enough from the "real" architectures angr already supports to show off its flexibility.
+We're going to implement BrainFuck in angr, because it's one of the simplest architectures that exists, but yet is far enough from the "real" architectures angr already supports to show off its flexibility.
 
-BrainFuck is an esoteric programming language created by Urban Muller, to be simple in concept, with incredibly simple compiler tools, but really painful to actually use.
+BrainFuck is an esoteric programming language created by Urban Muller to be simple in concept, but really painful to actually use.
 
 BrainFuck implements a Turing machine-like abstraction, in which a infinite(ish) tape of symbols contains the program, and another tape of "cells", holds the program's state (memory).
 Each cell is an unsigned byte, and the cell being referred to by instructions is chosen by the current value of a "pointer".
@@ -20,14 +20,14 @@ The data pointer starts at cell 0.
 
 BrainFuck has only 8 instructions:
 
-`>`: Move the pointer to the right (increment)  
-`<`: Move the pointer to the left (decrement)  
-`+`: Increment the cell under the pointer  
-`-`: Decrement the cell under the pointer  
-`[`: If the value at the pointer is zero, skip to the next `]`  
-`]`: If the value at the pointer is non-zero, skip to the previous `[`  
-`.`: Output (print to stdout) the cell at the pointer  
-`,`: Input (get character at stdin) to the cell at ptr  
+`>`: Move the pointer to the right (increment)
+`<`: Move the pointer to the left (decrement)
+`+`: Increment the cell under the pointer
+`-`: Decrement the cell under the pointer
+`[`: If the value at the pointer is zero, skip forward to the matching `]`
+`]`: If the value at the pointer is non-zero, skip backward to the matching `[`
+`.`: Output (print to stdout) the cell at the pointer
+`,`: Input (get character at stdin) to the cell at ptr
 
 ## Defining our architecture
 
@@ -35,7 +35,8 @@ From the description above, we notice a few things:
 * This is a "Harvard" architecture, data and memory are separate.
 * We have two real registers here: A pointer `ptr`, and the usual instruction pointer `ip`.
 * Memory accesses in BF are all in terms of a single byte.  There's no endianness to worry about.  However, the width of `ip` and `ptr` are not defined.
-* We have to do something about input and output.  
+* We have to do something about input and output.
+
 This last point is worth some discussion.
 In traditional architectures, this is handled by GPIOs, or some complicated mess of peripherals driven by the OS.  We have none of that, we just want bytes in and bytes out.  We'll need to help angr out a bit with this one; there are a few possible ways to implement this, but we're going to explore one that pretends there are mythical system calls to get our bytes in and out.  In a "normal" architecture, this means there's a syscall number in a register somewhere.  We're going to pretend that exists too.
 
@@ -56,7 +57,7 @@ class ArchBF(Arch):
     def __init__(self, endness="Iend_LE"):
         super(ArchBF, self).__init__('Iend_LE')
 ```
-We'll call this arch little endian, since we have to say something, and it doesn't matter.
+We'll call this arch little endian, since we have to say something, and in this case it doesn't matter.
 
 Next, some simple metadata:
 ```python
@@ -66,16 +67,16 @@ Next, some simple metadata:
 ```
 
 Names are usually all-caps.  As I mentioned above, the bit-width here corresponds to the address space and register widths, and we don't have one defined, so I picked 64.
-VEX doesn't support this arch (haha), so vex_arch is None.
+VEX doesn't support this arch, so `vex_arch` is None.
 
 Now here's the register file:
 
 ```python
         self.registers = {}
-        self.registers["ip"] =       (0, 1)
-        self.registers["ptr"] =       (1, 1)
-        self.registers["inout"] =      (2, 1)
-        self.registers["ip_at_syscall"] =      (3, 1)
+        self.registers["ip"] = (0, 1)
+        self.registers["ptr"] = (1, 1)
+        self.registers["inout"] = (2, 1)
+        self.registers["ip_at_syscall"] = (3, 1)
 ```
 I mentioned the 'inout' register, which is our syscall number when picking input vs output.
 However, we have another fake register `ip_at_syscall`, which is used by angr to track syscall-related return behavior.  Don't worry about it, just put it here.
