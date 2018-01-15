@@ -47,10 +47,11 @@ INOUT_REG = ArchBF().registers['inout'][0]
 class Instruction_NOP(Instruction):
     # Convert everything that's not an instruction into a No-op to meet the BF spec
     bin_format = 'xxxxxxxx' # We don't care, match it all
+    name = 'nop'
 
-    def parse(self, bitstrm, endianness):
+    def parse(self, bitstrm):
         self.last_instruction = False
-        data = Instruction.parse(self, bitstrm, endianness)
+        data = Instruction.parse(self, bitstrm)
         try:
             bitstrm.peek(8)
         except bitstring.ReadError:
@@ -84,6 +85,7 @@ class Instruction_INCPTR(Instruction):
 
 class Instruction_DECPTR(Instruction):
     bin_format = bin(ord("<"))[2:].zfill(8)
+    name = 'decptr'
 
     def compute_result(self, *args):
         """
@@ -234,6 +236,7 @@ all_instrs = [
 
 
 class LifterBF(GymratLifter):
+    SUPPORTED_ARCHES = "BF"
     instrs = all_instrs
 
 # Tell PyVEX that this lifter exists.
