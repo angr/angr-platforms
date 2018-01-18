@@ -236,11 +236,10 @@ all_instrs = [
 
 
 class LifterBF(GymratLifter):
-    SUPPORTED_ARCHES = "BF"
     instrs = all_instrs
 
 # Tell PyVEX that this lifter exists.
-register(LifterBF)
+register(LifterBF, 'BF')
 
 if __name__ == '__main__':
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

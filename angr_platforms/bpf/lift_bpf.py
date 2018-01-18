@@ -343,4 +343,4 @@ class LifterBPF(GymratLifter):
     instrs = all_instrs
 
 # Tell PyVEX that this lifter exists.
-register(LifterBPF)
+register(LifterBPF, 'BPF')
