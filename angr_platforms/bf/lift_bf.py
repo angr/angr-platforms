@@ -247,14 +247,14 @@ if __name__ == '__main__':
     logging.getLogger('pyvex').setLevel(logging.DEBUG)
     logging.basicConfig()
 
-    irsb_ = pyvex.IRSB(None, 0, arch=archinfo.arch_from_id('bf'))
     test1 = '<>+-[].,'
     test2 = '<>+-[].,'
-    lifter = LifterBF(irsb_, test1,len(test1) , len(test1), 0, None)
+    lifter = LifterBF(ArchBF(), 0)
+    lifter._lift(data=test1, bytes_offset=0, max_bytes=len(test1), opt_level=0, traceflags=None)
     lifter.lift()
     lifter.irsb.pp()
 
-    irsb_ = pyvex.IRSB(None, 0, arch=ArchBF())
-    lifter = LifterBF(irsb_, test2, len(test2),len(test2),0,  None)
+    lifter = LifterBF(ArchBF(), 0)
+    lifter._lift(data=test2, bytes_offset=0, max_bytes=len(test2), opt_level=0, traceflags=None)
     lifter.lift()
     lifter.irsb.pp()
