@@ -20,9 +20,7 @@ class ArchBF(Arch):
         self.registers["inout"] = (16, 1)
         self.registers["ip_at_syscall"] = (24, 8)
 
-        self.register_names = {}
-        self.register_names[self.registers['ip'][0]] = 'pc'
-        self.register_names[self.registers['ip'][1]] = 'ip'
+        self.register_names = { offset: name for name, (offset, _size) in self.registers.iteritems() }
 
         self.ip_offset = self.registers["ip"][0]
 
