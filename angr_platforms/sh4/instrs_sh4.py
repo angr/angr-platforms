@@ -23,7 +23,8 @@ CARRY_BIT_IND = 0
 # i: immediate data
 # d: displacement
 # a: addressing mode
-# s: operand size
+# s: operand size or sign/unsign
+# g: > or >=
 # c: constant post/pre increment
 
 # Lots of things are going to be interpreted as signed immediates. Here's a quickie to load them
@@ -124,9 +125,9 @@ class Instruction_MOV_Rm_Rn(SH4Instruction):
         if self.data['s'] == '00':
             self.name = self.name + ".b"
         elif self.data['s'] == '01':
-            self.name + ".w"
+            self.name = self.name + ".w"
         elif self.data['s'] == '10':
-            self.name + ".l"
+            self.name = self.name + ".l"
         else:
             self.name = self.name
         src_name, dst_name = self.resolve_reg(self.data['m'], self.data['n'])
@@ -292,7 +293,7 @@ class Instruction_XOR_imm(SH4Instruction):
         self.put(pc_vv, 'pc')
         ret = src ^ dst
         # Write_8 (GBR + R[0], temp) -> narrow_int just to make sure it's 8-bit
-        return ret if self.data['s'] == '10' else self.op_narrow_int(ret, BYTE_TYPE)
+        return ret if self.data['s'] == '10' else ret.cast_to(BYTE_TYPE)
 
 
 class Instruction_TST(SH4Instruction):
@@ -485,7 +486,9 @@ class Instruction_AND_imm(SH4Instruction):
 
 
 class Instruction_SUB(SH4Instruction):
-    bin_format = ''
+    # I defined this based on my intuition
+    # s: 00 -> sub, 10 -> subc, 11 -> subv
+    bin_format = '0011nnnnmmmm10ss'
     name = 'sub'
 
     def fetch_operands(self):
@@ -496,6 +499,8 @@ class Instruction_SUB(SH4Instruction):
         return src, dst
 
     def disassemle(self):
+        self.name = self.name if self.data['s'] == '00' else self.name + 'c' \
+                                if self.data['s'] == '10' else self.name + 'v'
         src, dst = resolve_reg(self.data['m'], self.data['n'])
         return self.addr. self.name, [src , dst]
 
@@ -503,8 +508,218 @@ class Instruction_SUB(SH4Instruction):
         pc_vv = self.get_pc()
         pc_vv += 2
         self.put(pc_vv, 'pc')
-        ret = src | dst
+        if self.data['s'] == '00' or self.data['s'] == '11':
+            ret = src - dst
+        elif self.data['s'] == '10':
+            tmp1 = dst - src
+            tmp0 = dst
+            ret = tmp1 - self.cast_to(self.get_carry(), REGISTER_TYPE)
         return ret
+
+    # Borrow bit resulting from the operation reflecting in T-bit
+    def carry(self, src, dst, ret):
+        if self.data['s'] == '00':
+            return
+        # Rn - Rm - T -> Rn, borrow -> T
+        elif self.data['s'] == '10':
+            tmp1 = dst - src
+            tmp0 = dst
+            return True if tmp1 > tmp0 or ret > tmp1 else False
+        # Rn - Rm -> Rn, underflow -> T
+        elif self.data['s'] == '11':
+            src_f = 0 if src >= 0 else 1
+            dst_f = 0 if dst >= 0 else 1
+            src_f += dst_f
+            dst -= src
+            ans_f = 0 if dst >= 0 else 1
+            ans_f += dst_f
+            return True if src_f == 1 and ans_f == 1 else False
+
+
+class Instruction_MUL(SH4Instruction):
+    # I defined this based on my intuition
+    # 00|00|nnnnmmmm|01|11 mul.l Rm,Rn
+    # 00|10|nnnnmmmm|11|11 muls.w Rm,Rn
+    # 00|10|nnnnmmmm|11|10 mulu.w Rm,Rn
+    # s: 11 -> signed, s: 10 -> unsigned
+    bin_format = '00ccnnnnmmmmbbss'
+    name = 'mul'
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        # signed
+        if self.data['s'] == '11':
+            if self.data['c'] == '00' and self.data['b'] == '01':
+                src = self.get(src_name, REGISTER_TYPE)
+                dst = self.get(dst_name, REGISTER_TYPE)
+            elif self.data['c'] == '10' and self.data['b'] == '11':
+                src = self.cast_to(self.get(src_name, WORD_TYPE), WORD_TYPE, signed=True)
+                dst = self.cast_to(self.get(dst_name, WORD_TYPE), WORD_TYPE, signed=True)
+        # unsigned
+        elif self.data['s'] == '10':
+            src = self.get(src_name, WORD_TYPE)
+            dst = self.get(dst_name, WORD_TYPE)
+        self.commit_result = lambda v: self.put(v, 'macl')
+        return src, dst
+
+    def disassemle(self):
+        self.name = self.name if self.data['s'] == '00' else self.name + 'c' \
+                                if self.data['s'] == '10' else self.name + 'v'
+        src, dst = resolve_reg(self.data['m'], self.data['n'])
+        return self.addr. self.name, [src , dst]
+
+    def compute_result(self, src, dst):
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        if self.data['s'] == '11':
+            if self.data['c'] == '00' and self.data['b'] == '01':
+                mul_vv_64 = src * dst
+                # mul_vv_32 = self.op_narrow_int(mul_vv_64, WORD_TYPE)
+                mul_vv_32 = mul_vv_64.narrow_low(WORD_TYPE)
+                ret = mul_vv_32
+            else:
+                ret = src * dst
+        return ret
+
+
+class Instruction_CMP_Rm_Rn(SH4Instruction):
+    """
+    cmp/eq Rm,Rn -> 0011nnnnmmmm0000
+    cmp/hs Rm,Rn -> 0011nnnnmmmm0010 >= unsigned
+    cmp/ge Rm,Rn -> 0011nnnnmmmm0011 >= signed
+    cmp/hi Rm,Rn -> 0011nnnnmmmm0110 >  unsigned
+    cmp/gt Rm,Rn -> 0011nnnnmmmm0111 >  signed
+    """
+    bin_format = '0011nnnnmmmmggss'
+    name = 'cmp/'
+    def compute_result(self, src, dst):
+        # s -> 00 (eq), s -> 01 (signed), s -> 11 (unsigned)
+        # g -> >= (ge), g -> > (g)
+        sign = self.data['s']
+        greq = self.data['g']
+        dst_num = int(self.data['n'], 2)
+        src_num = int(self.data['m'], 2)
+        dst = self.get(dst_num, REGISTER_TYPE)
+        src = self.get(src_num, REGISTER_TYPE)
+        # cmp/eq
+        if sign == '00' and greq == '00':
+            self.setsrc == dst
+        # MOV.X @Rm+, Rn
+        elif adr_mode == '01' and const == '01':
+            # Fetch the register
+            reg_vv = self.get(src_num, REGISTER_TYPE)
+            # Compute type
+            ty = Type.int_8 if self.data['s'] == '00' \
+                            else  Type.int_16 if self.data['s'] == '01' \
+                            else Type.int_32
+            # Post-increment
+            if dst_num == src_num:
+                reg_vv += get_type_size(ty)/8
+            else:
+                reg_vv = src
+            self.put(reg_vv, src_num)
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        return src
+    def disassemble(self):
+        # greater or equal
+        if self.data['g'] == '00':
+            if self.data['s'] == '00':
+                self.name = self.name + 'eq'
+            elif self.data['s'] == '10':
+                self.name = self.name + 'hs'
+            elif self.data['s'] == '11':
+                self.name = self.name + 'ge'
+        # greater
+        elif self.data['g'] == '01':
+            if self.data['s'] == '10':
+                self.name = self.name + 'hi'
+            elif self.data['s'] == '11':
+                self.name = self.name + 'gt'
+        src_name, dst_name = self.resolve_reg(self.data['m'], self.data['n'])
+        return self.addr, self.name, [src_name, dst_name]
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        return src, dst
+
+    # decide on the value of T-bit in SR reg
+    def carry(self, src, dst, ret):
+        if
+        if src == dst:
+
+
+class Instruction_CMP_Rm_Rn(SH4Instruction):
+    """
+    cmp/eq Rm,Rn -> 0011nnnnmmmm0000
+    cmp/hs Rm,Rn -> 0011nnnnmmmm0010 >= unsigned
+    cmp/ge Rm,Rn -> 0011nnnnmmmm0011 >= signed
+    cmp/hi Rm,Rn -> 0011nnnnmmmm0110 >  unsigned
+    cmp/gt Rm,Rn -> 0011nnnnmmmm0111 >  signed
+    """
+    bin_format = '0011nnnnmmmmggss'
+    name = 'cmp/'
+    def compute_result(self, src, dst):
+        # s -> 00 (eq), s -> 01 (signed), s -> 11 (unsigned)
+        # g -> >= (ge), g -> > (g)
+        sign = self.data['s']
+        greq = self.data['g']
+        dst_num = int(self.data['n'], 2)
+        src_num = int(self.data['m'], 2)
+        dst = self.get(dst_num, REGISTER_TYPE)
+        src = self.get(src_num, REGISTER_TYPE)
+        # cmp/eq
+        if sign == '00' and greq == '00':
+            self.setsrc == dst
+        # MOV.X @Rm+, Rn
+        elif adr_mode == '01' and const == '01':
+            # Fetch the register
+            reg_vv = self.get(src_num, REGISTER_TYPE)
+            # Compute type
+            ty = Type.int_8 if self.data['s'] == '00' \
+                            else  Type.int_16 if self.data['s'] == '01' \
+                            else Type.int_32
+            # Post-increment
+            if dst_num == src_num:
+                reg_vv += get_type_size(ty)/8
+            else:
+                reg_vv = src
+            self.put(reg_vv, src_num)
+        pc_vv = self.get_pc()
+        pc_vv += 2
+        self.put(pc_vv, 'pc')
+        return src
+    def disassemble(self):
+        # greater or equal
+        if self.data['g'] == '00':
+            if self.data['s'] == '00':
+                self.name = self.name + 'eq'
+            elif self.data['s'] == '10':
+                self.name = self.name + 'hs'
+            elif self.data['s'] == '11':
+                self.name = self.name + 'ge'
+        # greater
+        elif self.data['g'] == '01':
+            if self.data['s'] == '10':
+                self.name = self.name + 'hi'
+            elif self.data['s'] == '11':
+                self.name = self.name + 'gt'
+        src_name, dst_name = self.resolve_reg(self.data['m'], self.data['n'])
+        return self.addr, self.name, [src_name, dst_name]
+
+    def fetch_operands(self):
+        src_name, dst_name = resolve_reg(self.data['m'], self.data['n'])
+        src = self.get(src_name, REGISTER_TYPE)
+        dst = self.get(dst_name, REGISTER_TYPE)
+        return src, dst
+
+    # decide on the value of T-bit in SR reg
+    def carry(self, src, dst, ret):
+        if src == dst:
 
 
 class Instruction_RRC(Type1Instruction):
