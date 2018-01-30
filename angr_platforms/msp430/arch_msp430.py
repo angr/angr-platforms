@@ -84,7 +84,7 @@ class ArchMSP430(Arch):
         24: 'r12',
         26: 'r13',
         28: 'r14',
-        39: 'r15'
+        30: 'r15'
     }
 
     registers = {
