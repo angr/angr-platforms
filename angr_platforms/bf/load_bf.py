@@ -10,6 +10,7 @@ class BF(Blob):
     """
     Representation of a binary blob, i.e. an executable in an unknown file format.
     """
+    is_default = True
 
     def __init__(self, path, custom_offset=0, *args, **kwargs):
         """

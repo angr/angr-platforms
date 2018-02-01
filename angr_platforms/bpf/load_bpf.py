@@ -8,6 +8,8 @@ l = logging.getLogger("load_Bpf")
 
 
 class BPF(Blob):
+    is_default = False
+
     def __init__(self, path, custom_offset=0, *args, **kwargs):
         """
         Loader backend for BF programs
