@@ -1348,8 +1348,37 @@ class Instruction_SBIW(DoubleRegImmAVRInstruction):
     def negative(self, src, dst, res):
         return res[7]
 
-# TODO: SBRC
-# TODO: SBRS
+class SkipInstruction(NoFlags, AVRInstruction):
+    def apply_context(self, past, future):
+        self.next_size = future[0].bytewidth
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), int(self.data["b"], 2))
+
+    def commit_result(self, skip):
+        self.jump(skip, self.addr + self.next_size + 2)
+
+class Instruction_SBRC(SkipInstruction):
+    bin_format = "1111110rrrrr0bbb"
+    name = "sbrc"
+    def compute_result(self, reg, bit):
+        return ~reg[bit]
+
+class Instruction_SBRS(SkipInstruction):
+    bin_format = "1111111rrrrr0bbb"
+    name = "sbrs"
+    def compute_result(self, reg, bit):
+        return reg[bit]
+
+class Instruction_CPSE(SkipInstruction):
+    bin_format = '000100rdddddrrrr'
+    name = "cpse"
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), self.get_reg(self.data["d"]))
+
+    def compute_result(self, src, dst):
+        return src == dst
 
 class Instruction_SLEEP(AVRInstruction):
     bin_format = "1001010110001000"
@@ -1392,6 +1421,63 @@ class Instruction_STminus(NoFlags,AVRInstruction):
         addr -= 1
         self.store_data(val, addr)
         self.put(addr, self.arch.registers['X'][0])
+
+class Instruction_STindex(NoFlags, AVRInstruction):
+    bin_format = "10qsqq1rrrrryqqq"
+    name = "stI"
+
+    def match_instruction(self, data, bitstrm):
+        data["s"] = int(data["s"], 2)
+        data["q"] = int(data["q"], 2)
+        if data["s"] == 0: return
+        if data["q"] == 1 or data["q"] == 2: return
+        raise ParseError()
+
+    def fetch_operands(self):
+        # figure out which register (y or z) to operate on
+        index_reg = self.arch.registers["Y" if self.data["y"] == 1 else "Z"][0]
+        segment_reg = self.arch.registers["RAMPY" if self.data["y"] == 1 else "RAMPZ"][0]
+        segment = self.get(segment_reg, REG_TYPE).cast_to(Type.int_24) << 16
+        addr =  self.get(index_reg, DOUBLEREG_TYPE).cast_to(Type.int_24)
+
+        # special mode: pre-decrement
+        if self.data["s"] and self.data["q"] == 2:
+            addr -= 1
+            self.put(addr, index_reg)
+
+        # special mode: post-increment
+        if self.data["s"] and self.data["q"] == 1:
+            self.put(addr + 1, index_reg)
+
+        # optional offset if not special mode
+        offset = self.data["q"] if not self.data["s"] else 0
+        return (addr + offset, self.get_reg(self.data["r"]))
+
+    def compute_result(self, addr, val):
+        self.store_data(val, addr)
+
+class Instruction_STS(NoFlags, AVRInstruction):
+    bin_format = "1001001rrrrr0000"
+    name = "sts"
+
+    def parse(self, bitstrm):
+        data = AVRInstruction.parse(self, bitstrm)
+        data["k"] = read_trailer(bitstrm)
+        self.bitsize = 32
+        return data
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), int(self.data["k"], 2))
+
+    def compute_result(self, val, imm):
+        self.store_data(val, self.constant(imm, Type.int_16))
+
+class Instruction_SWAP(NoFlags, OneRegAVRInstruction):
+    opcode = "0010"
+    name = "swap"
+
+    def compute_result(self, val):
+        return (val >> 4) | (val << 4)
 
 class Instruction_SUBI(RegImmAVRInstruction):
     opcode = "0101"
@@ -1439,6 +1525,20 @@ class Instruction_WDR(NoFlags, AVRInstruction):
     def compute_result(self, *args):
         return None
         # EDG says: Uh... no.
+
+class Instruction_XCH(NoFlags, AVRInstruction):
+    bin_format = "1001001rrrrr0100"
+    name = "xch"
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), )
+
+    def compute_result(self, src):
+        addr = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Type.int_24)
+        segment = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Type.int_24) << 16
+        dataval = self.load_data(segment + addr, Type.int_8)
+        self.put_reg(dataval, self.data["r"])
+        self.store_data(src, segment + addr)
 
 class Instruction_CP(Instruction_SUB):
     opcode = "000101"
@@ -1578,6 +1678,8 @@ class LifterAVR(GymratLifter):
         # TODO SBRC
         # TODO SBRS
         #SEC Virtual;
+        Instruction_SBRC,
+        Instruction_SBRS,
         #SEH
         #SEI
         #SEN
@@ -1598,11 +1700,14 @@ class LifterAVR(GymratLifter):
         # TODO: SUB
         # TODO: SUBI
         # TODO: SWAP
+        Instruction_STindex,
+        Instruction_STS,
         Instruction_SUB,
         Instruction_SUBI,
+        Instruction_SWAP,
         # TST Virtual; see AND
         Instruction_WDR,
-        # TODO: XCH
+        Instruction_XCH,
         }
 
 
