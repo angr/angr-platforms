@@ -1578,7 +1578,6 @@ class LifterAVR(GymratLifter):
         # NOTE: The following instructions will lift to BRBC and BRBS
         #BRCC
         #BRCS
-        #BREAK
         #BREQ
         #BRGE
         #BRHC
@@ -1594,25 +1593,26 @@ class LifterAVR(GymratLifter):
         #BRTC
         #BRVC
         #BRVS
+        # TODO: BREAK
         Instruction_BSET,
         Instruction_BST,
         Instruction_CALL,
         Instruction_CBI,
-        #CBR Virtual; see ANDI
-        #CLC Virtual; see BCLR
+        # CBR Virtual; see ANDI
+        # Note: The following instructions will lift to BCLR
+        #CLC
         #CLH
         #CLI
         #CLN
-        #CLR Virtual; see EOR
         #CLS
         #CLT
         #CLV
         #CLZ
+        # CLR Virtual; see EOR
         Instruction_COM,
         Instruction_CP,
         Instruction_CPC,
         Instruction_CPI,
-        #TODO: Instruction_CPSE,
         Instruction_DEC,
         # TODO: DES
         Instruction_EICALL,
@@ -1624,8 +1624,6 @@ class LifterAVR(GymratLifter):
         # TODO: FMUL
         # TODO: FMULS
         # TODO: FMULSU
-        # TODO: ICALL
-        # TODO: IJMP
         Instruction_IN,
         Instruction_INC,
         Instruction_JMP,
@@ -1674,11 +1672,10 @@ class LifterAVR(GymratLifter):
         # TODO: SBIS
         Instruction_SBIW,
         #SBR Virtual; See OR
-        # TODO SBRC
-        # TODO SBRS
-        #SEC Virtual;
         Instruction_SBRC,
         Instruction_SBRS,
+        # Note: The following instructions will lift to BSET
+        #SEC
         #SEH
         #SEI
         #SEN
@@ -1692,13 +1689,6 @@ class LifterAVR(GymratLifter):
         Instruction_ST,
         Instruction_STplus,
         Instruction_STminus,
-        # TODO: STDX
-        # TODO: STDY
-        # TODO: STDZ
-        # TODO: STS
-        # TODO: SUB
-        # TODO: SUBI
-        # TODO: SWAP
         Instruction_STindex,
         Instruction_STS,
         Instruction_SUB,
