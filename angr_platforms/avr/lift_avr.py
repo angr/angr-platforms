@@ -855,7 +855,6 @@ class Instruction_LDDXminus(Instruction_LDDX):
         return val
 
 class Instruction_LDDY(NoFlags, AVRInstruction):
-    # TODO: Looks like a mistake in the ISA here.  Is it 1000 or 1001?
     bin_format = '1001000ddddd1000'
     name = 'lddY'
 
