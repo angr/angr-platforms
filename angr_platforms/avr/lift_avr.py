@@ -42,7 +42,21 @@ def bits_to_signed_int(s):
 def read_trailer(bitstrm):
     return bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
 
+# compute the carry bit at position i for res = dst + src
+def compute_carry_add(i, src, dst, res):
+    return (src[i] & dst[i]) | (src[i] & ~res[i]) |  (dst[i] & ~res[i])
 
+# compute the carry bit at position i for res = dst - src
+def compute_carry_sub(i, src, dst, res):
+    return (~dst[i] & src[i]) | (src[i] & res[i]) |  (res[i] & ~dst[i])
+
+# compute overflow bit for res = dst + src
+def compute_overflow_add(src, dst, res):
+    return (dst[7] & src[7] & ~res[7]) | (~dst[7] & ~src[7] & res[7])
+
+# compute overflow bit for res = dst - src
+def compute_overflow_sub(src, dst, res):
+    return (dst[7] & ~src[7] & ~res[7]) | (~dst[7] & src[7] & res[7])
 
 
 class AVRInstruction(Instruction):
@@ -358,16 +372,13 @@ class Instruction_ADC(TwoRegAVRInstruction):
         return src + dst + carryin
 
     def carry(self, src, dst, res):
-        # TODO
-        pass
+        return compute_carry_add(7, src, dst, res)
 
     def half_carry(self, src, dst, res):
-        # TODO
-        pass
+        return compute_carry_add(3, src, dst, res)
 
     def overflow(self, src, dst, res):
-        # TODO
-        pass
+        return compute_overflow_add(src, dst, res)
 
     def negative(self, src, dst, res):
         return res[7]
@@ -380,16 +391,13 @@ class Instruction_ADD(TwoRegAVRInstruction):
         return src + dst
 
     def carry(self, src, dst, res):
-        pass
-        # TODO
+        return compute_carry_add(7, src, dst, res)
 
     def half_carry(self, src, dst, res):
-        pass
-        # TODO
+        return compute_carry_add(3, src, dst, res)
 
     def overflow(self, src, dst, res):
-        pass
-        # TODO
+        return compute_overflow_add(src, dst, res)
 
     def negative(self, src, dst, res):
         return res[7]
@@ -403,16 +411,10 @@ class Instruction_ADIW(DoubleRegImmAVRInstruction):
         return src + imm
 
     def carry(self, src, dst, res):
-        pass
-        # TODO
-
-    def half_carry(self, src, dst, res):
-        pass
-        # TODO
+        return src[15] & ~res[15]
 
     def overflow(self, src, dst, res):
-        pass
-        # TODO
+        return ~src[15] & res[15]
 
     def negative(self, src, dst, res):
         return res[15]
@@ -604,89 +606,6 @@ class Instruction_COM(OneRegAVRInstruction):
 
     def overflow(self, src, res):
         return 0
-
-class Instruction_CP(TwoRegAVRInstruction):
-    opcode = "000101"
-    name = 'cp'
-
-    def compute_result(self, src, dst):
-        return src - dst
-
-    def commit_result(self, res):
-        pass
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-    def carry(self, src, dst, res):
-        return dst > src
-
-    def overflow(self, src, dst, res):
-        # TODO:
-        return None
-
-    def half_carry(self, src, dst, res):
-        # TODO
-        return None
-
-
-class Instruction_CPC(TwoRegAVRInstruction):
-    opcode = "000001"
-    name = 'cpc'
-
-    def compute_result(self, src, dst):
-        return src - dst + self.get_carry()
-
-    def commit_result(self, res):
-        pass
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-    def carry(self, src, dst, res):
-        return dst > src + self.get_carry()
-
-    def overflow(self, src, dst, res):
-        # TODO:
-        return None
-
-    def half_carry(self, src, dst, res):
-        # TODO
-        return None
-
-
-class Instruction_CPI(RegImmAVRInstruction):
-    opcode = '0011'
-    name = 'cpi'
-
-    def compute_result(self, src, imm):
-        return src - imm
-
-    def commit_result(self, res):
-        pass
-
-    def negative(self, src, imm, res):
-        return res[7]
-
-    def carry(self, src, imm, res):
-        return imm > src
-
-    def overflow(self, src, imm, res):
-        # TODO:
-        return None
-
-    def half_carry(self, src, imm, res):
-        # TODO
-        return None
-
-"""
-class Instruction_CPSE(TwoRegAVRInstruction):
-    # Skip the next instruction, whatever that is, if src = dst
-    bin_format = '000100'
-
-    def compute_result(self, src, dst):
-        self.jump(src == dst, self.addr + 4) #TODO: This is wrong
-"""
 
 class Instruction_DEC(OneRegAVRInstruction):
     opcode = '1010'
@@ -1370,13 +1289,16 @@ class Instruction_SBC(TwoRegAVRInstruction):
     name = 'sbc'
 
     def compute_result(self, src, dst):
-        return src - dst
+        return dst - src - self.get_carry()
 
-    # TODO: OVerflow
-    # TODO: half-carry
+    def half_carry(self, src, dst, res):
+        return compute_carry_sub(3, src, dst, res)
 
     def carry(self, src, dst, res):
-        return dst > src + self.get_carry()
+        return compute_carry_sub(7, src, dst, res)
+
+    def overflow(self, src, dst, res):
+        return compute_overflow_sub(src, dst, res)
 
     def negative(self, src, dst, res):
         return res[7]
@@ -1388,17 +1310,19 @@ class Instruction_SBCI(RegImmAVRInstruction):
     name = 'sbci'
 
     def compute_result(self, src, imm):
-        return src - imm
+        return src - imm - self.get_carry()
 
-    # TODO: OVerflow
-    # TODO: half-carry
+    def overflow(self, src, imm, res):
+        return compute_overflow_sub(imm, src, res)
 
-    def carry(self, src, dst, res):
-        return dst > src + self.get_carry()
+    def carry(self, src, imm, res):
+        return compute_carry_sub(7, imm, src, res)
+
+    def half_carry(self, src, imm, res):
+        return compute_carry_sub(3, imm, src, res)
 
     def negative(self, src, dst, res):
         return res[7]
-
 
 
 # TODO: SBI
@@ -1412,7 +1336,17 @@ class Instruction_SBIW(DoubleRegImmAVRInstruction):
     def compute_result(self, src, imm):
         return src - imm
 
-        # TODO flags
+    def overflow(self, src, imm, res):
+        return compute_overflow_sub(imm, src, res)
+
+    def carry(self, src, imm, res):
+        return compute_carry_sub(7, imm, src, res)
+
+    def half_carry(self, src, imm, res):
+        return compute_carry_sub(3, imm, src, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
 
 # TODO: SBRC
 # TODO: SBRS
@@ -1459,6 +1393,44 @@ class Instruction_STminus(NoFlags,AVRInstruction):
         self.store_data(val, addr)
         self.put(addr, self.arch.registers['X'][0])
 
+class Instruction_SUBI(RegImmAVRInstruction):
+    opcode = "0101"
+    name = "subi"
+
+    def compute_result(self, dst, imm):
+        return dst - imm
+
+    def half_carry(self, dst, imm, res):
+        return compute_carry_sub(3, imm, dst, res)
+
+    def carry(self, dst, imm, res):
+        return compute_carry_sub(3, imm, dst, res)
+
+    def negative(self, dst, imm, res):
+        return res[7]
+
+    def overflow(self, dst, imm, res):
+        return compute_overflow_sub(imm, dst, res)
+
+class Instruction_SUB(TwoRegAVRInstruction):
+    opcode = "00110"
+    name = "sub"
+
+    def compute_result(self, src, dst):
+        return dst - src
+
+    def half_carry(self, src, dst, res):
+        return compute_carry_sub(3, src, dst, res)
+
+    def carry(self, src, dst, res):
+        return compute_carry_sub(7, src, dst, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+    def overflow(self, src, dst, res):
+        return compute_overflow_sub(src, dst, res)
+
 
 class Instruction_WDR(NoFlags, AVRInstruction):
     bin_format = "1001010110101000"
@@ -1467,6 +1439,29 @@ class Instruction_WDR(NoFlags, AVRInstruction):
     def compute_result(self, *args):
         return None
         # EDG says: Uh... no.
+
+class Instruction_CP(Instruction_SUB):
+    opcode = "000101"
+    name = 'cp'
+
+    def commit_result(self, res):
+        pass
+
+class Instruction_CPC(Instruction_SBC):
+    opcode = "000001"
+    name = 'cpc'
+
+    def commit_result(self, res):
+        pass
+
+
+class Instruction_CPI(Instruction_SUBI):
+    opcode = '0011'
+    name = 'cpi'
+
+    def compute_result(self, src, imm):
+        return src - imm
+
 
 class LifterAVR(GymratLifter):
 
@@ -1603,6 +1598,8 @@ class LifterAVR(GymratLifter):
         # TODO: SUB
         # TODO: SUBI
         # TODO: SWAP
+        Instruction_SUB,
+        Instruction_SUBI,
         # TST Virtual; see AND
         Instruction_WDR,
         # TODO: XCH
