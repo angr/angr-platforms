@@ -1,12 +1,15 @@
-from archinfo import Arch
+from archinfo import Arch, Endness
 
 class ArchAVR(Arch):
     def __init__(self, endness="Iend_LE"):
         super(ArchAVR, self).__init__(endness)
 
         self.bits = 32
+        self.call_sp_fix = 4
+        self.instruction_alignment = 2
         self.vex_arch = None
         self.name = "AVR"
+        self.instruction_endness = Endness.LE
 
         # Things I did not want to include but were necessary unfortunately :-(
         # self.cs_mode = capstone.CS_MODE_LITTLE_ENDIAN if endness == 'Iend_LE' else capstone.CS_MODE_BIG_ENDIAN
