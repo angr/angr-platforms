@@ -138,5 +138,9 @@ class ArchAVR(Arch):
         self.register_size_names = {}
         self.register_size_names.update({self.registers["R%d_R%d" % (i+1, i)] : "R%d_R%d" % (i+1, i) for i in range(0, 32, 2)})
 
-        self.ip_offset = self.registers["pc"][0]
 
+        self.ip_offset = self.registers["pc"][0]
+        self.sp_offset = self.registers["sp"][0]
+        self.call_pushes_ret = True
+        # FIXME: something in angr assumes that sizeof(long) == sizeof(return address on stack)
+        self.sizeof["long"] = self.bytes
