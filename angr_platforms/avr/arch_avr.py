@@ -130,7 +130,12 @@ class ArchAVR(Arch):
 
         self.register_names = {}
         self.register_names.update({i: "r%d" % i for i in range(0, 32)})
+        self.register_names.update({i[0]: name for name, i in self.registers.iteritems() if i > self.ioreg_offset})
         self.register_names[self.registers['pc'][0]] = 'pc'
+        self.register_names[self.registers["SREG"][0]] = "SREG"
+
+        self.register_size_names = {}
+        self.register_size_names.update({self.registers["R%d_R%d" % (i+1, i)] : "R%d_R%d" % (i+1, i) for i in range(0, 32, 2)})
 
         self.ip_offset = self.registers["pc"][0]
 
