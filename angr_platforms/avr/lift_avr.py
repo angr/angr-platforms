@@ -560,7 +560,7 @@ class Instruction_CALL(NoFlags, AVRInstruction):
         data = AVRInstruction.parse(self, bitstrm)
         # get the rest of the imm
         data['k'] += read_trailer(bitstrm)
-        self.bitsize = 32
+        self.bitwidth = 32
         return data
 
     def fetch_operands(self):
@@ -779,7 +779,7 @@ class Instruction_JMP(NoFlags, AVRInstruction):
         data = AVRInstruction.parse(self, bitstrm)
         # get the rest of the imm
         data['k'] += read_trailer(bitstrm)
-        self.bitsize = 32
+        self.bitwidth = 32
         return data
 
     def fetch_operands(self):
@@ -957,7 +957,7 @@ class Instruction_LDS(NoFlags, AVRInstruction):
         data = AVRInstruction.parse(self, bitstrm)
         # get the rest of the imm
         data['k'] = read_trailer(bitstrm)
-        self.bitsize = 32
+        self.bitwidth = 32
         return data
 
     def fetch_operands(self):
@@ -1462,7 +1462,7 @@ class Instruction_STS(NoFlags, AVRInstruction):
     def parse(self, bitstrm):
         data = AVRInstruction.parse(self, bitstrm)
         data["k"] = read_trailer(bitstrm)
-        self.bitsize = 32
+        self.bitwidth = 32
         return data
 
     def fetch_operands(self):
