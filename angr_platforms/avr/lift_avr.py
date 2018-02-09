@@ -1607,7 +1607,7 @@ class LifterAVR(GymratLifter):
 
 
 
-register(LifterAVR)
+register(LifterAVR, "AVR")
 
 if __name__ == '__main__':
     import logging
@@ -1617,24 +1617,27 @@ if __name__ == '__main__':
         b'\x00\x00',  # NOP
         b'\x23\x01',  # MOVW
         b'\x46\x02',  # MULS
+        b"\x01\x1c"   # adc r0, r1
+        b'\x1f\xbe',  # out 0x3d, r1
+        b"\x01\xf8", # bld r0, 1
+        b"\x0e\x94\x00\x00", # call 0x0
+
     ]
     print "Decoder test:"
     for num, test in enumerate(tests):
         print num
-        irsb_ = pyvex.IRSB(None, 0, arch=archinfo.ArchAVR())
-        LifterAVR(irsb_, test, len(test), len(test), 0, None).lift()
+        l = LifterAVR(ArchAVR(), 0)
+        l._lift(test, 0, max_inst=1)
 
     print "Lifter test:"
     for test2 in tests:
-        irsb_ = pyvex.IRSB(None, 0, arch=archinfo.ArchAVR())
-        l = LifterAVR(irsb_, test2, len(test2), len(test2), 0, None)
-        l.lift()
+        l = LifterAVR(ArchAVR(), 0)
+        l._lift(test2, bytes_offset=0, max_bytes=len(test2), max_inst=len(test2)/2)
         l.irsb.pp()
 
     print "Full tests:"
     fulltest = "".join(tests)
-    irsb_ = pyvex.IRSB(None, 0, arch=archinfo.ArchAVR())
-    l = LifterAVR(irsb_, fulltest, len(fulltest), len(fulltest), 0, None)
-    l.lift()
+    l = LifterAVR(ArchAVR(), 0)
+    l._lift(fulltest, bytes_offset=0, max_bytes=len(fulltest), max_inst=len(fulltest) / 2)
     l.irsb.pp()
     pyvex.IRSB(fulltest, 0x0, arch=ArchAVR()).pp()
