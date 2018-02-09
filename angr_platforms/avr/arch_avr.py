@@ -20,7 +20,7 @@ class ArchAVR(Arch):
         self.ioreg_offset = 0x20
         # Instructions and data are in different memory in AVR
         # Translate data address into the address space by adding this
-        self.data_offset = 0x10000000
+        self.data_offset = 1 << 31
 
         self.registers = {}
         self.registers.update({"r%d" % i            : (i, 1) for i in range(0, 32)})
