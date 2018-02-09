@@ -71,6 +71,7 @@ class ArchAVR(Arch):
         self.registers["EIND"] =    (0x5c, 1)
 
         self.registers["SP"] =      (0x5d, 2)
+        self.registers["sp"] =      (0x5d, 2)
         self.registers["SPL"] =     (0x5d, 1)
         self.registers["SPH"] =     (0x5e, 1)
 
