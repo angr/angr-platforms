@@ -862,8 +862,8 @@ class Instruction_CPI(Instruction_SUBI):
     opcode = '0011'
     name = 'cpi'
 
-    def compute_result(self, src, imm):
-        return src - imm
+    def commit_result(self, res):
+        pass
 
 
 # DATA MEMORY ACCESS INSTRUCTIONS
