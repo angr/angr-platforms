@@ -905,10 +905,13 @@ class Instruction_LAT(Instruction_LAGeneric):
     def compute_result(self, val, dst):
         return val ^ dst
 
+class LoadStoreInstruction(NoFlags, AVRInstruction):
+    def process_address_operand(self):
+        """This function computes the address for the load or store instruction,
+        taking care of the correct segment register (RAMPX/Y/Z). 
+        It also applies any specified post-increment/pre-decrement.
+        """
 
-class Instruction_LDGeneric(NoFlags, AVRInstruction):
-    name = "ld"
-    def fetch_operands(self):
         # figure out which register (y or z) to operate on
         index_reg = self.arch.registers[self.data["index"]][0]
         segment_reg = self.arch.registers["RAMP" + self.data["index"]][0]
@@ -931,7 +934,13 @@ class Instruction_LDGeneric(NoFlags, AVRInstruction):
 
         # optional offset if not special mode
         offset = self.data["q"] if not self.data["s"] else 0
-        return (addr + offset, )
+        return addr + offset
+
+
+class Instruction_LDGeneric(LoadStoreInstruction):
+    name = "ld"
+    def fetch_operands(self):
+        return (self.process_address_operand(), )
 
     def compute_result(self, addr):
         return (self.load_data(addr), )
@@ -950,6 +959,36 @@ class Instruction_LDx(Instruction_LDGeneric):
 
 class Instruction_LDyz(Instruction_LDGeneric):
     bin_format = '10qsqq0dddddyqqq'
+
+    def match_instruction(self, data, bitstrm):
+        data["s"] = int(data["s"], 2)
+        data["q"] = int(data["q"], 2)
+        data["index"] = "Y" if int(data["y"], 2) == 1 else "Z"
+
+        # if "special" form, not all patterns are valid LD instructions.
+        # only q=1/2 are valid for special form
+        if data["s"] == 1 and data["q"] not in [1,2]:
+            raise ParseError()
+
+class Instruction_STGeneric(LoadStoreInstruction):
+    name = "st"
+
+    def fetch_operands(self):
+        return (self.process_address_operand(), self.get_reg(self.data["r"]))
+
+    def compute_result(self, addr, val):
+        self.store_data(val, addr)
+    
+class Instruction_STx(Instruction_STGeneric):
+    bin_format = '1001001rrrrr11qq'
+
+    def match_instruction(self, data, bitstrm):
+        data["q"] = int(data["q"], 2)
+        data["s"] = 1 if data["q"] in [1, 2] else 0
+        data["index"] = "X"
+
+class Instruction_STyz(Instruction_STGeneric):
+    bin_format = "10qsqq1rrrrryqqq"
 
     def match_instruction(self, data, bitstrm):
         data["s"] = int(data["s"], 2)
@@ -1018,59 +1057,6 @@ class Instruction_PUSH(NoFlags, AVRInstruction):
         self.store_data(src, sp)
         sp -= 1
         self.put_reg(sp, 'SP')
-
-class Instruction_STGeneric(NoFlags, AVRInstruction):
-    name = "st"
-
-    def fetch_operands(self):
-        # figure out which register (y or z) to operate on
-        index_reg = self.arch.registers[self.data["index"]][0]
-        segment_reg = self.arch.registers["RAMP" + self.data["index"]][0]
-
-        # compute the address
-        segment = self.get(segment_reg, REG_TYPE).cast_to(Type.int_24) << 16
-        addr =  self.get(index_reg, DOUBLEREG_TYPE).cast_to(Type.int_24)
-
-        # special mode: pre-decrement
-        if self.data["s"] and self.data["q"] == 2:
-            addr -= 1
-            self.put((addr >> 16).cast_to(Int.int_8), segment_reg)
-            self.put(addr.cast_to(Int.int_16), index_reg)
-
-        # special mode: post-increment
-        if self.data["s"] and self.data["q"] == 1:
-            new_addr = addr + 1
-            self.put((new_addr >> 16).cast_to(Type.int_8), segment_reg)
-            self.put(new_addr.cast_to(Type.int_16), index_reg)
-
-        # optional offset if not special mode
-        offset = self.data["q"] if not self.data["s"] else 0
-        return (addr + offset, self.get_reg(self.data["r"]))
-
-    def compute_result(self, addr, val):
-        self.store_data(val, addr)
-    
-
-class Instruction_STyz(Instruction_STGeneric):
-    bin_format = "10qsqq1rrrrryqqq"
-
-    def match_instruction(self, data, bitstrm):
-        data["s"] = int(data["s"], 2)
-        data["q"] = int(data["q"], 2)
-        data["index"] = "Y" if int(data["y"], 2) == 1 else "Z"
-
-        # if "special" form, not all patterns are valid ST instructions.
-        # only q=1/2 are valid for special form
-        if data["s"] == 1 and data["q"] not in [1,2]:
-            raise ParseError()
-
-class Instruction_STx(Instruction_STGeneric):
-    bin_format = '1001001rrrrr11qq'
-
-    def match_instruction(self, data, bitstrm):
-        data["q"] = int(data["q"], 2)
-        data["s"] = 1 if data["q"] in [1, 2] else 0
-        data["index"] = "X"
 
 class Instruction_STS(NoFlags, AVRInstruction):
     bin_format = "1001001rrrrr0000"
