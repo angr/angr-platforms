@@ -870,31 +870,36 @@ class Instruction_CPI(Instruction_SUBI):
 #
 # These instructions read or write data memory in some way, without altering control flow.
 
-class Instruction_LAC(NoFlags, AVRInstruction):
-    bin_format = "1001001rrrrr1111"
-    name = 'lac'
-
+class Instruction_LAGeneric(NoFlags, AVRInstruction):
     def fetch_operands(self):
-        z = self.get_reg('Z')
-        val = self.load_data(z, REG_TYPE)
-        dst = self.get_reg(self.data['r'])
+        z = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Types.int_32)
+        rampz = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Types.int_32)
+        self._target = (rampz << 16) + z
+        self._val = self.load_data(self._target)
+        dst = self.get_reg(self.data["d"])
         return val, dst
+
+    def commit_result(self, res):
+        self.store_data(res, self._target)
+        self.put_reg(self._val, self.data["d"])
+
+
+class Instruction_LAC(Instruction_LAGeneric):
+    bin_format = "1001001ddddd1111"
+    name = 'lac'
 
     def compute_result(self, val, dst):
         return (0xff - dst) & val
 
-    def commit_result(self, res):
-        self.put_reg(res, self.data['r'])
-
-class Instruction_LAS(Instruction_LAC):
-    bin_format = "1001001rrrrr1010"
+class Instruction_LAS(Instruction_LAGeneric):
+    bin_format = "1001001ddddd1010"
     name = 'las'
 
     def compute_result(self, val, dst):
         return val | dst
 
-class Instruction_LAT(Instruction_LAC):
-    bin_format = "1001001rrrrr0111"
+class Instruction_LAT(Instruction_LAGeneric):
+    bin_format = "1001001ddddd0111"
     name = 'lat'
 
     def compute_result(self, val, dst):
