@@ -323,7 +323,6 @@ class TwoDoubleRegAVRInstruction(AVRInstruction):
     def commit_result(self, res):
         self.put_reg_pair(res, self.data['d'])
 
-
 class TwoRegAVRInstruction(AVRInstruction):
     bin_format = 'oooooordddddrrrr'
 
@@ -337,7 +336,6 @@ class TwoRegAVRInstruction(AVRInstruction):
 
     def commit_result(self, res):
         self.put_reg(res, self.data['d'])
-
 
 class DoubleRegImmAVRInstruction(AVRInstruction):
     bin_format = "ooooooooKKddKKKK"
@@ -362,6 +360,12 @@ class RegImmAVRInstruction(AVRInstruction):
 
     def commit_result(self, res):
         self.put_reg(res, "1" + self.data["d"])
+
+
+# ARITHMETIC INSTRUCTIONS
+#
+# These instructions only touch registers and flags, and do not alter control flow or memory.
+# There are no complex side effects for these instructions.
 
 class Instruction_ADC(TwoRegAVRInstruction):
     opcode = '000111'
@@ -402,7 +406,6 @@ class Instruction_ADD(TwoRegAVRInstruction):
     def negative(self, src, dst, res):
         return res[7]
 
-
 class Instruction_ADIW(DoubleRegImmAVRInstruction):
     opcode = "10010110"
     name = 'adiw'
@@ -432,7 +435,6 @@ class Instruction_AND(TwoRegAVRInstruction):
     def negative(self, src, dst, res):
         return res[7]
 
-
 class Instruction_ANDI(RegImmAVRInstruction):
     opcode = '0111'
     name = 'andi'
@@ -445,7 +447,6 @@ class Instruction_ANDI(RegImmAVRInstruction):
 
     def negative(self, src, dst, res):
         return res[7]
-
 
 class Instruction_ASR(OneRegAVRInstruction):
     opcode = "0101"
@@ -466,7 +467,6 @@ class Instruction_ASR(OneRegAVRInstruction):
     def overflow(self, src, res):
         return self.carry(src, res) ^ self.negative(src, res)
 
-
 class Instruction_BCLR(NoFlags, AVRInstruction):
     bin_format = '100101001sss1000'
     name = 'bclr'
@@ -478,7 +478,6 @@ class Instruction_BCLR(NoFlags, AVRInstruction):
         sr = self.get_reg('SREG')
         sr[idx] = 0
         self.put_reg(sr, "SREG")
-
 
 class Instruction_BLD(NoFlags, AVRInstruction):
     bin_format = '1111100ddddd0bbb'
@@ -496,36 +495,6 @@ class Instruction_BLD(NoFlags, AVRInstruction):
     def commit_result(self, res):
         self.put_reg(res, self.data["d"])
 
-class Instruction_BRBC(NoFlags, AVRInstruction):
-    bin_format = '111101kkkkkkksss'
-    name = 'brbc'
-
-    def fetch_operands(self):
-        # K is two's complement signed
-        offset = bits_to_signed_int(self.data['k'])
-        idx = int(self.data['s'], 2)
-        return offset, idx
-
-    def compute_result(self, offset, idx):
-        sr = self.get_reg("SREG")
-        self.relative_jump(sr[idx] == 0, offset + 1)
-
-
-class Instruction_BRBS(NoFlags, AVRInstruction):
-    bin_format = '111100kkkkkkksss'
-    name = 'brbs'
-    def fetch_operands(self):
-        # K is two's complement signed
-        offset = bits_to_signed_int(self.data['k'])
-        idx = int(self.data['s'], 2)
-        return offset, idx
-
-    def compute_result(self, offset, idx):
-        sr = self.get_reg("SREG")
-        self.relative_jump(sr[idx] != 0, offset + 1)
-
-#class Instruction_BREAK(NoFlags, AVRInstruction):
-
 class Instruction_BSET(NoFlags, AVRInstruction):
     bin_format = '100101000sss1000'
     name = 'bset'
@@ -538,7 +507,6 @@ class Instruction_BSET(NoFlags, AVRInstruction):
         sr[idx] = 1
         self.put_reg(sr, 'SREG')
 
-
 class Instruction_BST(NoFlags, AVRInstruction):
     bin_format = '1111101ddddd0bbb'
     name = 'bst'
@@ -550,46 +518,6 @@ class Instruction_BST(NoFlags, AVRInstruction):
 
     def compute_result(self, src, idx):
         self.set_flag(AVRFlagIndex.T_TransferBit, src[idx])
-
-
-class Instruction_CALL(NoFlags, AVRInstruction):
-    bin_format = "1001010kkkkk111k"
-    name = 'call'
-
-    def parse(self, bitstrm):
-        data = AVRInstruction.parse(self, bitstrm)
-        # get the rest of the imm
-        data['k'] += read_trailer(bitstrm)
-        self.bitwidth = 32
-        return data
-
-    def fetch_operands(self):
-        # Unsigned
-        return (int(self.data['k'], 2), )
-
-    def compute_result(self, dst):
-        sp = self.get_reg("SP")
-        sp -= self.arch.call_sp_fix
-        self.store_data(self.get_pc() + 2, sp + 1)
-        self.put_reg(sp, "SP")
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
-
-class Instruction_CBI(NoFlags, AVRInstruction):
-    bin_format = '10011000AAAAAbbb'
-    name = 'cbi'
-
-    def fetch_operands(self):
-        # Bottom 32 io regs
-        ior = self.get_ioreg("0" + self.data['A'])
-        idx = int(self.data['b'], 2)
-        return ior, idx
-
-    def compute_result(self, ior):
-        ior[idx] = 0
-        return ior
-
-    def commit_result(self, res):
-        self.put_ioreg(res, "0" + self.data['A'])
 
 class Instruction_COM(OneRegAVRInstruction):
     opcode = "0000"
@@ -617,93 +545,6 @@ class Instruction_DEC(OneRegAVRInstruction):
     def negative(self, src, res):
         return res[7]
 
-# TODO: DES
-
-class Instruction_EICALL(NoFlags, AVRInstruction):
-    bin_format = "1001010100011001"
-    name = 'eicall'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z').cast_to(Type.int_23)
-        eind = self.get_reg('EIND').cast_to(Type.int_6)
-        dst = eind.cast_to(Type.int_23) << 16
-        dst += z
-        return (dst, )
-
-    def compute_result(self, dst):
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
-
-class Instruction_EIJMP(NoFlags, AVRInstruction):
-    bin_format = "1001010000011001"
-    name = 'eijmp'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z').cast_to(Type.int_23)
-        eind = self.get_reg('EIND').cast_to(Type.int_6)
-        dst = eind.cast_to(Type.int_23) << 16
-        dst += z
-        return (dst << 1,)
-
-    def compute_result(self, dst):
-        self.jump(None, dst)
-
-
-
-class Instruction_ELPM(NoFlags, AVRInstruction):
-    bin_format = "1001010110011000"
-    name = 'elpm'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z').cast_to(Type.int_24)
-        rampz = self.get_reg('RAMPZ')
-        src = rampz.cast_to(Type.int_24) << 16
-        src += z
-        return (src, )
-
-    def compute_result(self, src):
-        return self.load_program(src, REG_TYPE)
-
-    def commit_result(self, ret):
-        self.put_reg(ret, 'R0')
-
-class Instruction_ELPMd(NoFlags, AVRInstruction):
-    bin_format = "1001000ddddd0110"
-    name = 'elpm'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z').cast_to(Type.int_24)
-        rampz = self.get_reg('RAMPZ')
-        src = rampz.cast_to(Type.int_24) << 16
-        src += z
-        return (src, )
-
-    def compute_result(self, src):
-        return self.load_program(src, REG_TYPE)
-
-    def commit_result(self, ret):
-        self.put_reg(ret, self.data['d'])
-
-class Instruction_ELPMplus(NoFlags, AVRInstruction):
-    bin_format = "1001000ddddd0111"
-    name = 'elpm'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z').widen_unsigned(Type.int_24)
-        rampz = self.get_reg('RAMPZ')
-        src = rampz.cast_to(Type.int_24) << 16
-        src += z
-        # Post-increment Z
-        z += 1
-        self.put_reg(z, 'Z')
-        return (src, )
-
-    def compute_result(self, src):
-        return self.load_program(src, REG_TYPE)
-
-    def commit_result(self, ret):
-        self.put_reg(ret, self.data['d'])
-
-
 class Instruction_EOR(TwoRegAVRInstruction):
     opcode = '001001'
     name = 'eor'
@@ -717,53 +558,6 @@ class Instruction_EOR(TwoRegAVRInstruction):
     def negative(self, src, dst, res):
         return res[7]
 
-
-# TODO FMUL
-
-# TODO FMULS
-
-# TODO FMULSU
-
-class Instruction_ICALL(NoFlags, AVRInstruction):
-    # Call address at Z.  Post decrement SP
-    bin_format = '1001010100001001'
-    name = 'icall'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        return (z, )
-
-    def compute_result(self, dst):
-        sp = self.get_reg('SP') - self.arch.call_sp_fix
-        self.store_data(self.get_pc(), sp + 1)
-        self.put_reg(sp, 'SP')
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
-
-class Instruction_IJMP(NoFlags, AVRInstruction):
-    bin_format = '1001010000001001'
-    name = 'ijmp'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        return (z, )
-
-    def compute_result(self, dst):
-        self.absolute_jump(None, dst)
-
-class Instruction_IN(NoFlags, AVRInstruction):
-    bin_format = '10110AAdddddAAAA'
-    name = "in"
-
-    def fetch_operands(self):
-        return (self.get_ioreg(self.data['A']), )
-
-    def compute_result(self, src):
-        return src
-
-    def commit_result(self, res):
-        self.put_reg(res, self.data['d'])
-
-
 class Instruction_INC(NoFlags, OneRegAVRInstruction):
     opcode = '1011'
     name = 'inc'
@@ -771,23 +565,310 @@ class Instruction_INC(NoFlags, OneRegAVRInstruction):
     def compute_result(self, src):
         return src + 1
 
-class Instruction_JMP(NoFlags, AVRInstruction):
-    bin_format = "1001010kkkkk110k"
-    name = 'jmp'
+class Instruction_LDI(NoFlags, RegImmAVRInstruction):
+    opcode = '1110'
+    name = 'ldi'
 
-    def parse(self, bitstrm):
-        data = AVRInstruction.parse(self, bitstrm)
-        # get the rest of the imm
-        data['k'] += read_trailer(bitstrm)
-        self.bitwidth = 32
-        return data
+    def compute_result(self, src, imm):
+        return imm
+
+class Instruction_LSR(OneRegAVRInstruction):
+    opcode = '0110'
+    name = 'lsr'
+
+    def compute_result(self, src):
+        return src >> 1
+
+    def carry(self, src, res):
+        return src[0]
+
+    def negative(self, *args):
+        return 0
+
+    def overflow(self, *args):
+        return self.negative(*args) ^ self.carry(*args)
+
+class Instruction_MOV(NoFlags, TwoRegAVRInstruction):
+    opcode = '001011'
+    name = 'mov'
+
+    def compute_result(self, src, dst):
+        return src
+
+class Instruction_MOVW(NoFlags, TwoDoubleRegAVRInstruction):
+    opcode = '00000001'
+    name = 'movw'
+
+    def compute_result(self, src, dst):
+        return src
+
+class Instruction_MUL(TwoRegAVRInstruction):
+    opcode = "100111"
+    name = 'mul'
+
+    def compute_result(self, src, dst):
+        return src * dst
+
+    def commit_result(self, res):
+        # Stores to R1:R0
+        self.put_reg_pair(res, "R1_R0")
+
+    def carry(self, src, dst, res):
+        return res[15]
+
+class Instruction_MULS(TwoRegAVRInstruction):
+    bin_format = '00000010ddddrrrr'
+    name = 'muls'
 
     def fetch_operands(self):
-        # Unsigned
-        return (int(self.data['k'], 2), )
+        # Regs 16 - 31 only
+        src = self.get_reg("1" + self.data['r'])
+        dst = self.get_reg("1" + self.data['d'])
+        return src, dst
 
-    def compute_result(self, dst):
-        self.absolute_jump(None, dst)
+    def compute_result(self, src, dst):
+        src = src.widen_signed(DOUBLEREG_TYPE)
+        dst = dst.widen_signed(DOUBLEREG_TYPE)
+        src.is_signed = True
+        dst.is_signed = True
+        return src * dst
+
+    def commit_result(self, res):
+        # Stores to R1:R0
+        self.put_reg_pair(res, 'R1_R0')
+
+    def carry(self, src, dst, res):
+        return res[15]
+
+class Instruction_MULSU(TwoRegAVRInstruction):
+    bin_format = '000000110ddd0rrr'
+    name = 'mulsu'
+    def fetch_operands(self):
+        # Regs 16 - 23 only
+        src = self.get_reg("10" + self.data['r'])
+        dst = self.get_reg("10" + self.data['d'])
+        return src, dst
+
+    def compute_result(self, src, dst):
+        src.is_signed = True
+        dst.is_signed = False
+        return src * dst
+
+    def commit_result(self, res):
+        # Stores to R1:R0
+        self.put_reg_pair(res, 'R1_R0')
+
+    def carry(self, src, dst, res):
+        return res[15]
+
+class Instruction_NEG(OneRegAVRInstruction):
+    opcode = '0001'
+    name = 'neg'
+
+    def compute_result(self, src):
+        return 0 - src
+
+    # TODO Half-carry
+    # TODO Overflow
+    def negative(self, src, res):
+        return res[7]
+
+    def carry(self, src, res):
+        return res != 0
+
+class Instruction_NOP(NoFlags, AVRInstruction):
+    bin_format = "0000000000000000"
+    name = 'nop'
+    def compute_result(self, *args):
+        pass
+
+class Instruction_OR(TwoRegAVRInstruction):
+    opcode = "001010"
+    name = 'or'
+
+    def compute_result(self, src, dst):
+        return src | dst
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+    def overflow(self, src, dst, res):
+        return 0
+
+class Instruction_ORI(RegImmAVRInstruction):
+    opcode = '0110'
+    name = 'ori'
+
+    def compute_result(self, src, imm):
+        return src | imm
+
+    def negative(self, src, imm, res):
+        return res[7]
+
+    def overflow(self, src, imm, res):
+        return 0
+
+class Instruction_ROR(OneRegAVRInstruction):
+    # Rotate right with carry-in
+    opcode = '0111'
+    name = 'ror'
+
+    def compute_result(self, src):
+        carry = self.get_flag(AVRFlagIndex.C_Carry)
+        src >>= 1
+        src[7] = carry
+        return src
+
+    def carry(self, src, res):
+        return src[0]
+
+    def negative(self, src, res):
+        return res[7]
+
+    def overflow(self, *args):
+        return self.negative(*args) ^ self.carry(*args)
+
+class Instruction_SBC(TwoRegAVRInstruction):
+    opcode = '000010'
+    name = 'sbc'
+
+    def compute_result(self, src, dst):
+        return dst - src - self.get_carry()
+
+    def half_carry(self, src, dst, res):
+        return compute_carry_sub(3, src, dst, res)
+
+    def carry(self, src, dst, res):
+        return compute_carry_sub(7, src, dst, res)
+
+    def overflow(self, src, dst, res):
+        return compute_overflow_sub(src, dst, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+class Instruction_SBCI(RegImmAVRInstruction):
+    opcode = '0100'
+    name = 'sbci'
+
+    def compute_result(self, src, imm):
+        return src - imm - self.get_carry()
+
+    def overflow(self, src, imm, res):
+        return compute_overflow_sub(imm, src, res)
+
+    def carry(self, src, imm, res):
+        return compute_carry_sub(7, imm, src, res)
+
+    def half_carry(self, src, imm, res):
+        return compute_carry_sub(3, imm, src, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+class Instruction_SBIW(DoubleRegImmAVRInstruction):
+    opcode = "10010111"
+    name = 'sbiw'
+
+    def compute_result(self, src, imm):
+        return src - imm
+
+    def overflow(self, src, imm, res):
+        return compute_overflow_sub(imm, src, res)
+
+    def carry(self, src, imm, res):
+        return compute_carry_sub(7, imm, src, res)
+
+    def half_carry(self, src, imm, res):
+        return compute_carry_sub(3, imm, src, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+class Instruction_SWAP(NoFlags, OneRegAVRInstruction):
+    opcode = "0010"
+    name = "swap"
+
+    def compute_result(self, val):
+        return (val >> 4) | (val << 4)
+
+class Instruction_SUBI(RegImmAVRInstruction):
+    opcode = "0101"
+    name = "subi"
+
+    def compute_result(self, dst, imm):
+        return dst - imm
+
+    def half_carry(self, dst, imm, res):
+        return compute_carry_sub(3, imm, dst, res)
+
+    def carry(self, dst, imm, res):
+        return compute_carry_sub(3, imm, dst, res)
+
+    def negative(self, dst, imm, res):
+        return res[7]
+
+    def overflow(self, dst, imm, res):
+        return compute_overflow_sub(imm, dst, res)
+
+class Instruction_SUB(TwoRegAVRInstruction):
+    opcode = "00110"
+    name = "sub"
+
+    def compute_result(self, src, dst):
+        return dst - src
+
+    def half_carry(self, src, dst, res):
+        return compute_carry_sub(3, src, dst, res)
+
+    def carry(self, src, dst, res):
+        return compute_carry_sub(7, src, dst, res)
+
+    def negative(self, src, dst, res):
+        return res[7]
+
+    def overflow(self, src, dst, res):
+        return compute_overflow_sub(src, dst, res)
+
+class Instruction_XCH(NoFlags, AVRInstruction):
+    bin_format = "1001001rrrrr0100"
+    name = "xch"
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), )
+
+    def compute_result(self, src):
+        addr = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Type.int_24)
+        segment = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Type.int_24) << 16
+        dataval = self.load_data(segment + addr, Type.int_8)
+        self.put_reg(dataval, self.data["r"])
+        self.store_data(src, segment + addr)
+
+class Instruction_CP(Instruction_SUB):
+    opcode = "000101"
+    name = 'cp'
+
+    def commit_result(self, res):
+        pass
+
+class Instruction_CPC(Instruction_SBC):
+    opcode = "000001"
+    name = 'cpc'
+
+    def commit_result(self, res):
+        pass
+
+class Instruction_CPI(Instruction_SUBI):
+    opcode = '0011'
+    name = 'cpi'
+
+    def compute_result(self, src, imm):
+        return src - imm
+
+
+# DATA MEMORY ACCESS INSTRUCTIONS
+#
+# These instructions read or write data memory in some way, without altering control flow.
 
 class Instruction_LAC(NoFlags, AVRInstruction):
     bin_format = "1001001rrrrr1111"
@@ -940,15 +1021,6 @@ class Instruction_LDDZq(Instruction_LDDZ):
         val = (self.load_data(z, REG_TYPE),)
         return val
 
-
-class Instruction_LDI(NoFlags, RegImmAVRInstruction):
-    opcode = '1110'
-    name = 'ldi'
-
-    def compute_result(self, src, imm):
-        return imm
-
-
 class Instruction_LDS(NoFlags, AVRInstruction):
     bin_format = "1001000ddddd0000"
     name = 'lds'
@@ -972,209 +1044,9 @@ class Instruction_LDS(NoFlags, AVRInstruction):
     def commit_result(self, res):
         self.put_reg(res, self.data['d'])
 
-
 # TODO: LDS16
 # note that the LDS16 encoding overlaps with the LD z+q instruction, need to select correct
 # decoding based on what instruction the CPU supports
-
-class Instruction_LPM(NoFlags, AVRInstruction):
-    bin_format = "1001010111001000"
-    name = 'lpm'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        return (z, )
-
-    def compute_result(self, src):
-        return self.load_program(src, REG_TYPE)
-
-    def commit_result(self, ret):
-        self.put_reg(ret, 'R0')
-
-
-class Instruction_LPMd(NoFlags, AVRInstruction):
-    bin_format = "1001000ddddd0100"
-    name = 'lpm'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        return (z, )
-
-    def compute_result(self, src):
-        return self.load_program(src, REG_TYPE)
-
-    def commit_result(self, ret):
-        self.put_reg(ret, self.data['d'])
-
-class Instruction_LPMplus(Instruction_LPMd):
-    bin_format = "1001000ddddd0101"
-    name = 'lpm+'
-
-    def fetch_operands(self):
-        # Post-increment z
-        z = self.get_reg('Z')
-        self.put_reg(z + 1, 'Z')
-        return (z, )
-
-
-class Instruction_LSR(OneRegAVRInstruction):
-    opcode = '0110'
-    name = 'lsr'
-
-    def compute_result(self, src):
-        return src >> 1
-
-    def carry(self, src, res):
-        return src[0]
-
-    def negative(self, *args):
-        return 0
-
-    def overflow(self, *args):
-        return self.negative(*args) ^ self.carry(*args)
-
-
-class Instruction_MOV(NoFlags, TwoRegAVRInstruction):
-    opcode = '001011'
-    name = 'mov'
-
-    def compute_result(self, src, dst):
-        return src
-
-
-class Instruction_MOVW(NoFlags, TwoDoubleRegAVRInstruction):
-    opcode = '00000001'
-    name = 'movw'
-
-    def compute_result(self, src, dst):
-        return src
-
-
-class Instruction_MUL(TwoRegAVRInstruction):
-    opcode = "100111"
-    name = 'mul'
-
-    def compute_result(self, src, dst):
-        return src * dst
-
-    def commit_result(self, res):
-        # Stores to R1:R0
-        self.put_reg_pair(res, "R1_R0")
-
-    def carry(self, src, dst, res):
-        return res[15]
-
-
-class Instruction_MULS(TwoRegAVRInstruction):
-    bin_format = '00000010ddddrrrr'
-    name = 'muls'
-
-    def fetch_operands(self):
-        # Regs 16 - 31 only
-        src = self.get_reg("1" + self.data['r'])
-        dst = self.get_reg("1" + self.data['d'])
-        return src, dst
-
-    def compute_result(self, src, dst):
-        src = src.widen_signed(DOUBLEREG_TYPE)
-        dst = dst.widen_signed(DOUBLEREG_TYPE)
-        src.is_signed = True
-        dst.is_signed = True
-        return src * dst
-
-    def commit_result(self, res):
-        # Stores to R1:R0
-        self.put_reg_pair(res, 'R1_R0')
-
-    def carry(self, src, dst, res):
-        return res[15]
-
-
-class Instruction_MULSU(TwoRegAVRInstruction):
-    bin_format = '000000110ddd0rrr'
-    name = 'mulsu'
-    def fetch_operands(self):
-        # Regs 16 - 23 only
-        src = self.get_reg("10" + self.data['r'])
-        dst = self.get_reg("10" + self.data['d'])
-        return src, dst
-
-    def compute_result(self, src, dst):
-        src.is_signed = True
-        dst.is_signed = False
-        return src * dst
-
-    def commit_result(self, res):
-        # Stores to R1:R0
-        self.put_reg_pair(res, 'R1_R0')
-
-    def carry(self, src, dst, res):
-        return res[15]
-
-
-class Instruction_NEG(OneRegAVRInstruction):
-    opcode = '0001'
-    name = 'neg'
-
-    def compute_result(self, src):
-        return 0 - src
-
-    # TODO Half-carry
-    # TODO Overflow
-    def negative(self, src, res):
-        return res[7]
-
-    def carry(self, src, res):
-        return res != 0
-
-
-class Instruction_NOP(NoFlags, AVRInstruction):
-    bin_format = "0000000000000000"
-    name = 'nop'
-    def compute_result(self, *args):
-        pass
-
-class Instruction_OR(TwoRegAVRInstruction):
-    opcode = "001010"
-    name = 'or'
-
-    def compute_result(self, src, dst):
-        return src | dst
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-    def overflow(self, src, dst, res):
-        return 0
-
-
-
-class Instruction_ORI(RegImmAVRInstruction):
-    opcode = '0110'
-    name = 'ori'
-
-    def compute_result(self, src, imm):
-        return src | imm
-
-    def negative(self, src, imm, res):
-        return res[7]
-
-    def overflow(self, src, imm, res):
-        return 0
-
-
-class Instruction_OUT(NoFlags, AVRInstruction):
-    bin_format = '10111AArrrrrAAAA'
-    name = "out"
-    def fetch_operands(self):
-        return  (self.get_reg(self.data['r']), )
-
-    def compute_result(self, res):
-        return res
-
-    def commit_result(self, res):
-        self.put_ioreg(res, self.data['A'])
-
 
 class Instruction_POP(NoFlags, AVRInstruction):
     bin_format = "1001000ddddd1111"
@@ -1193,7 +1065,6 @@ class Instruction_POP(NoFlags, AVRInstruction):
     def commit_result(self, res):
         self.put_reg(res, self.data['d'])
 
-
 class Instruction_PUSH(NoFlags, AVRInstruction):
     bin_format = "1001001ddddd1111"
     name = 'push'
@@ -1207,181 +1078,6 @@ class Instruction_PUSH(NoFlags, AVRInstruction):
         self.store_data(src, sp)
         sp -= 1
         self.put_reg(sp, 'SP')
-
-
-class Instruction_RCALL(NoFlags, AVRInstruction):
-    # A relative call to k
-    bin_format = "1101kkkkkkkkkkkk"
-    name = 'rcall'
-
-    def fetch_operands(self):
-        return (bits_to_signed_int(self.data['k']), )
-
-    def compute_result(self, dst):
-        # Store return address
-        sp = self.get_reg('SP')
-        sp -= self.arch.call_sp_fix
-        self.store_data(self.get_pc() + 1, sp + 1)
-        self.put_reg(sp, "SP")
-        self.relative_jump(None, dst + 1, jumpkind=JumpKind.Call)
-
-
-class Instruction_RET(NoFlags, AVRInstruction):
-    bin_format = "1001010100001000"
-    name = 'ret'
-
-    def compute_result(self, *args):
-        sp = self.get_reg("SP")
-        self.put_reg(sp + self.arch.call_sp_fix, 'SP')
-        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
-
-
-class Instruction_RETI(NoFlags, AVRInstruction):
-    bin_format = "1001010100011000"
-    name = 'ret'
-
-    def compute_result(self, *args):
-        # Pre-increment SP
-        sp = self.get_reg("SP")
-        self.put_reg(sp + self.arch.call_sp_fix, 'SP')
-        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
-        # Set GIE
-        self.set_flag(MSPFlagIndex.GIE, 1)
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
-
-
-class Instruction_RJMP(NoFlags, AVRInstruction):
-    # A relative call to k
-    bin_format = "1100kkkkkkkkkkkk"
-    name = 'rjmp'
-
-    def fetch_operands(self):
-        return (bits_to_signed_int(self.data['k']),)
-
-    def compute_result(self, dst):
-        self.relative_jump(None, dst + 1)
-
-class Instruction_ROR(OneRegAVRInstruction):
-    # Rotate right with carry-in
-    opcode = '0111'
-    name = 'ror'
-
-    def compute_result(self, src):
-        carry = self.get_flag(AVRFlagIndex.C_Carry)
-        src >>= 1
-        src[7] = carry
-        return src
-
-    def carry(self, src, res):
-        return src[0]
-
-    def negative(self, src, res):
-        return res[7]
-
-    def overflow(self, *args):
-        return self.negative(*args) ^ self.carry(*args)
-
-
-class Instruction_SBC(TwoRegAVRInstruction):
-    opcode = '000010'
-    name = 'sbc'
-
-    def compute_result(self, src, dst):
-        return dst - src - self.get_carry()
-
-    def half_carry(self, src, dst, res):
-        return compute_carry_sub(3, src, dst, res)
-
-    def carry(self, src, dst, res):
-        return compute_carry_sub(7, src, dst, res)
-
-    def overflow(self, src, dst, res):
-        return compute_overflow_sub(src, dst, res)
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-
-
-class Instruction_SBCI(RegImmAVRInstruction):
-    opcode = '0100'
-    name = 'sbci'
-
-    def compute_result(self, src, imm):
-        return src - imm - self.get_carry()
-
-    def overflow(self, src, imm, res):
-        return compute_overflow_sub(imm, src, res)
-
-    def carry(self, src, imm, res):
-        return compute_carry_sub(7, imm, src, res)
-
-    def half_carry(self, src, imm, res):
-        return compute_carry_sub(3, imm, src, res)
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-
-# TODO: SBI
-# TODO: SBIC
-# TODO: SBIS
-
-class Instruction_SBIW(DoubleRegImmAVRInstruction):
-    opcode = "10010111"
-    name = 'sbiw'
-
-    def compute_result(self, src, imm):
-        return src - imm
-
-    def overflow(self, src, imm, res):
-        return compute_overflow_sub(imm, src, res)
-
-    def carry(self, src, imm, res):
-        return compute_carry_sub(7, imm, src, res)
-
-    def half_carry(self, src, imm, res):
-        return compute_carry_sub(3, imm, src, res)
-
-    def negative(self, src, dst, res):
-        return res[7]
-
-class SkipInstruction(NoFlags, AVRInstruction):
-    def apply_context(self, past, future):
-        self.next_size = future[0].bytewidth
-
-    def fetch_operands(self):
-        return (self.get_reg(self.data["r"]), int(self.data["b"], 2))
-
-    def commit_result(self, skip):
-        self.jump(skip, self.addr + self.next_size + 2)
-
-class Instruction_SBRC(SkipInstruction):
-    bin_format = "1111110rrrrr0bbb"
-    name = "sbrc"
-    def compute_result(self, reg, bit):
-        return ~reg[bit]
-
-class Instruction_SBRS(SkipInstruction):
-    bin_format = "1111111rrrrr0bbb"
-    name = "sbrs"
-    def compute_result(self, reg, bit):
-        return reg[bit]
-
-class Instruction_CPSE(SkipInstruction):
-    bin_format = '000100rdddddrrrr'
-    name = "cpse"
-
-    def fetch_operands(self):
-        return (self.get_reg(self.data["r"]), self.get_reg(self.data["d"]))
-
-    def compute_result(self, src, dst):
-        return src == dst
-
-class Instruction_SLEEP(AVRInstruction):
-    bin_format = "1001010110001000"
-    name = "sleep"
 
 class Instruction_ST(AVRInstruction):
     bin_format = '1001001rrrrr1100'
@@ -1471,51 +1167,361 @@ class Instruction_STS(NoFlags, AVRInstruction):
     def compute_result(self, val, imm):
         self.store_data(val, self.constant(imm, Type.int_16))
 
-class Instruction_SWAP(NoFlags, OneRegAVRInstruction):
-    opcode = "0010"
-    name = "swap"
 
-    def compute_result(self, val):
-        return (val >> 4) | (val << 4)
 
-class Instruction_SUBI(RegImmAVRInstruction):
-    opcode = "0101"
-    name = "subi"
+# PROGRAM MEMORY ACCESS INSTRUCTIONS
+#
+# These instructions read or write program memory in some way, without altering control flow.
 
-    def compute_result(self, dst, imm):
-        return dst - imm
+class Instruction_ELPM(NoFlags, AVRInstruction):
+    bin_format = "1001010110011000"
+    name = 'elpm'
 
-    def half_carry(self, dst, imm, res):
-        return compute_carry_sub(3, imm, dst, res)
+    def fetch_operands(self):
+        z = self.get_reg('Z').cast_to(Type.int_24)
+        rampz = self.get_reg('RAMPZ')
+        src = rampz.cast_to(Type.int_24) << 16
+        src += z
+        return (src, )
 
-    def carry(self, dst, imm, res):
-        return compute_carry_sub(3, imm, dst, res)
+    def compute_result(self, src):
+        return self.load_program(src, REG_TYPE)
 
-    def negative(self, dst, imm, res):
-        return res[7]
+    def commit_result(self, ret):
+        self.put_reg(ret, 'R0')
 
-    def overflow(self, dst, imm, res):
-        return compute_overflow_sub(imm, dst, res)
+class Instruction_ELPMd(NoFlags, AVRInstruction):
+    bin_format = "1001000ddddd0110"
+    name = 'elpm'
 
-class Instruction_SUB(TwoRegAVRInstruction):
-    opcode = "00110"
-    name = "sub"
+    def fetch_operands(self):
+        z = self.get_reg('Z').cast_to(Type.int_24)
+        rampz = self.get_reg('RAMPZ')
+        src = rampz.cast_to(Type.int_24) << 16
+        src += z
+        return (src, )
+
+    def compute_result(self, src):
+        return self.load_program(src, REG_TYPE)
+
+    def commit_result(self, ret):
+        self.put_reg(ret, self.data['d'])
+
+class Instruction_ELPMplus(NoFlags, AVRInstruction):
+    bin_format = "1001000ddddd0111"
+    name = 'elpm'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z').widen_unsigned(Type.int_24)
+        rampz = self.get_reg('RAMPZ')
+        src = rampz.cast_to(Type.int_24) << 16
+        src += z
+        # Post-increment Z
+        z += 1
+        self.put_reg(z, 'Z')
+        return (src, )
+
+    def compute_result(self, src):
+        return self.load_program(src, REG_TYPE)
+
+    def commit_result(self, ret):
+        self.put_reg(ret, self.data['d'])
+
+class Instruction_LPM(NoFlags, AVRInstruction):
+    bin_format = "1001010111001000"
+    name = 'lpm'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z')
+        return (z, )
+
+    def compute_result(self, src):
+        return self.load_program(src, REG_TYPE)
+
+    def commit_result(self, ret):
+        self.put_reg(ret, 'R0')
+
+class Instruction_LPMd(NoFlags, AVRInstruction):
+    bin_format = "1001000ddddd0100"
+    name = 'lpm'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z')
+        return (z, )
+
+    def compute_result(self, src):
+        return self.load_program(src, REG_TYPE)
+
+    def commit_result(self, ret):
+        self.put_reg(ret, self.data['d'])
+
+class Instruction_LPMplus(Instruction_LPMd):
+    bin_format = "1001000ddddd0101"
+    name = 'lpm+'
+
+    def fetch_operands(self):
+        # Post-increment z
+        z = self.get_reg('Z')
+        self.put_reg(z + 1, 'Z')
+        return (z, )
+
+
+
+# CONTROL FLOW INSTRUCTIONS
+#
+# These instructions change the control flow (jumps, branches, returns, ...).
+
+class Instruction_BRBC(NoFlags, AVRInstruction):
+    bin_format = '111101kkkkkkksss'
+    name = 'brbc'
+
+    def fetch_operands(self):
+        # K is two's complement signed
+        offset = bits_to_signed_int(self.data['k'])
+        idx = int(self.data['s'], 2)
+        return offset, idx
+
+    def compute_result(self, offset, idx):
+        sr = self.get_reg("SREG")
+        self.relative_jump(sr[idx] == 0, offset + 1)
+
+class Instruction_BRBS(NoFlags, AVRInstruction):
+    bin_format = '111100kkkkkkksss'
+    name = 'brbs'
+    def fetch_operands(self):
+        # K is two's complement signed
+        offset = bits_to_signed_int(self.data['k'])
+        idx = int(self.data['s'], 2)
+        return offset, idx
+
+    def compute_result(self, offset, idx):
+        sr = self.get_reg("SREG")
+        self.relative_jump(sr[idx] != 0, offset + 1)
+
+class Instruction_CALL(NoFlags, AVRInstruction):
+    bin_format = "1001010kkkkk111k"
+    name = 'call'
+
+    def parse(self, bitstrm):
+        data = AVRInstruction.parse(self, bitstrm)
+        # get the rest of the imm
+        data['k'] += read_trailer(bitstrm)
+        self.bitwidth = 32
+        return data
+
+    def fetch_operands(self):
+        # Unsigned
+        return (int(self.data['k'], 2), )
+
+    def compute_result(self, dst):
+        sp = self.get_reg("SP")
+        sp -= self.arch.call_sp_fix
+        self.store_data(self.get_pc() + 2, sp + 1)
+        self.put_reg(sp, "SP")
+        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+
+class Instruction_EICALL(NoFlags, AVRInstruction):
+    bin_format = "1001010100011001"
+    name = 'eicall'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z').cast_to(Type.int_23)
+        eind = self.get_reg('EIND').cast_to(Type.int_6)
+        dst = eind.cast_to(Type.int_23) << 16
+        dst += z
+        return (dst, )
+
+    def compute_result(self, dst):
+        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+
+class Instruction_EIJMP(NoFlags, AVRInstruction):
+    bin_format = "1001010000011001"
+    name = 'eijmp'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z').cast_to(Type.int_23)
+        eind = self.get_reg('EIND').cast_to(Type.int_6)
+        dst = eind.cast_to(Type.int_23) << 16
+        dst += z
+        return (dst << 1,)
+
+    def compute_result(self, dst):
+        self.jump(None, dst)
+
+class Instruction_ICALL(NoFlags, AVRInstruction):
+    # Call address at Z.  Post decrement SP
+    bin_format = '1001010100001001'
+    name = 'icall'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z')
+        return (z, )
+
+    def compute_result(self, dst):
+        sp = self.get_reg('SP') - self.arch.call_sp_fix
+        self.store_data(self.get_pc(), sp + 1)
+        self.put_reg(sp, 'SP')
+        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+
+class Instruction_IJMP(NoFlags, AVRInstruction):
+    bin_format = '1001010000001001'
+    name = 'ijmp'
+
+    def fetch_operands(self):
+        z = self.get_reg('Z')
+        return (z, )
+
+    def compute_result(self, dst):
+        self.absolute_jump(None, dst)
+
+class Instruction_JMP(NoFlags, AVRInstruction):
+    bin_format = "1001010kkkkk110k"
+    name = 'jmp'
+
+    def parse(self, bitstrm):
+        data = AVRInstruction.parse(self, bitstrm)
+        # get the rest of the imm
+        data['k'] += read_trailer(bitstrm)
+        self.bitwidth = 32
+        return data
+
+    def fetch_operands(self):
+        # Unsigned
+        return (int(self.data['k'], 2), )
+
+    def compute_result(self, dst):
+        self.absolute_jump(None, dst)
+
+class Instruction_RCALL(NoFlags, AVRInstruction):
+    # A relative call to k
+    bin_format = "1101kkkkkkkkkkkk"
+    name = 'rcall'
+
+    def fetch_operands(self):
+        return (bits_to_signed_int(self.data['k']), )
+
+    def compute_result(self, dst):
+        # Store return address
+        sp = self.get_reg('SP')
+        sp -= self.arch.call_sp_fix
+        self.store_data(self.get_pc() + 1, sp + 1)
+        self.put_reg(sp, "SP")
+        self.relative_jump(None, dst + 1, jumpkind=JumpKind.Call)
+
+class Instruction_RET(NoFlags, AVRInstruction):
+    bin_format = "1001010100001000"
+    name = 'ret'
+
+    def compute_result(self, *args):
+        sp = self.get_reg("SP")
+        self.put_reg(sp + self.arch.call_sp_fix, 'SP')
+        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
+        self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
+
+class Instruction_RETI(NoFlags, AVRInstruction):
+    bin_format = "1001010100011000"
+    name = 'ret'
+
+    def compute_result(self, *args):
+        # Pre-increment SP
+        sp = self.get_reg("SP")
+        self.put_reg(sp + self.arch.call_sp_fix, 'SP')
+        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
+        # Set GIE
+        self.set_flag(MSPFlagIndex.GIE, 1)
+        self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
+
+class Instruction_RJMP(NoFlags, AVRInstruction):
+    # A relative call to k
+    bin_format = "1100kkkkkkkkkkkk"
+    name = 'rjmp'
+
+    def fetch_operands(self):
+        return (bits_to_signed_int(self.data['k']),)
+
+    def compute_result(self, dst):
+        self.relative_jump(None, dst + 1)
+
+class SkipInstruction(NoFlags, AVRInstruction):
+    def apply_context(self, past, future):
+        self.next_size = future[0].bytewidth
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), int(self.data["b"], 2))
+
+    def commit_result(self, skip):
+        self.jump(skip, self.addr + self.next_size + 2)
+
+class Instruction_SBRC(SkipInstruction):
+    bin_format = "1111110rrrrr0bbb"
+    name = "sbrc"
+    def compute_result(self, reg, bit):
+        return ~reg[bit]
+
+class Instruction_SBRS(SkipInstruction):
+    bin_format = "1111111rrrrr0bbb"
+    name = "sbrs"
+    def compute_result(self, reg, bit):
+        return reg[bit]
+
+class Instruction_CPSE(SkipInstruction):
+    bin_format = '000100rdddddrrrr'
+    name = "cpse"
+
+    def fetch_operands(self):
+        return (self.get_reg(self.data["r"]), self.get_reg(self.data["d"]))
 
     def compute_result(self, src, dst):
-        return dst - src
+        return src == dst
 
-    def half_carry(self, src, dst, res):
-        return compute_carry_sub(3, src, dst, res)
 
-    def carry(self, src, dst, res):
-        return compute_carry_sub(7, src, dst, res)
 
-    def negative(self, src, dst, res):
-        return res[7]
+# SIDE-EFFECT INSTRUCTIONS
+#
+# These instructions do things with environmental side effects, such as changing IO registers
+# or physical processor properties (sleep mode, watchdog, etc).
 
-    def overflow(self, src, dst, res):
-        return compute_overflow_sub(src, dst, res)
+class Instruction_CBI(NoFlags, AVRInstruction):
+    bin_format = '10011000AAAAAbbb'
+    name = 'cbi'
 
+    def fetch_operands(self):
+        # Bottom 32 io regs
+        ior = self.get_ioreg("0" + self.data['A'])
+        idx = int(self.data['b'], 2)
+        return ior, idx
+
+    def compute_result(self, ior):
+        ior[idx] = 0
+        return ior
+
+    def commit_result(self, res):
+        self.put_ioreg(res, "0" + self.data['A'])
+
+class Instruction_IN(NoFlags, AVRInstruction):
+    bin_format = '10110AAdddddAAAA'
+    name = "in"
+
+    def fetch_operands(self):
+        return (self.get_ioreg(self.data['A']), )
+
+    def compute_result(self, src):
+        return src
+
+    def commit_result(self, res):
+        self.put_reg(res, self.data['d'])
+
+class Instruction_OUT(NoFlags, AVRInstruction):
+    bin_format = '10111AArrrrrAAAA'
+    name = "out"
+    def fetch_operands(self):
+        return  (self.get_reg(self.data['r']), )
+
+    def compute_result(self, res):
+        return res
+
+    def commit_result(self, res):
+        self.put_ioreg(res, self.data['A'])
 
 class Instruction_WDR(NoFlags, AVRInstruction):
     bin_format = "1001010110101000"
@@ -1524,42 +1530,10 @@ class Instruction_WDR(NoFlags, AVRInstruction):
     def compute_result(self, *args):
         return None
         # EDG says: Uh... no.
+class Instruction_SLEEP(AVRInstruction):
+    bin_format = "1001010110001000"
+    name = "sleep"
 
-class Instruction_XCH(NoFlags, AVRInstruction):
-    bin_format = "1001001rrrrr0100"
-    name = "xch"
-
-    def fetch_operands(self):
-        return (self.get_reg(self.data["r"]), )
-
-    def compute_result(self, src):
-        addr = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Type.int_24)
-        segment = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Type.int_24) << 16
-        dataval = self.load_data(segment + addr, Type.int_8)
-        self.put_reg(dataval, self.data["r"])
-        self.store_data(src, segment + addr)
-
-class Instruction_CP(Instruction_SUB):
-    opcode = "000101"
-    name = 'cp'
-
-    def commit_result(self, res):
-        pass
-
-class Instruction_CPC(Instruction_SBC):
-    opcode = "000001"
-    name = 'cpc'
-
-    def commit_result(self, res):
-        pass
-
-
-class Instruction_CPI(Instruction_SUBI):
-    opcode = '0011'
-    name = 'cpi'
-
-    def compute_result(self, src, imm):
-        return src - imm
 
 
 class LifterAVR(GymratLifter):
@@ -1698,8 +1672,6 @@ class LifterAVR(GymratLifter):
         Instruction_WDR,
         Instruction_XCH,
         }
-
-
 
 register(LifterAVR, "AVR")
 
