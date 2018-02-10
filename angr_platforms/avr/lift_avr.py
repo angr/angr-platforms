@@ -905,126 +905,61 @@ class Instruction_LAT(Instruction_LAGeneric):
     def compute_result(self, val, dst):
         return val ^ dst
 
-class Instruction_LDDX(NoFlags, AVRInstruction):
-    bin_format = '1001000ddddd1100'
-    name = 'lddX'
 
+class Instruction_LDGeneric(NoFlags, AVRInstruction):
+    name = "ld"
     def fetch_operands(self):
-        x = self.get_reg('X')
-        return (self.load_data(x, REG_TYPE), )
+        # figure out which register (y or z) to operate on
+        index_reg = self.arch.registers[self.data["index"]][0]
+        segment_reg = self.arch.registers["RAMP" + self.data["index"]][0]
 
-    def compute_result(self, val):
-        return val
+        # compute the address
+        segment = self.get(segment_reg, REG_TYPE).cast_to(Type.int_24) << 16
+        addr =  self.get(index_reg, DOUBLEREG_TYPE).cast_to(Type.int_24)
+
+        # special mode: pre-decrement
+        if self.data["s"] and self.data["q"] == 2:
+            addr -= 1
+            self.put((addr >> 16).cast_to(Int.int_8), segment_reg)
+            self.put(addr.cast_to(Int.int_16), index_reg)
+
+        # special mode: post-increment
+        if self.data["s"] and self.data["q"] == 1:
+            new_addr = addr + 1
+            self.put((new_addr >> 16).cast_to(Type.int_8), segment_reg)
+            self.put(new_addr.cast_to(Type.int_16), index_reg)
+
+        # optional offset if not special mode
+        offset = self.data["q"] if not self.data["s"] else 0
+        return (addr + offset, )
+
+    def compute_result(self, addr):
+        return (self.load_data(addr), )
 
     def commit_result(self, res):
-        self.put_reg(res, self.data['d'])
-
-class Instruction_LDDXplus(Instruction_LDDX):
-    bin_format = '1001000ddddd1101'
-    name = 'lddX+'
-
-    def fetch_operands(self):
-        x = self.get_reg('X')
-        val = (self.load_data(x, REG_TYPE),)
-        self.put_reg(x + 1, 'X')
-        return val
-
-class Instruction_LDDXminus(Instruction_LDDX):
-    bin_format = '1001000ddddd1110'
-    name = 'ldd-X'
+        self.put_reg(res, self.data["d"])
 
 
-    def fetch_operands(self):
-        x = self.get_reg('X') - 1
-        self.put_reg(x, 'X')
-        val = (self.load_data(x, REG_TYPE),)
-        return val
+class Instruction_LDx(Instruction_LDGeneric):
+    bin_format = '1001000ddddd11qq'
 
-class Instruction_LDDY(NoFlags, AVRInstruction):
-    bin_format = '1001000ddddd1000'
-    name = 'lddY'
+    def match_instruction(self, data, bitstrm):
+        data["q"] = int(data["q"], 2)
+        data["s"] = 1 if data["q"] in [1, 2] else 0
+        data["index"] = "X"
 
-    def fetch_operands(self):
-        y = self.get_reg('Y')
-        return (self.load_data(y, REG_TYPE), )
+class Instruction_LDyz(Instruction_LDGeneric):
+    bin_format = '10qsqq0dddddyqqq'
 
-    def compute_result(self, val):
-        return val
+    def match_instruction(self, data, bitstrm):
+        data["s"] = int(data["s"], 2)
+        data["q"] = int(data["q"], 2)
+        data["index"] = "Y" if int(data["y"], 2) == 1 else "Z"
 
-    def commit_result(self, res):
-        self.put_reg(res, self.data['d'])
-
-class Instruction_LDDYplus(Instruction_LDDY):
-    bin_format = '1001000ddddd1001'
-    name = 'lddY+'
-
-    def fetch_operands(self):
-        y = self.get_reg('Y')
-        val = (self.load_data(y, REG_TYPE),)
-        self.put_reg(y + 1, 'Y')
-        return val
-
-class Instruction_LDDYminus(Instruction_LDDY):
-    bin_format = '1001000ddddd1010'
-    name = 'ldd-Y'
-
-    def fetch_operands(self):
-        y = self.get_reg('Y') - 1
-        self.put_reg(x, 'Y')
-        val = (self.load_data(y, REG_TYPE),)
-        return val
-
-class Instruction_LDDYq(Instruction_LDDY):
-    bin_format = '10q0qq0ddddd1qqq'
-
-    def fetch_operands(self):
-        q = int(self.data['q'], 2)
-        y = self.get_reg('Y') + q
-        val = (self.load_data(y, REG_TYPE),)
-        return val
-
-class Instruction_LDDZ(NoFlags, AVRInstruction):
-    bin_format = '1001000ddddd0000'
-    name = 'lddZ'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        return (self.load_data(z, REG_TYPE), )
-
-    def compute_result(self, val):
-        return val
-
-    def commit_result(self, res):
-        self.put_reg(res, self.data['d'])
-
-class Instruction_LDDZplus(Instruction_LDDZ):
-    bin_format = '1001000ddddd0001'
-    name = 'lddZ+'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z')
-        val = (self.load_data(z, REG_TYPE),)
-        self.put_reg(z + 1, 'Z')
-        return val
-
-class Instruction_LDDZminus(Instruction_LDDZ):
-    bin_format = '1001000ddddd0010'
-    name = 'ldd-Z'
-
-    def fetch_operands(self):
-        z = self.get_reg('Z') - 1
-        self.put_reg(x, 'Z')
-        val = (self.load_data(z, REG_TYPE),)
-        return val
-
-class Instruction_LDDZq(Instruction_LDDZ):
-    bin_format = '10q0qq0ddddd0qqq'
-
-    def fetch_operands(self):
-        q = int(self.data['q'], 2)
-        z = self.get_reg('Y') + q
-        val = (self.load_data(z, REG_TYPE),)
-        return val
+        # if "special" form, not all patterns are valid ST instructions.
+        # only q=1/2 are valid for special form
+        if data["s"] == 1 and data["q"] not in [1,2]:
+            raise ParseError()
 
 class Instruction_LDS(NoFlags, AVRInstruction):
     bin_format = "1001000ddddd0000"
@@ -1591,17 +1526,8 @@ class LifterAVR(GymratLifter):
         Instruction_LAC,
         Instruction_LAS,
         Instruction_LAT,
-        Instruction_LDDX,
-        Instruction_LDDXminus,
-        Instruction_LDDXplus,
-        Instruction_LDDY,
-        Instruction_LDDYminus,
-        Instruction_LDDYplus,
-        Instruction_LDDYq,
-        Instruction_LDDZ,
-        Instruction_LDDZminus,
-        Instruction_LDDZplus,
-        Instruction_LDDZq,
+        Instruction_LDx,
+        Instruction_LDyz,
         Instruction_LDI,
         Instruction_LDS,
         Instruction_LPM,
