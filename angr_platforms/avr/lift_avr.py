@@ -1038,8 +1038,8 @@ class Instruction_LDS(NoFlags, AVRInstruction):
         return dst, imm
 
     def compute_result(self, dst, imm):
-        # TODO: Something about RAMPD
-        return self.load_data(self.constant(imm, Type.int_32), REG_TYPE)
+        segment = self.get_reg("RAMPD").cast_to(Type.int_32) << 16
+        return self.load_data(segment + imm, REG_TYPE)
 
     def commit_result(self, res):
         self.put_reg(res, self.data['d'])
@@ -1165,7 +1165,8 @@ class Instruction_STS(NoFlags, AVRInstruction):
         return (self.get_reg(self.data["r"]), int(self.data["k"], 2))
 
     def compute_result(self, val, imm):
-        self.store_data(val, self.constant(imm, Type.int_16))
+        segment = self.get_reg("RAMPD").cast_to(Type.int_32) << 16
+        self.store_data(val, segment + imm)
 
 
 
