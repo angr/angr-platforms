@@ -60,6 +60,9 @@ def compute_overflow_sub(src, dst, res):
 
 
 class AVRInstruction(Instruction):
+    # TODO: allow changing this based on arch
+    pc_type = Type.int_24
+
     def get_reg(self, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
             if len(name) != 5:
@@ -166,22 +169,19 @@ class AVRInstruction(Instruction):
             except KeyError:
                 raise ValueError("Invalid register for put: " + name)
 
-    # Memory access stuff is weird
-
+    # AVR has different address spaces for flash (program memory) and ram (data memory).
+    # The program memory is mapped at arch.flash_offset. All program addresses are translated during lifting.
     def load_program(self, addr, ty):
-        # Let's assume the program memory is in the bottom bits of the address sapce.
-        # Just load it
-        return self.load(addr, ty)
+        return self.load(addr.cast_to(Type.int_32) + self.arch.flash_offset, ty)
 
     def load_data(self, addr, ty):
-        # Assume the data is in the upper half of the address space.
-        return self.load(addr.cast_to(Type.int_32) + self.arch.data_offset, ty)
+        return self.load(addr, ty)
 
     def store_program(self, val, addr):
-        self.store(val, addr)
+        self.store(val, addr.cast_to(Type.int_32) + self.arch.flash_offset)
 
     def store_data(self, val, addr):
-        self.store(val, addr.cast_to(Type.int_32) + self.arch.data_offset)
+        self.store(val, addr)
 
     #################################
     #      Flag access helpers      #
@@ -283,13 +283,15 @@ class AVRInstruction(Instruction):
     # So if PC = 0x8, that refers to the instruction located at byte offset 0x8<<1 = 0x10
 
     def relative_jump(self, condition, offset, **kwargs):
-        self.jump(condition, self.addr + (offset << 1), **kwargs)
+        self.absolute_jump(condition, self.get_pc() + offset, **kwargs)
 
     def absolute_jump(self, condition, addr, **kwargs):
-        self.jump(condition, addr << 1, **kwargs)
+        if not isinstance(addr, int):
+            addr = addr.cast_to(Type.int_32)
+        self.jump(condition, self.arch.flash_offset + (addr << 1), **kwargs)
 
     def get_pc(self):
-        return self.get("pc", Type.int_24)
+        return (self.addr - self.arch.flash_offset) >> 1
 #
 # Some "instruction formats".  These only get you so far in AVR.
 #
@@ -872,10 +874,10 @@ class Instruction_CPI(Instruction_SUBI):
 
 class Instruction_LAGeneric(NoFlags, AVRInstruction):
     def fetch_operands(self):
-        z = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Types.int_32)
-        rampz = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Types.int_32)
+        z = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Type.int_32)
+        rampz = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Type.int_32)
         self._target = (rampz << 16) + z
-        self._val = self.load_data(self._target)
+        self._val = self.load_data(self._target, Type.int_8)
         dst = self.get_reg(self.data["d"])
         return val, dst
 
@@ -943,7 +945,7 @@ class Instruction_LDGeneric(LoadStoreInstruction):
         return (self.process_address_operand(), )
 
     def compute_result(self, addr):
-        return (self.load_data(addr), )
+        return self.load_data(addr, REG_TYPE)
 
     def commit_result(self, res):
         self.put_reg(res, self.data["d"])
@@ -1224,7 +1226,7 @@ class Instruction_CALL(NoFlags, AVRInstruction):
     def compute_result(self, dst):
         sp = self.get_reg("SP")
         sp -= self.arch.call_sp_fix
-        self.store_data(self.get_pc() + 2, sp + 1)
+        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp + 1)
         self.put_reg(sp, "SP")
         self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
 
@@ -1267,7 +1269,7 @@ class Instruction_ICALL(NoFlags, AVRInstruction):
 
     def compute_result(self, dst):
         sp = self.get_reg('SP') - self.arch.call_sp_fix
-        self.store_data(self.get_pc(), sp + 1)
+        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp + 1)
         self.put_reg(sp, 'SP')
         self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
 
@@ -1312,7 +1314,7 @@ class Instruction_RCALL(NoFlags, AVRInstruction):
         # Store return address
         sp = self.get_reg('SP')
         sp -= self.arch.call_sp_fix
-        self.store_data(self.get_pc() + 1, sp + 1)
+        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp + 1)
         self.put_reg(sp, "SP")
         self.relative_jump(None, dst + 1, jumpkind=JumpKind.Call)
 

@@ -18,9 +18,11 @@ class ArchAVR(Arch):
         # IO Registers are mapped into the register file starting at 0x20
         # Any instruction that references an IO register by numer should just add this.
         self.ioreg_offset = 0x20
+
         # Instructions and data are in different memory in AVR
-        # Translate data address into the address space by adding this
-        self.data_offset = 1 << 31
+        # The program code segment will be mapped in the higher part of the address space.
+        # Instructions that access program memory like lpm need to be aware of this.
+        self.flash_offset = 1 << 31
 
         self.registers = {}
         self.registers.update({"r%d" % i            : (i, 1) for i in range(0, 32)})
@@ -126,8 +128,8 @@ class ArchAVR(Arch):
         self.registers["UBRR0L"] =  (0xc4, 1)
         self.registers["UDR0"] =    (0xc6, 1)
 
-        self.registers["pc"] =      (0x80000000, 2)
-        self.registers["ip"] =      (0x80000000, 2)
+        self.registers["pc"] =      (0x80000000, 4)
+        self.registers["ip"] =      (0x80000000, 4)
 
         self.register_names = {}
         self.register_names.update({i: "r%d" % i for i in range(0, 32)})
