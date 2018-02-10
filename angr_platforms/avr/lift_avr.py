@@ -1079,70 +1079,29 @@ class Instruction_PUSH(NoFlags, AVRInstruction):
         sp -= 1
         self.put_reg(sp, 'SP')
 
-class Instruction_ST(AVRInstruction):
-    bin_format = '1001001rrrrr1100'
-    name = 'st'
-    def fetch_operands(self):
-        return (self.get_reg(self.data['r']), )
-
-    def compute_result(self, val):
-        addr = self.get(self.arch.registers['X'][0], DOUBLEREG_TYPE)
-        self.store_data(val, addr)
-
-class Instruction_STplus(NoFlags, AVRInstruction):
-    bin_format = '1001001rrrrr1101'
-    name = 'st+'
-
-    def fetch_operands(self):
-        return (self.get_reg(self.data['r']), )
-
-    def compute_result(self, val):
-        # Post-increment
-        addr = self.get(self.arch.registers['X'][0], DOUBLEREG_TYPE)
-        self.store_data(val, addr)
-        addr += 1
-        self.put(addr, self.arch.registers['X'][0])
-
-class Instruction_STminus(NoFlags,AVRInstruction):
-    bin_format = '1001001rrrrr1110'
-    name = 'st-'
-
-    def fetch_operands(self):
-        return (self.get_reg(self.data['r']),)
-
-    def compute_result(self, val):
-        # Pre-decrement
-        addr = self.get(self.arch.registers['X'][0], DOUBLEREG_TYPE)
-        addr -= 1
-        self.store_data(val, addr)
-        self.put(addr, self.arch.registers['X'][0])
-
-class Instruction_STindex(NoFlags, AVRInstruction):
-    bin_format = "10qsqq1rrrrryqqq"
-    name = "stI"
-
-    def match_instruction(self, data, bitstrm):
-        data["s"] = int(data["s"], 2)
-        data["q"] = int(data["q"], 2)
-        if data["s"] == 0: return
-        if data["q"] == 1 or data["q"] == 2: return
-        raise ParseError()
+class Instruction_STGeneric(NoFlags, AVRInstruction):
+    name = "st"
 
     def fetch_operands(self):
         # figure out which register (y or z) to operate on
-        index_reg = self.arch.registers["Y" if self.data["y"] == 1 else "Z"][0]
-        segment_reg = self.arch.registers["RAMPY" if self.data["y"] == 1 else "RAMPZ"][0]
+        index_reg = self.arch.registers[self.data["index"]][0]
+        segment_reg = self.arch.registers["RAMP" + self.data["index"]][0]
+
+        # compute the address
         segment = self.get(segment_reg, REG_TYPE).cast_to(Type.int_24) << 16
         addr =  self.get(index_reg, DOUBLEREG_TYPE).cast_to(Type.int_24)
 
         # special mode: pre-decrement
         if self.data["s"] and self.data["q"] == 2:
             addr -= 1
-            self.put(addr, index_reg)
+            self.put((addr >> 16).cast_to(Int.int_8), segment_reg)
+            self.put(addr.cast_to(Int.int_16), index_reg)
 
         # special mode: post-increment
         if self.data["s"] and self.data["q"] == 1:
-            self.put(addr + 1, index_reg)
+            new_addr = addr + 1
+            self.put((new_addr >> 16).cast_to(Type.int_8), segment_reg)
+            self.put(new_addr.cast_to(Type.int_16), index_reg)
 
         # optional offset if not special mode
         offset = self.data["q"] if not self.data["s"] else 0
@@ -1150,6 +1109,28 @@ class Instruction_STindex(NoFlags, AVRInstruction):
 
     def compute_result(self, addr, val):
         self.store_data(val, addr)
+    
+
+class Instruction_STyz(Instruction_STGeneric):
+    bin_format = "10qsqq1rrrrryqqq"
+
+    def match_instruction(self, data, bitstrm):
+        data["s"] = int(data["s"], 2)
+        data["q"] = int(data["q"], 2)
+        data["index"] = "Y" if int(data["y"], 2) == 1 else "Z"
+
+        # if "special" form, not all patterns are valid ST instructions.
+        # only q=1/2 are valid for special form
+        if data["s"] == 1 and data["q"] not in [1,2]:
+            raise ParseError()
+
+class Instruction_STx(Instruction_STGeneric):
+    bin_format = '1001001rrrrr11qq'
+
+    def match_instruction(self, data, bitstrm):
+        data["q"] = int(data["q"], 2)
+        data["s"] = 1 if data["q"] in [1, 2] else 0
+        data["index"] = "X"
 
 class Instruction_STS(NoFlags, AVRInstruction):
     bin_format = "1001001rrrrr0000"
@@ -1661,10 +1642,8 @@ class LifterAVR(GymratLifter):
         Instruction_SLEEP,
         # TODO: SPM
         # TODO: SPM2
-        Instruction_ST,
-        Instruction_STplus,
-        Instruction_STminus,
-        Instruction_STindex,
+        Instruction_STx,
+        Instruction_STyz,
         Instruction_STS,
         Instruction_SUB,
         Instruction_SUBI,
