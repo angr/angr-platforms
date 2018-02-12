@@ -958,6 +958,8 @@ class Instruction_LDx(Instruction_LDGeneric):
         data["q"] = int(data["q"], 2)
         data["s"] = 1 if data["q"] in [1, 2] else 0
         data["index"] = "X"
+        if data["q"] not in [0, 1, 2]:
+            raise ParseError()
 
 class Instruction_LDyz(Instruction_LDGeneric):
     bin_format = '10qsqq0dddddyqqq'
@@ -988,6 +990,8 @@ class Instruction_STx(Instruction_STGeneric):
         data["q"] = int(data["q"], 2)
         data["s"] = 1 if data["q"] in [1, 2] else 0
         data["index"] = "X"
+        if data["q"] not in [0, 1, 2]:
+            raise ParseError()
 
 class Instruction_STyz(Instruction_STGeneric):
     bin_format = "10qsqq1rrrrryqqq"
