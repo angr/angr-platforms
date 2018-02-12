@@ -887,7 +887,7 @@ class Instruction_LAGeneric(NoFlags, AVRInstruction):
 
 
 class Instruction_LAC(Instruction_LAGeneric):
-    bin_format = "1001001ddddd1111"
+    bin_format = "1001001ddddd0110"
     name = 'lac'
 
     def compute_result(self, val, dst):
