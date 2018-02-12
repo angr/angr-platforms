@@ -119,12 +119,12 @@ class AVRInstruction(Instruction):
                 # regs.  5-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible double registers.")
             else:
-                num = int(name_num, 2)
-        elif isinstance(name_num, int):
+                name_num = int(name_num, 2)
+        if isinstance(name_num, int):
             num = name_num
 
             try:
-                offset = self.arch.registers['R%d_R%d' % (2 * num + 1, 2 * num)]
+                offset = self.arch.registers['R%d_R%d' % (2 * num + 1, 2 * num)][0]
                 return self.put(value, offset)
             except KeyError:
                 raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num))
