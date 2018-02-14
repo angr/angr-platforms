@@ -389,6 +389,9 @@ class DoubleRegImmAVRInstruction(AVRInstruction):
         imm = self.constant(int(self.data['K'], 2), DOUBLEREG_TYPE)
         return src, imm
 
+    def commit_result(self, res):
+        self.put_reg_pair(res, "11" + self.data["d"])
+
 class RegImmAVRInstruction(AVRInstruction):
     bin_format = "ooooKKKKddddKKKK"
 
@@ -920,7 +923,7 @@ class Instruction_LAGeneric(NoFlags, AVRInstruction):
         self._target = (rampz << 16) + z
         self._val = self.load_data(self._target, Type.int_8)
         dst = self.get_reg(self.data["d"])
-        return val, dst
+        return self._val, dst
 
     def commit_result(self, res):
         self.store_data(res, self._target)
@@ -977,7 +980,7 @@ class LoadStoreInstruction(NoFlags, AVRInstruction):
 
         # optional offset if not special mode
         offset = self.data["q"] if not self.data["s"] else 0
-        return addr + offset
+        return addr + offset + segment
 
 
 class Instruction_LDGeneric(LoadStoreInstruction):
@@ -1359,7 +1362,11 @@ class Instruction_RCALL(NoFlags, AVRInstruction):
         sp -= self.arch.call_sp_fix
         self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp)
         self.put_reg(sp, "SP")
-        self.relative_jump(None, dst + 1, jumpkind=JumpKind.Call)
+        # HACK: if the call target is the next instruction, treat this as a boring jump
+        # gcc likes to use rcall to reserve space on stack. these calls are not actually calls,
+        # they are just there to decrease the stack pointer by 2/3 (depending on arch) bytes
+        jumpkind = JumpKind.Call if dst != 0 else JumpKind.Boring
+        self.relative_jump(None, dst + 1, jumpkind=jumpkind)
 
 class Instruction_RET(NoFlags, AVRInstruction):
     bin_format = "1001010100001000"
