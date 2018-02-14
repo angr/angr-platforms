@@ -60,7 +60,7 @@ def compute_overflow_sub(src, dst, res):
 
 
 class AVRInstruction(Instruction):
-    # TODO: allow changing this based on arch
+    # TODO: allow changing this based on arch, support pc overflow
     pc_type = Type.int_24
 
     def get_reg(self, name):
@@ -135,6 +135,28 @@ class AVRInstruction(Instruction):
             except KeyError:
                 raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num))
 
+    def _get_ioreg_register(self, reg_offset, ty):
+        # we need special handling for the stack pointer
+        # angr expects the stack pointer to point to the last stack entry,
+        # while the AVR stack pointer must point to the next free entry (one byte below the last stack entry)
+        #
+        # luckily, the only way that a program can observe the stack pointer is through IO registers, 
+        # so we can let the SP in the register file point to the last stack entry and translate it
+        # during IO register access.
+        spl = self.arch.registers["SPL"][0]
+        sph = self.arch.registers["SPH"][0]
+
+        if reg_offset == spl:
+            assert ty in [Type.int_8, Type.int_16], "access to SP/SPL must be either 8 or 16 bit size"
+            sp = self.get("SP", DOUBLEREG_TYPE)
+            return (sp - 1).cast_to(ty)
+
+        if reg_offset == sph:
+            assert ty == Type.int_8, "access to SPH must be 8 bit size"
+            sp = self.get("SP", DOUBLEREG_TYPE)
+            return (sp - 1).narrow_high(Type.int_8)
+
+        return self.get(reg_offset, ty)
 
     def get_ioreg(self, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
@@ -143,14 +165,33 @@ class AVRInstruction(Instruction):
                 # regs.  6-bit IO regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible IO registers.")
             else:
-                return self.get(self.arch.ioreg_offset + int(name, 2), REG_TYPE)
+                return self._get_ioreg_register(self.arch.ioreg_offset + int(name, 2), REG_TYPE)
         else:
             try:
                 reg, width = self.arch.registers[name]
                 ty = REG_TYPE if width == 1 else DOUBLEREG_TYPE
-                return self.get(reg, ty)
+                return self._get_ioreg_register(reg, ty)
             except KeyError:
                 raise ValueError("Invalid register for name: " + name)
+
+    def _put_ioreg_register(self, value, reg_offset):
+        spl = self.arch.registers["SPL"][0]
+        sph = self.arch.registers["SPH"][0]
+
+        if reg_offset == spl:
+            assert value.ty in [Type.int_8, Type.int_16], "access to SP/SPL must be either 8 or 16 bit size"
+
+            self.put_reg(value + 1, "SPL")
+            return
+
+        if reg_offset == sph:
+            assert value.ty == Type.int_8, "access to SPH must be 8 bit size"
+            low = self.get_reg("SPL")
+            self.put_reg(value + (low == 0).ite(1, 0), "SPH")
+            return
+
+        self.put(value, reg_offset)
+
 
     def put_ioreg(self, value, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
@@ -159,12 +200,12 @@ class AVRInstruction(Instruction):
                 # regs.  6-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible IO registers. ")
             else:
-                self.put(value, self.arch.ioreg_offset + int(name, 2))
+                self._put_ioreg_register(value, self.arch.ioreg_offset + int(name, 2))
                 return
         else:
             try:
                 reg, _ = self.arch.registers[name]
-                self.put(value, reg)
+                self._put_ioreg_register(value, reg)
                 return
             except KeyError:
                 raise ValueError("Invalid register for put: " + name)
@@ -1041,10 +1082,8 @@ class Instruction_POP(NoFlags, AVRInstruction):
         return (None, )
 
     def compute_result(self, none):
-        # Pre-increment SP
         sp = self.get_reg('SP')
-        sp += 1
-        self.put_reg(sp, 'SP')
+        self.put_reg(sp + 1, 'SP')
         return self.load_data(sp, REG_TYPE)
 
     def commit_result(self, res):
@@ -1060,8 +1099,8 @@ class Instruction_PUSH(NoFlags, AVRInstruction):
 
     def compute_result(self, src):
         sp = self.get_reg('SP')
-        self.store_data(src, sp)
         sp -= 1
+        self.store_data(src, sp)
         self.put_reg(sp, 'SP')
 
 class Instruction_STS(NoFlags, AVRInstruction):
@@ -1230,7 +1269,7 @@ class Instruction_CALL(NoFlags, AVRInstruction):
     def compute_result(self, dst):
         sp = self.get_reg("SP")
         sp -= self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp + 1)
+        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp)
         self.put_reg(sp, "SP")
         self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
 
@@ -1273,7 +1312,7 @@ class Instruction_ICALL(NoFlags, AVRInstruction):
 
     def compute_result(self, dst):
         sp = self.get_reg('SP') - self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp + 1)
+        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp)
         self.put_reg(sp, 'SP')
         self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
 
@@ -1318,7 +1357,7 @@ class Instruction_RCALL(NoFlags, AVRInstruction):
         # Store return address
         sp = self.get_reg('SP')
         sp -= self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp + 1)
+        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp)
         self.put_reg(sp, "SP")
         self.relative_jump(None, dst + 1, jumpkind=JumpKind.Call)
 
@@ -1329,7 +1368,7 @@ class Instruction_RET(NoFlags, AVRInstruction):
     def compute_result(self, *args):
         sp = self.get_reg("SP")
         self.put_reg(sp + self.arch.call_sp_fix, 'SP')
-        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
+        dst = self.load_data(sp, int_type_for_size(self.arch.call_sp_fix * 8))
         self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
 
 class Instruction_RETI(NoFlags, AVRInstruction):
@@ -1340,7 +1379,7 @@ class Instruction_RETI(NoFlags, AVRInstruction):
         # Pre-increment SP
         sp = self.get_reg("SP")
         self.put_reg(sp + self.arch.call_sp_fix, 'SP')
-        dst = self.load_data(sp + 1, int_type_for_size(self.arch.call_sp_fix * 8))
+        dst = self.load_data(sp, int_type_for_size(self.arch.call_sp_fix * 8))
         # Set GIE
         self.set_flag(MSPFlagIndex.GIE, 1)
         self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)

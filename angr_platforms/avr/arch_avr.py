@@ -5,7 +5,7 @@ class ArchAVR(Arch):
         super(ArchAVR, self).__init__(endness)
 
         self.bits = 32
-        self.call_sp_fix = 4
+        self.call_sp_fix = 3
         self.instruction_alignment = 2
         self.vex_arch = None
         self.name = "AVR"
@@ -143,6 +143,7 @@ class ArchAVR(Arch):
 
         self.ip_offset = self.registers["pc"][0]
         self.sp_offset = self.registers["sp"][0]
+        self.initial_sp = 0x7fff
         self.call_pushes_ret = True
         # FIXME: something in angr assumes that sizeof(long) == sizeof(return address on stack)
-        self.sizeof["long"] = self.bytes
+        self.sizeof["long"] = 24
