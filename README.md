@@ -10,6 +10,8 @@ Here you can find the following:
 
 * ```Berkeley Packet Filter (BPF)``` (by @ltfish) 
 
+* ```CyberTronix64k support``` (by @rhelmot) Demonstrates how to support arches with odd byte-widths (16-bits), and uses memory-mapped registers and mmio.
+
 * ```[WIP] Atmel AVR support``` (by @subwire, and maybe you!) WIP branch at https://github.com/angr/angr-platforms/tree/wip/avr
 
 * ```[WIP] Hitachi SH4 support``` (by @pwnslinger) https://github.com/angr/angr-platforms/tree/wip/ikaruga
