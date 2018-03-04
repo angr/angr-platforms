@@ -4,7 +4,7 @@ import archinfo
 import logging
 import struct
 
-from ct64_engine import *
+from .ct64_engine import *
 
 l = logging.getLogger('angr.ct64k')
 
@@ -65,8 +65,7 @@ class SimCT64K(angr.SimOS):
         super(SimCT64K, self).__init__(project, 'ct64k')
 
     def configure_project(self):
-        self.project.factory.default_engine = SimEngineCT64K()
-        self.project.factory.engines.append(self.project.factory.default_engine)
+        self.project.engines.register_plugin('default_engine', SimEngineCT64K())
 
     def state_blank(self, addr=None, **kwargs):
         if addr is None:
@@ -121,7 +120,6 @@ class SimCT64K(angr.SimOS):
             return
         p[1](state, state.inspect.reg_write_expr)
 
-angr.register_default_engine(CT64KBlob, SimEngineCT64K)
 angr.calling_conventions.register_default_cc('CT64K', angr.calling_conventions.SimCCCdecl)
 angr.simos.register_simos('ct64k', SimCT64K)
 

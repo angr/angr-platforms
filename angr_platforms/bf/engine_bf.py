@@ -1,17 +1,13 @@
-import logging
-from angr import SimValueError
-from angr.engines import SimEngine
-from .load_bf import BF
-from angr import register_default_engine
+import angr
 import claripy
+import logging
 
 l = logging.getLogger('angr.engines.SinEngineBF')
 
 
-class SimEngineBF(SimEngine):
+class SimEngineBF(angr.SimEngine):
     """
     This is a SimEngine for executing BrainFuck.  Oh yeah, you're not hallucinating.
-    :ivar callable check_failed: A callback that is called after _check() returns False.
     """
 
     def _build_jump_table(self, state):
@@ -21,7 +17,7 @@ class SimEngineBF(SimEngine):
         while True:
             try:
                 inst = chr(state.mem_concrete(addr, 1))
-            except SimValueError:
+            except angr.SimValueError:
                 break
             except KeyError:
                 break
@@ -79,7 +75,7 @@ class SimEngineBF(SimEngine):
             # we just ask for a concrete value, and we'll get one.
             try:
                 inst = chr(state.mem_concrete(state.ip,1))
-            except SimValueError:
+            except angr.SimValueError:
                 # ...except if it IS symbolic.  That means we ran off the memory.
                 # Drop the mic and go home.  We're done here.
                 the_end = state.copy()
@@ -179,4 +175,6 @@ class SimEngineBF(SimEngine):
         return True
 
 # Engine registration
-register_default_engine(BF, SimEngineBF, arch='any')
+bf_engine_preset = angr.engines.vex_preset.copy()
+bf_engine_preset.add_default_plugin('default_engine', SimEngineBF)
+bf_engine_preset.set_order(['default_engine'])
