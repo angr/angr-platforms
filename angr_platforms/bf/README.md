@@ -26,7 +26,7 @@ Here, we provide an example of both.
 
 Our lifter, demoed here, directly converts the `<>+-[].,` of BF into multiple VEX instructions.
 In addition to making lifters modular, we also provide a set of helper functions for those writing even very
-complex lifters, which can be found in `pyvex.lift.util.vex_helper`
+complex lifters, which can be found in `pyvex.lifting.util.vex_helper`
 
 Example usage (with the VEX lifter):
 ```python

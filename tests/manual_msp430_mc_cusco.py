@@ -6,7 +6,7 @@ linspect = logging.getLogger('angr.state_plugins.inspect')
 linspect.setLevel(logging.ERROR)
 logging.getLogger("claripy.backends.backend_z3").setLevel(logging.WARNING)
 logging.getLogger("angr.engines.vex.expressions").setLevel(logging.WARNING)
-logging.getLogger('pyvex.lift.util.lifter_helper').setLevel(logging.WARNING)
+logging.getLogger('pyvex.lifting.util.lifter_helper').setLevel(logging.WARNING)
 logging.getLogger('angr_platforms.msp430.instrs_msp430').setLevel(logging.WARNING)
 from angr_platforms.msp430 import *
 from angr import options as o

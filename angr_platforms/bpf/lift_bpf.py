@@ -2,8 +2,8 @@
 import logging
 
 import archinfo
-from pyvex.lift.util import *
-from pyvex.lift import register
+from pyvex.lifting.util import *
+from pyvex.lifting import register
 
 
 log = logging.getLogger("lift_bpf")

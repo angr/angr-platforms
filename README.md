@@ -16,7 +16,7 @@ Here you can find the following:
 
 * ```[WIP] Hitachi SH4 support``` (by @pwnslinger) https://github.com/angr/angr-platforms/tree/wip/ikaruga
 
-The core idea here is that angr and its components are extensible through _registration_ -- a method, such as `pyvex.lift.register()` can be used to include your out-of-tree code into angr's automatic consideration.
+The core idea here is that angr and its components are extensible through _registration_ -- a method, such as `pyvex.lifting.register()` can be used to include your out-of-tree code into angr's automatic consideration.
 Through these mechanisms, you can write new architectural descriptions, laoders for new binary formats, lifters for new instruction sets, new simulated execution environments (SimOSes).  You can even create entirely new execution engines that operate on instructions other than the VEX IR.
 
 A set of tutorials, providing a walkthrough of these components, how they interact, and how to write them, can be found here: https://github.com/angr/angr-platforms/tree/master/tutorial

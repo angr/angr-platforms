@@ -44,7 +44,7 @@ This is the actual lifter class used by `pyvex`.
 You will need to make a subclass of this, and provide a property `instrs` containing a list of possible instruction classes.
 `GymratLifter`s are provided with a block of code to lift in their constructor, and when `lift()` is called, will iterate through the code, matching instruction classes to the bytes, and populating an IRSB object (IR Super Block) with the appropriate VEX instructions. This IRSB gets returned eventually to angr, and used for its analyses.
 By default, GymratLifter will try using every instruction contained in `instrs` until one succeeds.
-Don't forget to call `pyvex.lift.register()` to tell pyvex that your new lifter exists.
+Don't forget to call `pyvex.lifting.register()` to tell pyvex that your new lifter exists.
 
 ### Type
 In the binary world, a "type" here merely denodes how many bits wide a value is, and how it is interpreted (int, float, etc)
