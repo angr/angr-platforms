@@ -1,8 +1,8 @@
 import pyvex
 from arch_msp430 import ArchMSP430
 import instrs_msp430 as instrs
-from pyvex.lift import register
-from pyvex.lift.util import *
+from pyvex.lifting import register
+from pyvex.lifting.util import *
 
 
 class LifterMSP430(GymratLifter):
