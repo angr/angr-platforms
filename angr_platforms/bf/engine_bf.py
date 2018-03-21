@@ -174,7 +174,9 @@ class SimEngineBF(angr.SimEngine):
         """
         return True
 
+
 # Engine registration
-bf_engine_preset = angr.engines.vex_preset.copy()
-bf_engine_preset.add_default_plugin('default_engine', SimEngineBF)
-bf_engine_preset.set_order(['default_engine'])
+bf_engine_preset = angr.engines.basic_preset.copy()
+bf_engine_preset.add_default_plugin('bf', SimEngineBF)
+bf_engine_preset.default_engine = 'bf'
+bf_engine_preset.order = 'bf',
