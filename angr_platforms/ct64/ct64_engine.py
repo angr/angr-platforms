@@ -261,3 +261,10 @@ def disasm(state, addr, length=None):
             break
         elif isinstance(b, Instruction2) and claripy.is_true(b.rm == 0):
             break
+
+
+# Engine registration
+ct64k_engine_preset = angr.engines.basic_preset.copy()
+ct64k_engine_preset.add_default_plugin('ct64k', SimEngineCT64K)
+ct64k_engine_preset.default_engine = 'ct64k'
+ct64k_engine_preset.order = 'ct64k',
