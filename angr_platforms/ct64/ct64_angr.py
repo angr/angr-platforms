@@ -65,6 +65,9 @@ class SimCT64K(angr.SimOS):
         }
         super(SimCT64K, self).__init__(project, 'ct64k')
 
+    def configure_project(self):
+        pass
+
     def state_blank(self, addr=None, **kwargs):
         if addr is None:
             addr = 0x1000
