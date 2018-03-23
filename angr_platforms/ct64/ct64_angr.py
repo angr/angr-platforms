@@ -55,6 +55,7 @@ class CT64KBlob(cle.backends.blob.Blob):
         self.memory.add_backer(mem_addr - self.linked_base, unistring)
         self._max_addr = max(len(unistring) + mem_addr, self._max_addr)
         self._min_addr = min(mem_addr, self._min_addr)
+        self.engine_preset = ct64k_engine_preset
 
 class SimCT64K(angr.SimOS):
     def __init__(self, project):
@@ -63,9 +64,6 @@ class SimCT64K(angr.SimOS):
             0x201: (hard_201_rd, hard_201_wr),
         }
         super(SimCT64K, self).__init__(project, 'ct64k')
-
-    def configure_project(self):
-        self.project.engines.register_plugin('default_engine', SimEngineCT64K())
 
     def state_blank(self, addr=None, **kwargs):
         if addr is None:
