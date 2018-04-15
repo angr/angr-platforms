@@ -4,7 +4,7 @@ from archinfo.tls import TLSArchInfo
 register_simos('SH4', SimMSP430)"""
 
 class ArchSH4(Arch):
-    def __init__(self, endness=Endness.BE):
+    def __init__(self, endness=Endness.LE):
         super(ArchSH4, self).__init__(endness)
         self.ip_offset = 72
         self.sp_offset = 68

@@ -19,10 +19,27 @@ class LifterSH4(GymratLifter):
 
 	 instrs = [instrs_sh4.__dict__[x] for x in filter(lambda x: x.startswith("Instruction_"), instrs_sh4.__dict__.keys())]
 	 
-	 def __init__(self, arch, startPos, toLift = "", max_bytes = 10000000, max_inst = 1000000):
+	 """
+	 Reverse the endianness of the input data (SH4 instructions).  Total hack.
+	 """
+	 def cheese(self, binData):
+	 
+		binData = [b for b in binData]
+									 
+		# This skips the last byte if it is unpaired
+		for i in range(0, len(binData) - 1, 2):
+
+			binData[i], binData[i+1] = binData[i+1], binData[i]
+						
+		return ''.join(binData)
+	 
+	 def __init__(self, arch, startPos, toLift = "", max_bytes = 100000, max_inst = 10000, cheese=False):
 		super(LifterSH4, self).__init__(arch, startPos)
 		
 		if len(toLift) > 0:
+		
+			if cheese:
+				toLift = self.cheese(toLift)
 		
 			self.max_bytes = max_bytes
 			self.max_inst = max_inst 
@@ -42,14 +59,14 @@ def test_hello():
 	
 	# This would lift a single instruction, as specified
 	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x69x62")
-	l = LifterSH4(arch_sh4.ArchSH4(), 0, "\xd1x16", max_bytes=2)
+	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\xd1x16", max_bytes=2)
 
-	"""ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
-	
-	bytes = ld.memory.read_bytes(ld.main_object.entry, 0x100)
+	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
+	# '''ld.main_object.entry'''
+	bytes = ld.memory.read_bytes(0x400506 , 0x1000)
 	bytes=''.join(bytes)
 	
-	l = LifterSH4(arch_sh4.ArchSH4(), 0, bytes)"""
+	l = LifterSH4(arch_sh4.ArchSH4(), 0, bytes, cheese=True)
 
 	"""l.irsb = pyvex.IRSB('\x63\x68', 0, arch)
 
