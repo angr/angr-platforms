@@ -58,15 +58,22 @@ def test_hello():
 	logging.getLogger('pyvex.lift.util.lifter_helper').setLevel('DEBUG')
 	
 	# This would lift a single instruction, as specified
-	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x69x62")
-	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\xd1x16", max_bytes=2)
+	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x69\x62")
+	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\xd1\x16", max_bytes=2)
+	
+	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x2f\x11", cheese=True, max_bytes=2)
+	
+	
+
 
 	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
-	# '''ld.main_object.entry'''
-	bytes = ld.memory.read_bytes(0x400506 , 0x1000)
+	# '''ld.main_object.entry or 0x400506'''
+	start = 0x4006a4 #0x400430
+	
+	bytes = ld.memory.read_bytes(start, 0x1000)
 	bytes=''.join(bytes)
 	
-	l = LifterSH4(arch_sh4.ArchSH4(), 0, bytes, cheese=True)
+	l = LifterSH4(arch_sh4.ArchSH4(), start, bytes, cheese=True)
 
 	"""l.irsb = pyvex.IRSB('\x63\x68', 0, arch)
 
@@ -77,8 +84,8 @@ def test_hello():
 	"""	
 	
 	irsb = l.lift()
-	print irsb.statements
-	irsb.pp()
+	#print irsb.statements
+	#irsb.pp()
 	
 	register(LifterSH4, 'sh4')		
 

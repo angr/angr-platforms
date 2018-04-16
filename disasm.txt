@@ -546,7 +546,7 @@ Disassembly of section .text:
   40050c:	e3 61       	mov	r14,r1
   40050e:	10 71       	add	#16,r1
   400510:	ff e2       	mov	#-1,r2
-  400512:	2f 11       	mov.l	r2,@(60,r1)
+  400512:	2f 11       	mov.l	r2,@(60,r1)  
   400514:	e3 61       	mov	r14,r1
   400516:	10 71       	add	#16,r1
   400518:	01 e2       	mov	#1,r2

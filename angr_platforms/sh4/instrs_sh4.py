@@ -107,6 +107,8 @@ class SH4Instruction(Instruction):
 	"""
 	def get_flag(self, flag):
 	
+		return self.constant(0, LWORD_TYPE)
+	
 		# TODO!
 		pass
 		
@@ -255,8 +257,163 @@ class Instruction_XTRCT(SH4Instruction):
 		self.inc_pc()
 	
 		return res	
+		
+class Instruction_EXTS(SH4Instruction):
 
-class Instruction_MOVL(SH4Instruction):
+	bin_format = '0110nnnnmmmm11dd'
+	name='ext?.?'
+	
+	def fetch_operands(self):
+	
+		if self.data['d'] == '10':
+			self.name = 'exts.b'
+			rm = self.get_rreg_val('m',ty=BYTE_TYPE,extend=True)
+		elif self.data['d'] == '11':
+			self.name = 'exts.w'
+			rm = self.get_rreg_val('m',ty=WORD_TYPE,extend=True)
+		elif self.data['d'] == '00':
+			self.name = 'extu.b'
+			rm = self.get_rreg_val('m',ty=BYTE_TYPE).cast_to(LWORD_TYPE)
+		elif self.data['d'] == '01':
+			self.name = 'extu.w'
+			rm = self.get_rreg_val('m',ty=WORD_TYPE).cast_to(LWORD_TYPE)
+									
+		rm_name = self.get_rreg('m')
+		rn_name = self.get_rreg('n')
+
+		return rm, rm_name, rn_name
+		
+	def disassemble(self):
+	
+		rm, rm_name, rn_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn_name):
+		"""
+		Sign-extends the contents of general register Rm and stores the result in Rn. The value of Rm bit 7 is transferred to Rn bits 8 to 31. 
+		
+		Sign-extends the contents of general register Rm and stores the result in Rn. The value of Rm bit 15 is transferred to Rn bits 16 to 31. 
+		
+		Zero-extends the contents of general register Rm and stores the result in Rn. 0 is transferred to Rn bits 8 to 31. 
+		
+		Zero-extends the contents of general register Rm and stores the result in Rn. 0 is transferred to Rn bits 16 to 31. 
+		"""
+		
+		# Note: are the ops in fetch_operands preferable to manual &'s?
+		
+		self.put(rm, rn_name)
+					
+		self.inc_pc()
+	
+		return rm	
+		
+class Instruction_MOVB_RM_RN(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm0000'
+	name='mov.b'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+
+		return rm, rn_name
+		
+	def disassemble(self):
+	
+		rm, rn_name = self.fetch_operands()
+			
+		return "%s @%s,%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn_name):
+		"""
+		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
+		"""
+		
+		# May need to be 8 bit
+		val = self.load(rm, Type.int_32)
+		
+		if ((val & 0x80) == 0):
+			val &= 0x000000FF
+		else:
+			val |= 0xFFFFFF00;
+
+		self.put(val, rn_name)
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_MOVW_RM_RN(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm0001'
+	name='mov.w'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+
+		return rm, rn_name
+		
+	def disassemble(self):
+	
+		rm, rn_name = self.fetch_operands()
+			
+		return "%s @%s,%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn_name):
+		"""
+		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
+		"""
+		
+		# May need to be 16 bit
+		val = self.load(rm, Type.int_32)
+		
+		if ((val & 0x8000) == 0):
+			val &= 0x0000FFFF
+		else:
+			val |= 0xFFFF0000;
+
+		self.put(val, rn_name)
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_MOVL_RM_RN(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm0010'
+	name='mov.l'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+
+		return rm, rn_name
+		
+	def disassemble(self):
+	
+		rm, rn_name = self.fetch_operands()
+			
+		return "%s @%s,%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn_name):
+		"""
+		Transfers the source operand to the destination.
+		"""
+		
+		val = self.load(rm, Type.int_32)
+		
+		self.put(val, rn_name)
+	
+		self.inc_pc()
+	
+		return val	
+
+class Instruction_MOVL_IMM(SH4Instruction):
 
 	bin_format = '1101nnnndddddddd'
 	name='mov.l'
@@ -289,7 +446,139 @@ class Instruction_MOVL(SH4Instruction):
 	
 		self.inc_pc()
 	
-		return val		
+		return val	
+
+class Instruction_MOV_RM_RN(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm0011'
+	name='mov'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
+		rn_name = self.get_rreg('n')
+
+		return rm, rm_name, rn_name
+		
+	def disassemble(self):
+	
+		rm, rm_name, rn_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		self.put(rm, rn_name)
+					
+		self.inc_pc()
+	
+		return rm	
+		
+class Instruction_MOV_IMM_RN(SH4Instruction):
+
+	bin_format = '1110nnnniiiiiiii'
+	name='mov'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i')
+		rn_name = self.get_rreg('n')
+
+		return i, rn_name
+		
+	def disassemble(self):
+	
+		i, rn_name = self.fetch_operands()
+			
+		return "%s #%s,%s" % (self.name, i, rn_name)
+
+	def compute_result(self, i, rn_name):
+		"""
+		Stores immediate data, sign-extended to longword, in general register Rn. 
+		"""
+		
+		if (i & 0x80) == 0:
+			i = (0x000000FF & i)
+		else:
+			i = (0xFFFFFF00 | i)
+		
+		self.put(i, rn_name)
+					
+		self.inc_pc()
+	
+		return i	
+		
+class Instruction_MOVL_RM_RN_D(SH4Instruction):
+
+	bin_format = '0001nnnnmmmmdddd'
+	name='mov.l'
+	
+	def fetch_operands(self):
+									
+		d = self.get_rimm_val('d', Type.int_32, extend=True)
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+
+		return d, rm, rn
+		
+	def disassemble(self):
+	
+		d, rm, rn = self.fetch_operands()
+			
+		return "%s %s,@(%s,%s)" % (self.name, rm, d, rn)
+
+	def compute_result(self, d, rm, rn):
+		"""
+		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
+		"""
+		
+		disp = (0x000000FF & d);
+		writeAddr = ( rn + (disp << 2) );
+		
+		self.store(rm, writeAddr)
+			
+		self.inc_pc()
+	
+		return rm	
+		
+class Instruction_MOVL_RN_RM_D(SH4Instruction):
+
+	bin_format = '0101nnnnmmmmdddd'
+	name='mov.l'
+	
+	def fetch_operands(self):
+									
+		d = self.get_rimm_val('d', Type.int_32, extend=True)
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+
+		return d, rm, rn_name
+		
+	def disassemble(self):
+	
+		d, rm, rn_name = self.fetch_operands()
+			
+		return "%s @(%s,%s), %s" % (self.name, rm, d, rn_name)
+
+	def compute_result(self, d, rm, rn_name):
+		"""
+		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
+		"""
+		
+		disp = (0x000000F & d);
+		toRead = ( rm + (disp << 2) );
+		
+		val = self.load(toRead, Type.int_32)
+		
+		self.put(val, rn_name)
+					
+		self.inc_pc()
+	
+		return val	
 
 class Instruction_MOVW(SH4Instruction):
 
@@ -329,7 +618,800 @@ class Instruction_MOVW(SH4Instruction):
 	
 		self.inc_pc()
 	
-		return val			
+		return val		
+
+class Instruction_MOVW_RM_D(SH4Instruction):
+
+	bin_format = '10000101mmmmdddd'
+	name='mov.w'
+	
+	def fetch_operands(self):
+									
+		d = self.get_rimm_val('d', Type.int_32, extend=True)
+		rm = self.get_rreg_val('m')
+
+		return d, rm
+		
+	def disassemble(self):
+	
+		d, rm = self.fetch_operands()
+			
+		return "%s @(%s,%s),R0" % (self.name, d, rm)
+
+	def compute_result(self, d, rm):
+		"""
+		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register.  
+		"""
+		
+		disp = (0x000000FF & d);
+		toRead = ( rm + (disp << 1) );
+		
+		self.store(rm, writeAddr)
+		
+		# This should be 16 bit, but that should be handled below
+		val = self.load(toRead, Type.int_32)
+		
+		if val & 0x8000 == 0:
+			val = val & 0x0000FFFF
+		else:
+			val = val & 0xFFFF0000
+			
+		self.put(val, 'r0')
+			
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_MOVB_RM_D(SH4Instruction):
+
+	bin_format = '10000100mmmmdddd'
+	name='mov.b'
+	
+	def fetch_operands(self):
+									
+		d = self.get_rimm_val('d', Type.int_32, extend=True)
+		rm = self.get_rreg_val('m')
+
+		return d, rm
+		
+	def disassemble(self):
+	
+		d, rm = self.fetch_operands()
+			
+		return "%s @(%s,%s),R0" % (self.name, d, rm)
+
+	def compute_result(self, d, rm):
+		"""
+		Transfers the source operand to the destination. The 4-bit displacement is only zero-extended, so a range up to +15 bytes can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
+		"""
+		
+		disp = (0x000000F & d);
+		toRead = ( rm + disp );
+		
+		self.store(rm, writeAddr)
+		
+		# This should be 8 bit, but that should be handled below
+		val = self.load(toRead, Type.int_32)
+		
+		if val & 0x80 == 0:
+			val = val & 0x000000FF
+		else:
+			val = val & 0xFFFFFF00
+			
+		self.put(val, 'r0')
+			
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_MOVB_RM_ARN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0000'
+	name='mov.b'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		# .cast_to(BYTE_TYPE)
+		self.store(rm.cast_to(BYTE_TYPE), rn)
+			
+		self.inc_pc()
+	
+		return rm.cast_to(BYTE_TYPE)	
+		
+class Instruction_MOVW_RM_ARN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0001'
+	name='mov.w'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		self.store(rm.cast_to(WORD_TYPE), rn)
+			
+		self.inc_pc()
+	
+		return rm.cast_to(WORD_TYPE)	
+		
+class Instruction_MOVL_RM_ARN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0010'
+	name='mov.l'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		self.store(rm, rn)
+			
+		self.inc_pc()
+	
+		return rm	
+		
+class Instruction_MOVL_RM_A_NEG_RN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0110'
+	name='mov.l'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@-%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		rn -= 4
+		self.put(rn, rn_name)
+		
+		self.store(rm, rn)
+					
+		self.inc_pc()
+	
+		return rm	
+
+class Instruction_MOVW_RM_A_NEG_RN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0101'
+	name='mov.w'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@-%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		rn -= 2
+		self.put(rn, rn_name)
+		
+		self.store(rm.cast_to(WORD_TYPE), rn)
+					
+		self.inc_pc()
+	
+		return rm		
+
+class Instruction_MOVB_RM_A_NEG_RN(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0100'
+	name='mov.b'
+	
+	def fetch_operands(self):
+									
+		rm = self.get_rreg_val('m')
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,@-%s" % (self.name, rm, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Transfers the source operand to the destination. 
+		"""
+		
+		rn -= 1
+		self.put(rn, rn_name)
+		
+		self.store(rm, rn, BYTE_TYPE)
+					
+		self.inc_pc()
+	
+		return rm			
+		
+# TODO - other MOVs
+# 0110nnnnmmmm0100
+# 0110nnnnmmmm0101
+# 0110nnnnmmmm0110
+# 10000000nnnndddd
+# 10000001nnnndddd
+# 0000nnnnmmmm1100
+# 0000nnnnmmmm1101
+# 0000nnnnmmmm1110
+# 0000nnnnmmmm0100
+# 0000nnnnmmmm0101
+# 0000nnnnmmmm0110
+# 11000100dddddddd
+# 11000101dddddddd
+# 11000110dddddddd
+# 11000000dddddddd
+# 11000010dddddddd
+
+# TODO - lds (first and a few others)
+# TODO - how to deal with .word? 4005f0 
+# mov.b 40061e
+# TODO - shll and shar
+
+class Instruction_MOVT(SH4Instruction):
+
+	bin_format = '0000nnnn00101001'
+	name='movt'
+	
+	def fetch_operands(self):
+									
+		rn_name = self.get_rreg('n')
+		
+		# TODO - this operation must return either 0 or 1 as 32 bit
+		T = self.get_flag('T')
+
+		return T, rn_name
+		
+	def disassemble(self):
+	
+		T, rn_name = self.fetch_operands()
+			
+		return "%s %s" % (self.name, rn_name)
+
+	def compute_result(self, T, rn_name):
+		"""
+		Stores the T bit in general register Rn. The value of Rn is 1 when T = 1 and 0 when T = 0. 
+		"""
+		
+		self.put(T, rn_name)
+					
+		self.inc_pc()
+	
+		return rm
+		
+# TODO 0100nnnn00011011 (tas.b)		
+		
+class Instruction_TST(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm1000'
+	name='tst'
+	
+	def fetch_operands(self):
+									
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rn
+		
+	def disassemble(self):
+	
+		rm, rn = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm, rn)
+
+	def compute_result(self, rm, rn):
+		"""
+		ANDs the contents of general registers Rn and Rm, and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of Rn are not changed. 
+		"""
+		
+		# TODO - should we do this and skip the compute_flags method?
+		
+		if rm & rn:
+			self.set_flags(T=1)
+			val = 1
+		else:
+			self.set_flags(T=0)
+			val = 0
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_TST_IMM(SH4Instruction):
+
+	bin_format = '11001000iiiiiiii'
+	name='tst'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		
+		return i, r0
+		
+	def disassemble(self):
+	
+		i, r0 = self.fetch_operands()
+			
+		return "%s #%s,%s" % (self.name, i, r0)
+
+	def compute_result(self, i, r0):
+		"""
+		ANDs the contents of general register R0 and the zero-extended immediate value and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of Rn are not changed.
+
+		Note
+		Since the 8-bit immediate value is zero-extended, this instruction can only be used to test the lower 8 bits of R0.  
+		"""
+		
+		temp = r0 & (0x000000FF & i)
+		
+		# TODO - should we do this and skip the compute_flags method?
+		
+		if temp == 0:
+			self.set_flags(T=1)
+			val = 1
+		else:
+			self.set_flags(T=0)
+			val = 0
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_TST_GBR(SH4Instruction):
+
+	bin_format = '11001100iiiiiiii'
+	name='tst'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		gbr = self.get_reg_val('gbr')
+		
+		return i, r0, gbr
+		
+	def disassemble(self):
+	
+		i, r0, gbr = self.fetch_operands()
+			
+		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+
+	def compute_result(self, i, r0, gbr):
+		"""
+		ANDs the contents of the memory byte indicated by the indirect GBR address with the zero-extended immediate value and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of the memory byte are not changed. 
+		"""
+		
+		temp = self.load(r0 + gbr, BYTE_TYPE)
+		
+		temp &= (0x000000FF & i)
+		
+		# TODO - should we do this and skip the compute_flags method?
+		
+		if temp == 0:
+			self.set_flags(T=1)
+			val = 1
+		else:
+			self.set_flags(T=0)
+			val = 0
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_XOR(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm1010'
+	name='xor'
+	
+	def fetch_operands(self):
+									
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		XORs the contents of general registers Rn and Rm and stores the result in Rn. 
+		"""
+		
+		val = rm ^ rn
+		
+		self.put(val, rn_name)
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_XOR_IMM(SH4Instruction):
+
+	bin_format = '11001010iiiiiiii'
+	name='xor'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		
+		return i, r0
+		
+	def disassemble(self):
+	
+		i, r0 = self.fetch_operands()
+			
+		return "%s #%s,%s" % (self.name, i, r0)
+
+	def compute_result(self, i, r0):
+		"""
+		XORs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
+
+		Note
+		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
+		"""
+		
+		val = r0 ^ (0x000000FF & i)
+		
+		self.put(r0, 'r0')
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_XOR_GBR(SH4Instruction):
+
+	bin_format = '11001110iiiiiiii'
+	name='xor.b'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		gbr = self.get_reg_val('gbr')
+		
+		return i, r0, gbr
+		
+	def disassemble(self):
+	
+		i, r0, gbr = self.fetch_operands()
+			
+		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+
+	def compute_result(self, i, r0, gbr):
+		"""
+		XORs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
+		"""
+		
+		temp = self.load(r0 + gbr, BYTE_TYPE)
+		
+		temp ^= (0x000000FF & i)
+		
+		# TODO - check type correctness
+		self.store(r0 + gbr, tmp, BYTE_TYPE)
+							
+		self.inc_pc()
+	
+		return temp
+		
+class Instruction_NOT(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm0111'
+	name='not'
+	
+	def fetch_operands(self):
+									
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		Finds the one's complement of the contents of general register Rm and stores the result in Rn. That is, it inverts the Rm bits and stores the result in Rn.
+		"""
+		
+		val = ~rm
+		
+		self.put(val, rn_name)
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_AND(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm1001'
+	name='and'
+	
+	def fetch_operands(self):
+									
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		ANDs the contents of general registers Rn and Rm and stores the result in Rn. 
+		"""
+		
+		val = rm & rn
+		
+		self.put(val, rn_name)
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_AND_IMM(SH4Instruction):
+
+	bin_format = '11001001iiiiiiii'
+	name='and'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		
+		return i, r0
+		
+	def disassemble(self):
+	
+		i, r0 = self.fetch_operands()
+			
+		return "%s #%s,%s" % (self.name, i, r0)
+
+	def compute_result(self, i, r0):
+		"""
+		ANDs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
+
+		Note
+		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
+		"""
+		
+		val = r0 & (0x000000FF & i)
+		
+		self.put(r0, 'r0')
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_AND_GBR(SH4Instruction):
+
+	bin_format = '11001101iiiiiiii'
+	name='and.b'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		gbr = self.get_reg_val('gbr')
+		
+		return i, r0, gbr
+		
+	def disassemble(self):
+	
+		i, r0, gbr = self.fetch_operands()
+			
+		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+
+	def compute_result(self, i, r0, gbr):
+		"""
+		ANDs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
+		"""
+		
+		temp = self.load(r0 + gbr, BYTE_TYPE)
+		
+		temp &= (0x000000FF & i)
+		
+		# TODO - check type correctness
+		self.store(r0 + gbr, tmp, BYTE_TYPE)
+							
+		self.inc_pc()
+	
+		return temp
+		
+class Instruction_OR(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm1011'
+	name='or'
+	
+	def fetch_operands(self):
+									
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rm, rn, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rn, rn_name, rm_name):
+		"""
+		ORs the contents of general registers Rn and Rm and stores the result in Rn. 
+		"""
+		
+		val = rm | rn
+		
+		self.put(val, rn_name)
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_OR_IMM(SH4Instruction):
+
+	bin_format = '11001011iiiiiiii'
+	name='or'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		
+		return i, r0
+		
+	def disassemble(self):
+	
+		i, r0 = self.fetch_operands()
+			
+		return "%s #%s,%s" % (self.name, i, r0)
+
+	def compute_result(self, i, r0):
+		"""
+		ORs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
+
+		Note
+		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
+		"""
+		
+		val = r0 | (0x000000FF & i)
+		
+		self.put(r0, 'r0')
+							
+		self.inc_pc()
+	
+		return val
+		
+class Instruction_OR_GBR(SH4Instruction):
+
+	bin_format = '11001111iiiiiiii'
+	name='or.b'
+	
+	def fetch_operands(self):
+									
+		i = self.get_rimm_val('i', ty=Type.int_32)
+		r0 = self.get_reg_val('r0')
+		gbr = self.get_reg_val('gbr')
+		
+		return i, r0, gbr
+		
+	def disassemble(self):
+	
+		i, r0, gbr = self.fetch_operands()
+			
+		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+
+	def compute_result(self, i, r0, gbr):
+		"""
+		ORs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
+		"""
+		
+		temp = self.load(r0 + gbr, BYTE_TYPE)
+		
+		temp |= (0x000000FF & i)
+		
+		# TODO - check type correctness
+		self.store(r0 + gbr, tmp, BYTE_TYPE)
+							
+		self.inc_pc()
+	
+		return temp
 
 class Instruction_MOVA(SH4Instruction):
 
@@ -634,6 +1716,617 @@ class Instruction_NOP(SH4Instruction):
 									
 		self.inc_pc()
 		
+class Instruction_NEG(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm1011'
+	name='neg'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name):
+		"""
+		Finds the two's complement of the contents of general register Rm and stores the result in Rn. That is, it subtracts Rm from 0 and stores the result in Rn. 
+		"""
+		
+		val = 0 - rm
+		
+		self.put(val, rn_name)
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_NEG_C(SH4Instruction):
+
+	bin_format = '0110nnnnmmmm1010'
+	name='negc'
+	
+	def fetch_operands(self):
+			
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		T = self.get_flag('T')
+		
+		return T, rm, rm_name, rn, rn_name
+		
+	def disassemble(self):
+	
+		T, rm, rm_name, rn_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, T, rm, rm_name, rn_name):
+		"""
+		Subtracts the contents of general register Rm and the T bit from 0 and stores the result in Rn. A borrow resulting from the operation is reflected in the T bit. This instruction can be used for sign inversion of a value exceeding 32 bits.
+
+		Note
+		This instruction can also be used to efficiently store the reversed T bit value in a general register, if the MOVRT instruction is not available.  
+		"""
+		
+		temp = 0 - rm
+		val = temp - T
+		
+		self.put(val, rn_name)
+				
+		if 0 < temp:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		if temp < val:
+			self.set_flags(T=1)
+	
+		self.inc_pc()
+	
+		return val	
+
+class Instruction_SUB(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm1000'
+	name='sub'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name):
+		"""
+		Subtracts the contents of general register Rm from the contents of general register Rn and stores the result in Rn. For immediate data subtraction, ADD #imm,Rn should be used. 
+		"""
+		
+		val = rn - rm
+		
+		self.put(val, rn_name)
+	
+		self.inc_pc()
+	
+		return val	
+		
+		
+class Instruction_MUL(SH4Instruction):
+
+	bin_format = '0000nnnnmmmm0111'
+	name='mul'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name):
+		"""
+		Performs 32-bit multiplication of the contents of general registers Rn and Rm, and stores the lower 32 bits of the result in the MACL register. The contents of MACH are not changed. 
+		"""
+		
+		val = rn + rm
+		
+		self.put(val, 'macl')
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_MUL_W(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm111d'
+	name='mul?.w'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')	
+			
+		if self.data['d'] == '1':
+			self.name = 'muls.w'
+			rm = rm.cast_to(WORD_TYPE, signed=True)
+			rn = rn.cast_to(WORD_TYPE, signed=True)
+		elif seld.data['d'] == '0':
+			self.name = 'mulu.w'
+			rm = rm.cast_to(WORD_TYPE, signed=False)
+			rn = rn.cast_to(WORD_TYPE, signed=False)
+
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name):
+		"""
+		Performs 16-bit multiplication of the contents of general registers Rn and Rm, and stores the 32-bit result in the MACL register. The multiplication is performed as a signed arithmetic operation. The contents of MACH are not changed. 
+		
+		Performs 16-bit multiplication of the contents of general registers Rn and Rm, and stores the 32-bit result in the MACL register. The multiplication is performed as an unsigned arithmetic operation. The contents of MACH are not changed. 
+		"""
+		
+		val = rn * rm
+		
+		self.put(val, 'macl')
+	
+		self.inc_pc()
+	
+		return val	
+		
+# TODO - this is probably not fully correct
+class Instruction_MAC_L(SH4Instruction):
+
+	bin_format = '0000nnnnmmmm1111'
+	name='mac.l'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')	
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		S = self.get_flag('S')
+		MACH = self.get_reg_val('mach')
+		MACL = self.get_reg_val('macl')
+		
+		return rn, rm, rn_name, rm_name, S, MACH, MACL
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name, _, _, _ = self.fetch_operands()
+			
+		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+		"""
+		Performs signed multiplication of the 32-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 64-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 4 each time they are read.
+
+		When the S bit is cleared to 0, the 64-bit result is stored in the coupled MACH and MACL registers.
+
+		When bit S is set to 1, addition to the MAC register is a saturation operation of 48 bits starting from the LSB. For the saturation operation, only the lower 48 bits of the MACL register are enabled and the result is limited to a range of 0xFFFF800000000000 (minimum) and 0x00007FFFFFFFFFFF (maximum).
+
+		Note
+		On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the latency of MAC*/MUL* is 5 cycles. In the case of consecutive executions of MAC.W/MAC.L, the latency is decreased to 2 cycles. 
+		"""
+		
+		tempn = self.load(rn, LWORD_TYPE)
+		tempm = self.load(rm, LWORD_TYPE)
+
+		self.put(rn + 4, rn_name)
+		self.put(rm + 4, rm_name)
+
+		if (tempn ^ tempm) < 0:
+			fnLmL = -1
+		else:
+			fnLmL = 0
+
+		if (tempn < 0):
+			tempn = 0 - tempn
+		if (tempm < 0):
+			tempm = 0 - tempm
+
+		temp1 = tempn
+		temp2 = tempm
+
+		RnL = temp1 & 0x0000FFFF
+		RnH = (temp1 >> 16) & 0x0000FFFF
+		RmL = temp2 & 0x0000FFFF
+		RmH = (temp2 >> 16) & 0x0000FFFF
+		temp0 = RmL * RnL
+		temp1 = RmH * RnL
+		temp2 = RmL * RnH
+		temp3 = RmH * RnH
+
+		Res2 = 0
+
+		Res1 = temp1 + temp2
+		if (Res1 < temp1):
+			Res2 += 0x00010000
+
+		temp1 = (Res1 << 16) & 0xFFFF0000
+
+		Res0 = temp0 + temp1;
+		if (Res0 < temp0):
+			Res2+=1
+
+		Res2 = Res2 + ((Res1 >> 16) & 0x0000FFFF) + temp3;
+
+		if(fnLmL < 0):
+		
+			Res2 = ~Res2;
+			if (Res0 == 0):
+				Res2+=1
+			else:
+				Res0 = (~Res0) + 1
+		
+
+		if S == 1:
+		
+			Res0 = MACL + Res0;
+			if (MACL > Res0):
+				Res2+=1
+
+			Res2 += MACH & 0x0000FFFF;
+
+			if ((Res2 < 0) and (Res2 < 0xFFFF8000)):
+				Res2 = 0xFFFF8000
+				Res0 = 0x00000000
+
+			if ((Res2 > 0) and (Res2 > 0x00007FFF)):
+			
+				Res2 = 0x00007FFF
+				Res0 = 0xFFFFFFFF
+
+			MACH = (Res2 & 0x0000FFFF) | (MACH & 0xFFFF0000)
+			MACL = Res0
+						
+			self.put(MACH, 'mach')
+			self.put(MACL, 'macl')
+
+		else:
+		
+			Res0 = MACL + Res0
+			if (MACL > Res0):
+				Res2 +=1
+
+			Res2 += MACH;
+			MACH = Res2
+			MACL = Res0
+			
+			self.put(MACH, 'mach')
+			self.put(MACL, 'macl')
+		
+		self.inc_pc()
+	
+		return MACH, MACL	
+	
+# TODO - this is probably not fully correct
+class Instruction_MAC_W(SH4Instruction):
+
+	bin_format = '0100nnnnmmmm1111'
+	name='mac.w'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')	
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		S = self.get_flag('S')
+		MACH = self.get_reg_val('mach')
+		MACL = self.get_reg_val('macl')
+		
+		return rn, rm, rn_name, rm_name, S, MACH, MACL
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name, _, _, _ = self.fetch_operands()
+			
+		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+		"""
+		Performs signed multiplication of the 16-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 32-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 2 each time they are read.
+
+		If the S bit is 0, a 16 * 16 + 64 -> 64-bit multiply-and-accumulate operation is performed, and the 64-bit result is stored in the linked MACH and MACL registers.
+
+		If the S bit is 1, a 16 * 16 + 32 -> 32-bit multiply-and-accumulate operation is performed, and the addition to the MAC register contents is a saturation operation. In a saturation operation, only the MACL register is valid, and the result range is limited to 0x80000000 (minimum value) to 0x7FFFFFFF (maximum value). If overflow occurs, the LSB of the MACH register is set to 1. 0x80000000 (minimum value) is stored in the MACL register if the result overflows in the negative direction, and 0x7FFFFFFF (maximum value) is stored if the result overflows in the positive direction
+
+		Note
+		When the S bit is 0, the SH2 and SH-DSP CPU perform a 16 * 16 + 64 -> 64 bit multiply and accumulate operation and the SH1 CPU performs a 16 * 16 + 42 -> 42 bit multiply and accumulate operation.
+
+		On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the latency of MAC*/MUL* is 5 cycles. In the case of consecutive executions of MAC.W/MAC.L, the latency is decreased to 2 cycles. 
+		"""
+		
+		tempn = self.load(rn, WORD_TYPE)
+		tempm = self.load(rm, WORD_TYPE)
+
+		self.put(rn + 2, rn_name)
+		self.put(rm + 2, rm_name)
+		
+		templ = MACL;
+		tempm = tempn * tempm;
+
+		if MACL >= 0:
+			dest = 0
+		else:
+			dest = 1
+
+		if tempm >= 0:
+			src = 0
+			tempn = 0
+		else:
+			src = 1
+			tempn = 0xFFFFFFFF
+		
+		src += dest;
+		MACL += tempm;
+
+		if MACL >= 0:
+			ans = 0
+		else:
+			ans = 1
+
+		ans += dest;
+
+		if (S == 1):
+		
+			if (ans == 1):
+			
+				if (src == 0):
+					MACL = 0x7FFFFFFF
+				if (src == 2):
+					MACL = 0x80000000
+		
+		else:
+			MACH += tempn;
+			if (templ > MACL):
+				MACH += 1	
+		
+		self.put(MACH, 'mach')
+		self.put(MACL, 'macl')
+		
+		self.inc_pc()
+		
+		return MACH, MACL	
+		
+class Instruction_DIV0S(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm0111'
+	name='div0s'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name):
+		"""
+		Performs initial settings for signed division. This instruction is followed by a DIV1 instruction that executes 1-digit division, for example, and repeated division steps are executed to find the quotient. See the description of the DIV1 instruction for details.
+
+		Note
+		This instruction can also be used to compare the signs of Rm and Rn. If the signs of Rm and Rn are equal, T will be set to 0. If the signs of Rm and Rn are not equal, T will be set to 1.  
+		"""
+		
+		if ((rn & 0x80000000) == 0):
+			q = 0
+		else:
+			q = 1
+
+		if ((rm & 0x80000000) == 0):
+			m = 0
+		else:
+			m = 1
+
+		t = (not (m == q))
+		
+		self.set_flags(T=t,M=m,Q=q)
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_DIV0U(SH4Instruction):
+
+	bin_format = '0000000000011001'
+	name='div0u'
+	
+	def fetch_operands(self):
+			
+		return []
+		
+	def disassemble(self):
+		
+		return "%s" % (self.name)
+
+	def compute_result(self, garbage):
+		"""
+		Performs initial settings for unsigned division. This instruction is followed by a DIV1 instruction that executes 1-digit division, for example, and repeated division steps are executed to find the quotient. See the description of the DIV1 instruction for details.  
+		"""
+				
+		self.set_flags(T=0,M=0,Q=0)
+	
+		self.inc_pc()
+	
+		return val	
+
+# TODO check this!
+class Instruction_DIV1(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0100'
+	name='div1'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rm = self.get_rreg_val('m')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
+		q = self.get_flag('Q')
+		t = self.get_flag('T')
+		m = self.get_flag('M')
+
+		return rn, rm, rn_name, rm_name, q, t, m
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name, _, _, _ = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rm_name)
+
+	def compute_result(self, rn, rm, rn_name, rm_name, q, t, m):
+		"""
+		Performs 1-digit division (1-step division) of the 32-bit contents of general register Rn (dividend) by the contents of Rm (divisor). The quotient is obtained by repeated execution of this instruction alone or in combination with other instructions. The specified registers and the M, Q, and T bits must not be modified during these repeated executions.
+
+		In 1-step division, the dividend is shifted 1 bit to the left, the divisor is subtracted from this, and the quotient bit is reflected in the Q bit according to whether the result is positive or negative.
+
+		Detection of division by zero or overflow is not provided. Check for division by zero and overflow division before executing the division. A remainder operation is not provided. Find the remainder by finding the product of the divisor and the obtained quotient, and subtracting this value from the dividend:
+		remainder = dividend - (divisor * quotient)
+
+		Initial settings should first be made with the DIV0S or DIV0U instruction. DIV1 is executed once for each bit of the divisor. If a quotient of more than 17 bits is required, place an ROTCL instruction before the DIV1 instruction. See the examples for details of the division sequence. 
+		"""
+		
+		old_q = q
+		q = (0x80000000 & rn) != 0
+		tmp2 = rm
+		rn = rn << 1
+		rn = rn | t
+		
+		if (old_q == 0):
+		
+			if (m == 0):
+			
+			  tmp0 = rn
+			  rn -= tmp2
+			  tmp1 = rn > tmp0;
+
+			  if (q == 0):
+				q = tmp1
+			  elif (q == 1):
+				q = tmp1 == 0
+
+			elif (m == 1):
+			
+				tmp0 = rn
+				rn += tmp2
+				tmp1 = rn < tmp0
+
+				if (q == 0):
+					q = (tmp1 == 0)
+				elif (q == 1):
+					q = tmp1
+
+		elif (old_q == 1):
+		
+			if (m == 0):
+			
+				tmp0 = rn
+				rn += tmp2
+				tmp1 = rn < tmp0
+
+				if (q == 0):
+					q = tmp1
+				elif (q == 1):
+					q = (tmp1 == 0)
+
+			elif (m == 1):
+			
+				tmp0 = rn
+				rn -= tmp2
+				tmp1 = rn > tmp0
+
+				if (q == 0):
+					q = (tmp1 == 0)
+				elif (q == 1):
+					q = tmp1
+
+		t = (q == m)
+		
+		self.put(rn, rn_name)
+		self.set_flags(T=t,Q=q)
+	
+		self.inc_pc()
+	
+		return rn	
+		
+class Instruction_DT(SH4Instruction):
+
+	bin_format = '0100nnnn00010000'
+	name='dt'
+	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n')
+		rn_name = self.get_rreg('n')
+
+		return rn, rn_name
+		
+	def disassemble(self):
+	
+		rn, rn_name = self.fetch_operands()
+			
+		return "%s %s" % (self.name, rn_name)
+
+	def compute_result(self, rn, rn_name):
+		"""
+		Decrements the contents of general register Rn by 1 and compares the result with zero. If the result is zero, the T bit is set to 1. If the result is nonzero, the T bit is cleared to 0. 
+		"""
+		
+		val = rn - 1
+		
+		self.put(val, rn_name)
+		
+		if val == 0:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+	
+		self.inc_pc()
+	
+		return val			
 		
 class Instruction_ADD(SH4Instruction):
 
@@ -676,7 +2369,7 @@ class Instruction_ADD_IMM(SH4Instruction):
 	def fetch_operands(self):
 			
 		rn_name = self.get_rreg('n')
-		i = self.get_rimm_val('i', ty=Type.int_32,extend=True)
+		i = self.get_rimm_val('i', ty=Type.int_32)
 		
 		return i, rn_name
 		
@@ -702,6 +2395,116 @@ class Instruction_ADD_IMM(SH4Instruction):
 		self.inc_pc()
 	
 		return val	
+		
+class Instruction_SUB_C(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm1010'
+	name='subc'
+	
+	def fetch_operands(self):
+			
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		T = self.get_flag('T')
+		
+		return T, rm, rm_name, rn, rn_name
+		
+	def disassemble(self):
+	
+		T, rm, rm_name, rn, rn_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, T, rm, rm_name, rn, rn_name):
+		"""
+		Subtracts the contents of general register Rm and the T bit from the contents of general register Rn, and stores the result in Rn. A borrow resulting from the operation is reflected in the T bit. This instruction is used for subtractions exceeding 32 bits.
+
+		Note
+		This instruction can also be used to store the T bit to all the bits of a general register. 
+		"""
+		
+		tmp1 = rn - rm
+		tmp0 = rn
+		
+		val = tmp1 - T
+		
+		self.put(val, rn_name)
+		
+		if tmp0 < tmp1:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		if tmp1 < val:
+			self.set_flags(T=1)
+	
+		self.inc_pc()
+	
+		return val	
+		
+class Instruction_SUB_V(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm1011'
+	name='subv'
+	
+	def fetch_operands(self):
+			
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+		
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Subtracts the contents of general register Rm from the contents of general register Rn, and stores the result in Rn. If underflow occurs, the T bit is set. 
+		"""
+		
+		if rn >= 0:
+			dest = 0
+		else:
+			dest = 1
+
+		if rm >= 0:
+			src = 0
+		else:
+			src = 1
+	
+		src += dest
+		
+		val = rn - rm
+		
+		self.put(val, rn_name)
+		
+		if val >= 0:
+			ans = 0
+		else:
+			ans = 1
+
+		ans += dest
+
+		if src == 1:
+			if ans == 1:
+				newT = 1
+			else:
+				newT = 0
+		else:
+			newT = 0
+		
+		self.set_flags(T=newT)
+		
+		self.inc_pc()
+	
+		return val		
 
 class Instruction_ADD_C(SH4Instruction):
 
@@ -734,7 +2537,7 @@ class Instruction_ADD_C(SH4Instruction):
 		
 		val = tmp1 + T
 		
-		self.put(tmp1, rn_name)
+		self.put(val, rn_name)
 		
 		if tmp0 > tmp1:
 			self.set_flags(T=1)
@@ -1050,13 +2853,377 @@ class Instruction_RTS(SH4Instruction):
 		# execute the next instruction first
 		# self.delay_slot(temp + 2)
 			
-		return val				
+		return val	
 
+class Instruction_CMPEQ_IMM_R0(SH4Instruction):
+
+	bin_format = '10001000iiiiiiii'
+	name='cmp/eq'
+	
+	def fetch_operands(self):
 		
+		r0 = self.get_reg_val('r0')
+		i = self.get_rimm_val('i')
+		
+		return i
+		
+	def disassemble(self):
+	
+		r0, i = self.fetch_operands()
+				
+		return "%s #%s,r0" % (self.name)
+
+	def compute_result(self, r0, i):
+		"""
+		Compares general register R0 and the sign-extended 8-bit immediate data and sets the T bit if the values are equal. If they are not equal the T bit is cleared. The contents of R0 are not changed.  		
+		"""
+
+		if ((i & 0x80) == 0):
+			imm = (0x000000FF & i);
+		else:
+			imm = (0xFFFFFF00 | i);
+
+		if (r0 == imm):
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		self.inc_pc()
+						
+		return r0 == imm	
+
+class Instruction_CMPEQ(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0000'
+	name='cmp/eq'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if they are equal. The contents of Rn and Rm are not changed. 	
+		"""
+
+		if rm == rn:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		self.inc_pc()
+						
+		return rm == rn		
+		
+class Instruction_CMPHS(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0010'
+	name='cmp/hs'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if Rn is greater or equal Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 		
+		"""
+		
+		rm = rm.cast_to(LWORD_TYPE, signed=False)
+		rn = rn.cast_to(LWORD_TYPE, signed=False)
+
+		if rm >= rn:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		self.inc_pc()
+						
+		return rm >= rn		
+		
+class Instruction_CMPGE(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0011'
+	name='cmp/ge'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if Rn is greater or equal Rm. The values for the comparison are interpreted as signed integer values. The contents of Rn and Rm are not changed. 		
+		"""
+
+		if rm >= rn:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+						
+		self.inc_pc()				
+						
+		return rm >= rn	
+				
+class Instruction_CMPSTR(SH4Instruction):
+
+	bin_format = '0010nnnnmmmm1100'
+	name='cmp/str'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if any of the 4 bytes in Rn are equal to the corresponding byte in Rm. The contents of Rn and Rm are not changed.
+
+		Note
+		This instruction can be used to speed up some string operations such as finding the string length of a zero terminated string or string matching.  		
+		"""
+
+		temp = rn ^ rm;
+		HH = (temp & 0xFF000000) >> 24
+		HL = (temp & 0x00FF0000) >> 16
+		LH = (temp & 0x0000FF00) >> 8
+		LL = temp & 0x000000FF
+		HH = HH and HL and LH and LL
+
+		if (HH == 0):
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+						
+		self.inc_pc()				
+						
+		return HH == 0			
+			
+class Instruction_CMPHI(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0110'
+	name='cmp/hi'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 			
+		"""
+		
+		rm = rm.cast_to(LWORD_TYPE, signed=False)
+		rn = rn.cast_to(LWORD_TYPE, signed=False)
+
+		if rm > rn:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+			
+		self.inc_pc()
+						
+		return rm > rn		
+		
+class Instruction_CMPGT(SH4Instruction):
+
+	bin_format = '0011nnnnmmmm0111'
+	name='cmp/gt'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rm = self.get_rreg_val('m')
+		
+		return rm, rm_name, rn, rn_name
+				
+	def disassemble(self):
+	
+		rm, rm_name, rn, rn_name = self.fetch_operands()
+				
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result(self, rm, rm_name, rn, rn_name):
+		"""
+		Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm. The values for the comparison are interpreted as signed integer values. The contents of Rn and Rm are not changed. 		
+		"""
+
+		if rm > rn:
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+						
+		self.inc_pc()				
+						
+		return rm > rn	
+		
+class Instruction_CMPPL(SH4Instruction):
+
+	bin_format = '0100nnnn00010101'
+	name='cmp/pl'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		
+		return rn, rn_name
+				
+	def disassemble(self):
+	
+		rn, rn_name = self.fetch_operands()
+				
+		return "%s %s" % (self.name, rn_name)
+
+	def compute_result(self, rn, rn_name):
+		"""
+		Compares general register Rn and sets the T bit if Rn is greater than 0. The value in Rn for the comparison is interpreted as signed integer. The contents of Rn are not changed. 	
+		"""
+
+		if (rn > 0):
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+						
+		self.inc_pc()				
+						
+		return rn > 0
+		
+class Instruction_CMPPZ(SH4Instruction):
+
+	bin_format = '0100nnnn00010001'
+	name='cmp/pz'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		
+		return rn, rn_name
+				
+	def disassemble(self):
+	
+		rn, rn_name = self.fetch_operands()
+				
+		return "%s %s" % (self.name, rn_name)
+
+	def compute_result(self, rn, rn_name):
+		"""
+		Compares general register Rn and sets the T bit if Rn is greater than or equal to 0. The value in Rn for the comparison is interpreted as signed integer. The contents of Rn are not changed. 	
+		"""
+
+		if (rn >= 0):
+			self.set_flags(T=1)
+		else:
+			self.set_flags(T=0)
+						
+		self.inc_pc()				
+						
+		return rn >= 0
+		
+		
+class Instruction_ROTL(SH4Instruction):
+
+	bin_format = '0100nnnn00000100'
+	name='rotl'
+	
+	def fetch_operands(self):
+		
+		rn_name = self.get_rreg('n')
+		rn = self.get_rreg_val('n')
+		
+		return rn, rn_name
+				
+	def disassemble(self):
+	
+		rn, rn_name = self.fetch_operands()
+				
+		return "%s %s" % (self.name, rn_name)
+
+	def compute_result(self, rn, rn_name):
+		"""
+		Rotates the contents of general register Rn one bit to the left, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 	
+		"""
+
+		if ((rn & 0x80000000) == 0):
+			t = 0;
+		else:
+			t = 1;
+
+		rn = rn << 1;
+
+		if (t == 1):
+			rn = rn | 0x00000001
+		else:
+			rn = rn & 0xFFFFFFFE
+			
+		self.set_flags(T=t)
+		self.put(rn, rn_name)
+						
+		self.inc_pc()				
+						
+		return rn
+			
 ##############################################		
 # End Adam's Code		
 ##############################################		
-		
+	
+'''	
 class Instruction_MOV_Rm_Rn(SH4Instruction):
 	# I defined this based on my intuition
 	# a: 01 -> @Rm, Rn # 00 -> Rm, @Rn
@@ -1206,6 +3373,8 @@ class Instruction_MOV_Rm_Rn(SH4Instruction):
 				writeout = lambda v: self.store(v, val)
 		return src_vv, val, writeout
 
+		
+		
 class Instruction_XOR_Rm_Rn(SH4Instruction):
 	bin_format = '0010nnnnmmmm1010'
 	name = 'xor'
@@ -1452,7 +3621,6 @@ class Instruction_AND_imm(SH4Instruction):
 		ret = src & dst
 		return ret
 
-
 class Instruction_SUB(SH4Instruction):
 	# I defined this based on my intuition
 	# s: 00 -> sub, 10 -> subc, 11 -> subv
@@ -1502,8 +3670,7 @@ class Instruction_SUB(SH4Instruction):
 			ans_f = 0 if dst >= 0 else 1
 			ans_f += dst_f
 			return True if src_f == 1 and ans_f == 1 else False
-
-
+			
 class Instruction_MUL(SH4Instruction):
 	# I defined this based on my intuition
 	# 00|00|nnnnmmmm|01|11 mul.l Rm,Rn
@@ -1550,7 +3717,10 @@ class Instruction_MUL(SH4Instruction):
 				ret = src * dst
 		return ret
 
-
+'''
+		
+"""		
+		
 class Instruction_CMP_Rm_Rn(SH4Instruction):
 	'''
 	cmp/eq Rm,Rn -> 0011nnnnmmmm0000
@@ -1691,4 +3861,4 @@ class Instruction_CMP_Rm_Rn(SH4Instruction):
 		#if src == dst:
 		# Adam
 		pass
-
+"""
