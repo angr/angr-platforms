@@ -8,6 +8,7 @@ import logging
 l = logging.getLogger(__name__)
 
 REGISTER_TYPE = Type.int_32
+HALFBYTE_TYPE = Type.int_4
 BYTE_TYPE = Type.int_8
 WORD_TYPE = Type.int_16
 LWORD_TYPE = Type.int_32
@@ -164,7 +165,7 @@ class SH4Instruction(Instruction):
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			val = val.cast_to(zerox)
+			val = val.cast_to(zerox, signed=False)
 			
 		return val
 		
@@ -179,7 +180,7 @@ class SH4Instruction(Instruction):
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			val = val.cast_to(zerox)
+			val = val.cast_to(zerox, signed=False)
 			
 		return val
 		
@@ -194,7 +195,7 @@ class SH4Instruction(Instruction):
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			val = val.cast_to(zerox)
+			val = val.cast_to(zerox, signed=False)
 			
 		return val
 			
@@ -341,7 +342,7 @@ class Instruction_EXTS(SH4Instruction):
 	
 		return rm	
 		
-class Instruction_MOVB_RM_RN(SH4Instruction):
+class Instruction_MOVBL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0000'
 	name='mov.b'
@@ -364,21 +365,15 @@ class Instruction_MOVB_RM_RN(SH4Instruction):
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
 		
-		# May need to be 8 bit
-		val = self.load(rm, Type.int_32)
-		
-		if ((val & 0x80) == 0):
-			val &= 0x000000FF
-		else:
-			val |= 0xFFFFFF00;
+		val = self.load(rm, Type.int_8)
 
-		self.put(val, rn_name)
+		self.put(val.widen_signed(Type.int_32), rn_name)
 	
 		self.inc_pc()
 	
 		return val	
 		
-class Instruction_MOVW_RM_RN(SH4Instruction):
+class Instruction_MOVWL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0001'
 	name='mov.w'
@@ -401,21 +396,15 @@ class Instruction_MOVW_RM_RN(SH4Instruction):
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
 		
-		# May need to be 16 bit
-		val = self.load(rm, Type.int_32)
+		val = self.load(rm, Type.int_16)
 		
-		if ((val & 0x8000) == 0):
-			val &= 0x0000FFFF
-		else:
-			val |= 0xFFFF0000;
-
-		self.put(val, rn_name)
+		self.put(val.widen_signed(Type.int_32), rn_name)
 	
 		self.inc_pc()
 	
 		return val	
 		
-class Instruction_MOVL_RM_RN(SH4Instruction):
+class Instruction_MOVLL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0010'
 	name='mov.l'
@@ -454,7 +443,7 @@ class Instruction_MOVLI(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', BYTE_TYPE, zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', BYTE_TYPE, extend=LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -470,8 +459,7 @@ class Instruction_MOVLI(SH4Instruction):
 		Stores immediate data, sign-extended to longword, in general register Rn. The data is stored from memory address (PC + 4 + displacement * 4). The 8-bit displacement is multiplied by four after zero-extension, and so the relative distance from the operand is in the range up to PC + 4 + 1020 bytes. The PC value is the address of this instruction. A value with the lower 2 bits adjusted to 00 is used in address calculation. 
 		"""
 		
-		disp = (0x000000FF & d); # shouldn't be needed
-		toRead = ( (pc & 0xFFFFFFFC) + 4 + (disp << 2) );
+		toRead = ( (pc & 0xFFFFFFFC) + 4 + (d << 2) );
 		
 		val = self.load(toRead, Type.int_32)
 		
@@ -481,7 +469,7 @@ class Instruction_MOVLI(SH4Instruction):
 	
 		return val	
 
-class Instruction_MOV_RM_RN(SH4Instruction):
+class Instruction_MOV(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0011'
 	name='mov'
@@ -511,14 +499,14 @@ class Instruction_MOV_RM_RN(SH4Instruction):
 	
 		return rm	
 		
-class Instruction_MOV_IMM_RN(SH4Instruction):
+class Instruction_MOVI(SH4Instruction):
 
 	bin_format = '1110nnnniiiiiiii'
 	name='mov'
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i')
+		i = self.get_rimm_val('i',ty=Type.Int_8,extend=Type.int_32)
 		rn_name = self.get_rreg('n')
 
 		return i, rn_name
@@ -534,25 +522,20 @@ class Instruction_MOV_IMM_RN(SH4Instruction):
 		Stores immediate data, sign-extended to longword, in general register Rn. 
 		"""
 		
-		if (i & 0x80) == 0:
-			i = (0x000000FF & i)
-		else:
-			i = (0xFFFFFF00 | i)
-		
 		self.put(i, rn_name)
 					
 		self.inc_pc()
 	
 		return i	
 		
-class Instruction_MOVL_RM_RN_D(SH4Instruction):
+class Instruction_MOVLS4(SH4Instruction):
 
 	bin_format = '0001nnnnmmmmdddd'
 	name='mov.l'
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', BYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn = self.get_rreg_val('n')
 
@@ -585,7 +568,7 @@ class Instruction_MOVL_RN_RM_D(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', BYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
 
@@ -621,7 +604,7 @@ class Instruction_MOVW(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', ty=Type.int_16).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', ty=Type.int_8).cast_to(LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -653,14 +636,14 @@ class Instruction_MOVW(SH4Instruction):
 	
 		return val		
 
-class Instruction_MOVW_RM_D(SH4Instruction):
+class Instruction_MOVWL4(SH4Instruction):
 
 	bin_format = '10000101mmmmdddd'
 	name='mov.w'
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', Type.int_8).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 
 		return d, rm
@@ -676,33 +659,25 @@ class Instruction_MOVW_RM_D(SH4Instruction):
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register.  
 		"""
 		
-		#d = (0x000000FF & d);
 		toRead = ( rm + (d << 1) );
-		
-		self.store(rm, writeAddr)
-		
+				
 		# This should be 16 bit, but that should be handled below
-		val = self.load(toRead, Type.int_32)
+		val = self.load(toRead, Type.int_16)
 		
-		if val & 0x8000 == 0:
-			val = val & 0x0000FFFF
-		else:
-			val = val & 0xFFFF0000
-			
 		self.put(val, 'r0')
 			
 		self.inc_pc()
 	
 		return val	
 		
-class Instruction_MOVB_RM_D(SH4Instruction):
+class Instruction_MOVBL4(SH4Instruction):
 
 	bin_format = '10000100mmmmdddd'
 	name='mov.b'
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', Type.int_8).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 
 		return d, rm
@@ -717,17 +692,8 @@ class Instruction_MOVB_RM_D(SH4Instruction):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is only zero-extended, so a range up to +15 bytes can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
-		
-		disp = (0x000000F & d);
-		toRead = ( rm + disp );
-				
-		# This should be 8 bit, but that should be handled below
-		val = self.load(toRead, Type.int_8)
-		
-		if val & 0x80 == 0:
-			val = val & 0x000000FF
-		else:
-			val = val & 0xFFFFFF00
+						
+		val = self.load(rm + d , Type.int_8)
 			
 		self.put(val, 'r0')
 			
@@ -735,7 +701,7 @@ class Instruction_MOVB_RM_D(SH4Instruction):
 	
 		return val	
 		
-class Instruction_MOVB_RM_ARN(SH4Instruction):
+class Instruction_MOVBS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0000'
 	name='mov.b'
@@ -760,14 +726,13 @@ class Instruction_MOVB_RM_ARN(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		# .cast_to(BYTE_TYPE)
 		self.store(rm.cast_to(BYTE_TYPE), rn)
 			
 		self.inc_pc()
 	
 		return rm.cast_to(BYTE_TYPE)	
 		
-class Instruction_MOVW_RM_ARN(SH4Instruction):
+class Instruction_MOVWS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0001'
 	name='mov.w'
@@ -798,7 +763,7 @@ class Instruction_MOVW_RM_ARN(SH4Instruction):
 	
 		return rm.cast_to(WORD_TYPE)	
 		
-class Instruction_MOVL_RM_ARN(SH4Instruction):
+class Instruction_MOVLS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0010'
 	name='mov.l'
@@ -829,7 +794,7 @@ class Instruction_MOVL_RM_ARN(SH4Instruction):
 	
 		return rm	
 		
-class Instruction_MOVL_RM_A_NEG_RN(SH4Instruction):
+class Instruction_MOVLM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0110'
 	name='mov.l'
@@ -863,7 +828,7 @@ class Instruction_MOVL_RM_A_NEG_RN(SH4Instruction):
 	
 		return rm	
 
-class Instruction_MOVW_RM_A_NEG_RN(SH4Instruction):
+class Instruction_MOVWM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0101'
 	name='mov.w'
@@ -888,16 +853,16 @@ class Instruction_MOVW_RM_A_NEG_RN(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		self.store(rm.cast_to(WORD_TYPE), rn)
-		
 		rn -= 2
 		self.put(rn, rn_name)
+		
+		self.store(rm.cast_to(WORD_TYPE), rn)
 					
 		self.inc_pc()
 	
 		return rm		
 
-class Instruction_MOVB_RM_A_NEG_RN(SH4Instruction):
+class Instruction_MOVBM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0100'
 	name='mov.b'
@@ -922,10 +887,10 @@ class Instruction_MOVB_RM_A_NEG_RN(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		self.store(rm.cast_to(BYTE_TYPE), rn)		
-				
 		rn -= 1
 		self.put(rn, rn_name)
+		
+		self.store(rm.cast_to(BYTE_TYPE), rn)		
 					
 		self.inc_pc()
 	
@@ -957,19 +922,13 @@ class Instruction_MOVBL0(SH4Instruction):
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
 		
-		rn = self.load(rm + r0, BYTE_TYPE).cast_to(LWORD_TYPE)
-		
-		# TODO - use this, or just extend above?
-		if ((rn & 0x80) == 0):
-			rn = rn & 0x000000FF
-		else:
-			rn = rn | 0xFFFFFF00
-		
+		rn = self.load(rm + r0, BYTE_TYPE).widen_signed(LWORD_TYPE)
+			
 		self.put(rn, rn_name)
 							
 		self.inc_pc()
 	
-		return rm	
+		return rn	
 
 class Instruction_MOVWL0(SH4Instruction):
 
@@ -997,19 +956,13 @@ class Instruction_MOVWL0(SH4Instruction):
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
 		
-		rn = self.load(rm + r0, WORD_TYPE).cast_to(LWORD_TYPE)
-		
-		# TODO - use this, or just extend above?
-		if ((rn & 0x8000) == 0):
-			rn = rn & 0x0000FFFF
-		else:
-			rn = rn | 0xFFFF0000
+		rn = self.load(rm + r0, WORD_TYPE).widen_signed(LWORD_TYPE)
 		
 		self.put(rn, rn_name)
 							
 		self.inc_pc()
 	
-		return rm	
+		return rn	
 
 class Instruction_MOVLL0(SH4Instruction):
 
@@ -1262,7 +1215,7 @@ class Instruction_MOVBS4(SH4Instruction):
 	def fetch_operands(self):
 									
 		r0 = self.get_reg_val('r0')
-		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=Type.int_32)
 		rn_name = self.get_rreg('n')
 		rn = self.get_rreg_val('n')
 
@@ -1293,7 +1246,7 @@ class Instruction_MOVWS4(SH4Instruction):
 	def fetch_operands(self):
 									
 		r0 = self.get_reg_val('r0')
-		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=Type.int_32)
 		rn_name = self.get_rreg('n')
 		rn = self.get_rreg_val('n')
 
@@ -1324,7 +1277,7 @@ class Instruction_MOVBLG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		
 		return gbr, d
 		
@@ -1356,7 +1309,7 @@ class Instruction_MOVWLG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		
 		return gbr, d
 		
@@ -1390,7 +1343,7 @@ class Instruction_MOVLLG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		
 		return gbr, d
 		
@@ -1488,7 +1441,7 @@ class Instruction_MOVLSG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return gbr, d, r0
@@ -2424,7 +2377,7 @@ class Instruction_TST_IMM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return i, r0
@@ -2443,7 +2396,7 @@ class Instruction_TST_IMM(SH4Instruction):
 		Since the 8-bit immediate value is zero-extended, this instruction can only be used to test the lower 8 bits of R0.  
 		"""
 		
-		temp = r0 & (0x000000FF & i)
+		temp = r0 & i
 		
 		# TODO - should we do this and skip the compute_flags method?
 		
@@ -2465,7 +2418,7 @@ class Instruction_TST_GBR(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8, extend=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		gbr = self.get_reg_val('gbr')
 		
@@ -2484,7 +2437,7 @@ class Instruction_TST_GBR(SH4Instruction):
 		
 		temp = self.load(r0 + gbr, BYTE_TYPE)
 		
-		temp &= (0x000000FF & i)
+		temp = temp & i
 		
 		# TODO - should we do this and skip the compute_flags method?
 		
@@ -2539,7 +2492,7 @@ class Instruction_XOR_IMM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return i, r0
@@ -2558,9 +2511,9 @@ class Instruction_XOR_IMM(SH4Instruction):
 		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
 		"""
 		
-		val = r0 ^ (0x000000FF & i)
+		val = r0 ^ i
 		
-		self.put(r0, 'r0')
+		self.put(val, 'r0')
 							
 		self.inc_pc()
 	
@@ -2573,7 +2526,7 @@ class Instruction_XOR_GBR(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8)
 		r0 = self.get_reg_val('r0')
 		gbr = self.get_reg_val('gbr')
 		
@@ -2592,10 +2545,9 @@ class Instruction_XOR_GBR(SH4Instruction):
 		
 		temp = self.load(r0 + gbr, BYTE_TYPE)
 		
-		temp ^= (0x000000FF & i)
+		temp = temp & i
 		
-		# TODO - check type correctness
-		self.store(tmp.cast_to(BYTE_TYPE), r0 + gbr)
+		self.store(temp, r0 + gbr)
 							
 		self.inc_pc()
 	
@@ -2674,7 +2626,7 @@ class Instruction_AND_IMM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8)
 		r0 = self.get_reg_val('r0')
 		
 		return i, r0
@@ -2693,9 +2645,9 @@ class Instruction_AND_IMM(SH4Instruction):
 		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
 		"""
 		
-		val = r0 & (0x000000FF & i)
+		val = r0 & i
 		
-		self.put(r0, 'r0')
+		self.put(val, 'r0')
 							
 		self.inc_pc()
 	
@@ -2708,7 +2660,7 @@ class Instruction_AND_GBR(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8)
 		r0 = self.get_reg_val('r0')
 		gbr = self.get_reg_val('gbr')
 		
@@ -2727,10 +2679,9 @@ class Instruction_AND_GBR(SH4Instruction):
 		
 		temp = self.load(r0 + gbr, BYTE_TYPE)
 		
-		temp &= (0x000000FF & i)
+		temp = temp & i
 		
-		# TODO - check type correctness
-		self.store(tmp.cast_to(BYTE_TYPE), r0 + gbr)
+		self.store(temp, r0 + gbr)
 							
 		self.inc_pc()
 	
@@ -2776,7 +2727,7 @@ class Instruction_OR_IMM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return i, r0
@@ -2795,9 +2746,9 @@ class Instruction_OR_IMM(SH4Instruction):
 		Since the 8-bit immediate value is zero-extended, the upper 24 bits of R0 are not modified. 
 		"""
 		
-		val = r0 | (0x000000FF & i)
+		val = r0 | i
 		
-		self.put(r0, 'r0')
+		self.put(val, 'r0')
 							
 		self.inc_pc()
 	
@@ -2810,7 +2761,7 @@ class Instruction_OR_GBR(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		i = self.get_rimm_val('i', ty=Type.int_8)
 		r0 = self.get_reg_val('r0')
 		gbr = self.get_reg_val('gbr')
 		
@@ -2829,10 +2780,9 @@ class Instruction_OR_GBR(SH4Instruction):
 		
 		temp = self.load(r0 + gbr, BYTE_TYPE)
 		
-		temp |= (0x000000FF & i)
+		temp = temp | i
 		
-		# TODO - check type correctness
-		self.store(tmp.cast_to(BYTE_TYPE), r0 + gbr)
+		self.store(temp, r0 + gbr)
 							
 		self.inc_pc()
 	
@@ -2846,7 +2796,7 @@ class Instruction_MOVA(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', Type.int_16).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', ty=Type.int_8,zerox=Type.int_32)
 		rn_name = 'r0'
 
 		return pc, d, rn_name
@@ -2862,9 +2812,7 @@ class Instruction_MOVA(SH4Instruction):
 		Stores the effective address of the source operand into general register R0. The 8-bit displacement is zero-extended and quadrupled. Consequently, the relative interval from the operand is PC + 1020 bytes. The PC is the address four bytes after this instruction, but the lowest two bits of the PC are fixed at 00.
 		"""
 		
-		disp = (0x000000FF & d);
-		
-		val = ( (pc & 0xFFFFFFFC) + 4 + (disp << 2) );
+		val = ( (pc & 0xFFFFFFFC) + 4 + (d << 2) );
 				
 		self.put(val, rn_name)
 	
@@ -4036,7 +3984,7 @@ class Instruction_ADD(SH4Instruction):
 	
 		return val	
 
-class Instruction_ADD_IMM(SH4Instruction):
+class Instruction_ADDI(SH4Instruction):
 
 	bin_format = '0111nnnniiiiiiii'
 	name='add'
@@ -4044,26 +3992,23 @@ class Instruction_ADD_IMM(SH4Instruction):
 	def fetch_operands(self):
 			
 		rn_name = self.get_rreg('n')
-		i = self.get_rimm_val('i', ty=Type.int_32)
+		rn = self.get_rreg_val('n')
+		i = self.get_rimm_val('i', ty=Type.int_8,extend=Type.int_32)
 		
-		return i, rn_name
+		return i, rn, rn_name
 		
 	def disassemble(self):
 	
-		i, rn_name = self.fetch_operands()
+		i,rn, rn_name = self.fetch_operands()
 			
 		return "%s #%s,%s" % (self.name, i, rn_name)
 
-	def compute_result(self, i, rn_name):
+	def compute_result(self, i, rn, rn_name):
 		"""
-		Adds together the contents of general registers Rn and Rm and the T bit, and stores the result in Rn. A carry resulting from the operation is reflected in the T bit. This instruction can be used to implement additions exceeding 32 bits. 
+		Adds together the contents of general register Rn and the immediate value and stores the result in Rn. The 8-bit immediate value is sign-extended to 32 bits, which allows it to be used for immediate subtraction or decrement operations. 
 		"""
 		
-		if (i & 0x80) == 0:
-			val = (0x000000FF & i)
-		else:
-			val = (0xFFFFFF00 | i)
-		
+		val = i & rn
 		
 		self.put(val, rn_name)
 	
