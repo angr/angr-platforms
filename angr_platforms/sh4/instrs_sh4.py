@@ -637,8 +637,8 @@ class Instruction_MOVW(SH4Instruction):
 		Stores immediate data, sign-extended to longword, in general register Rn. The data is stored from memory address (PC + 4 + displacement * 2). The 8-bit displacement is multiplied by two after zero-extension, and so the relative distance from the table is in the range up to PC + 4 + 510 bytes. The PC value is the address of this instruction. 
 		"""
 		
-		#disp = (0x000000FF & d);
-		toRead = ( pc + 4 + (disp << 1) );
+		#d = (0x000000FF & d);
+		toRead = ( pc + 4 + (d << 1) );
 		
 		val = self.load(toRead, Type.int_16)
 		
@@ -676,8 +676,8 @@ class Instruction_MOVW_RM_D(SH4Instruction):
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register.  
 		"""
 		
-		#disp = (0x000000FF & d);
-		toRead = ( rm + (disp << 1) );
+		#d = (0x000000FF & d);
+		toRead = ( rm + (d << 1) );
 		
 		self.store(rm, writeAddr)
 		
