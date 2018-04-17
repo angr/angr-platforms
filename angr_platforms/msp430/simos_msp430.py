@@ -39,12 +39,9 @@ class MCgetsn(SimProcedure):
     # pylint:disable=arguments-differ
 
     def run(self, ptr, maxbytes):
-        fd = 0 # Posix STDIN
-        #import IPython; IPython.embed()
-        self.state.posix.read(fd, ptr, maxbytes)
+        self.state.posix.fd[0].read(ptr, maxbytes)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
         return self.state.se.Unconstrained('getsn', self.state.arch.bits)
-
 
 
 class SimMSP430(SimOS):

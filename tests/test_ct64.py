@@ -16,7 +16,7 @@ def test_crackme():
     simgr = p.factory.simulation_manager()
     simgr.explore(
         find=lambda s: 'flag{' in deinterlace(s.posix.dumps(1)),
-        step_func=lambda lsm: lsm.drop(stash='deadended'))
+        )#step_func=lambda lsm: lsm.drop(stash='deadended'))
 
     if not simgr.found:
         assert False, "Failed to find any path containing the flag"

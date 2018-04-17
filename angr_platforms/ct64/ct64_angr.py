@@ -129,11 +129,11 @@ def hard_200_rd(state):
     return state.solver.BVV(0, 16)
 
 def hard_200_wr(state, v):
-    state.posix.files[1].write(v, 1)
+    state.posix.fd[1].write_data(v)
 
 # input
 def hard_201_rd(state):
-    r = state.posix.files[0].read_from(1)
+    r = state.posix.fd[0].read_data(1)[0]
     state.solver.add(r < 0x100)
     return r
 
