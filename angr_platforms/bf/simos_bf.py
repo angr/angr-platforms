@@ -18,9 +18,7 @@ class WriteByteAtPtr(SimProcedure):
 
     def run(self, state):
         # pylint:disable=unused-argument
-        fd = 1  # POSIX STDOUT
-        data = self.state.memory.load(self.state.regs.ptr, 1)
-        self.state.posix.write(fd, data, 1)
+        self.state.posix.fd[1].write(self.state.regs.ptr, 1)
         return None
 
 
@@ -35,8 +33,7 @@ class ReadByteToPtr(SimProcedure):
     # pylint:disable=arguments-differ
 
     def run(self):
-        fd = 0 # Posix STDIN
-        self.state.posix.read(fd, self.state.regs.ptr, 1)
+        self.state.posix.fd[0].read(self.state.regs.ptr, 1)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
         return None
 
