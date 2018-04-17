@@ -68,7 +68,7 @@ def test_hello():
 
 	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
 	# '''ld.main_object.entry or 0x400506'''
-	start = ld.main_object.entry #0x4006a4 #0x400430
+	start = 0x400430 #ld.main_object.entry #0x4006a4 #0x400430
 	
 	bytes = ld.memory.read_bytes(start, 0x1000)
 	bytes=''.join(bytes)
