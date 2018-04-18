@@ -5,7 +5,7 @@ import os
 from angr_platforms.sh4 import instrs_sh4, arch_sh4
 import angr
 import angr.project
-from pyvex.lift.util import *
+from pyvex.lifting.util import *
 from pyvex.lifting import register
 import cle
 import IPython
@@ -55,7 +55,9 @@ def test_hello():
 	1101000100010110
 	
 	import logging
-	logging.getLogger('pyvex.lift.util.lifter_helper').setLevel('DEBUG')
+	#logging.getLogger('pyvex.lifting.util.lifter_helper').setLevel('DEBUG')
+	logging.getLogger('angr').setLevel('DEBUG')
+	logging.getLogger('pyvex').setLevel('DEBUG')
 	
 	# This would lift a single instruction, as specified
 	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x69\x62")
@@ -64,7 +66,7 @@ def test_hello():
 	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x2f\x11", cheese=True, max_bytes=2)
 	
 	
-
+	"""
 	
 	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
 	# '''ld.main_object.entry or 0x400506'''
@@ -74,6 +76,12 @@ def test_hello():
 	bytes=''.join(bytes)
 	
 	l = LifterSH4(arch_sh4.ArchSH4(), start, bytes, cheese=True)
+	
+	irsb = l.lift()
+	#print irsb.statements
+	irsb.pp()
+	
+	"""
 
 	"""l.irsb = pyvex.IRSB('\x63\x68', 0, arch)
 
@@ -83,9 +91,9 @@ def test_hello():
 	l.max_inst = 10000000
 	"""	
 	
-	irsb = l.lift()
-	#print irsb.statements
-	#irsb.pp()
+	
+	
+	angr.calling_conventions.register_default_cc('sh4', angr.calling_conventions.SimCCCdecl)
 	
 	register(LifterSH4, 'sh4')		
 
@@ -97,12 +105,14 @@ def test_hello():
 	irsb.pp()
 	"""
 	
-	"""
-	hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), './test_programs/sh4/CADET_00001.sh4'))
+	
+	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), './test_programs/sh4/CADET_00001.sh4'))
 	
 	#angr.project.register_default_engine(cle.backends.elf.ELF, angr.engines.SimEngineVEX)
 	
-	p = angr.Project(hellobf, engines_preset = angr.engines.basic_preset.copy())
+	# engines_preset = angr.engines.basic_preset.copy()
+	
+	p = angr.Project(hellosh4, auto_load_libs=False)
 	entry = p.factory.entry_state()
 	smgr = p.factory.simgr(entry)
 	
@@ -110,12 +120,14 @@ def test_hello():
 		irsb = p.factory.block(p.entry).vex
 	except Exception as e:
 		print(e)
-	IPython.embed()
 	
 	smgr.explore()
+	
+	IPython.embed()
+	
 	print(smgr.deadended[0].posix.dumps(1))
 	nose.tools.assert_equals(smgr.deadended[0].posix.dumps(1), 'Hello World!\n')
-	"""
+	
 def test_1bytecrackme_good():
 	"""
 	The world-famous 1-byte crackme (easy version)

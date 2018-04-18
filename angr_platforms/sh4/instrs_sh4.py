@@ -1,6 +1,6 @@
 import abc
 from arch_sh4 import ArchSH4
-from pyvex.lift.util import *
+from pyvex.lifting.util import *
 from pyvex.const import get_type_size
 import bitstring
 from bitstring import Bits
@@ -506,7 +506,7 @@ class Instruction_MOVI(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		i = self.get_rimm_val('i',ty=Type.Int_8,extend=Type.int_32)
+		i = self.get_rimm_val('i',ty=Type.int_8,extend=Type.int_32)
 		rn_name = self.get_rreg('n')
 
 		return i, rn_name

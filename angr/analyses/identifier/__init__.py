@@ -1,2 +1,0 @@
-
-from .identify import Identifier

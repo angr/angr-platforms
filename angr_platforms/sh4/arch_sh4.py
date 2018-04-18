@@ -320,4 +320,4 @@ class ArchSH4(Arch):
     ld_linux_name = 'ld-linux-sh4.so.2'
     elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0)
 	
-register_arch([r'.*sh4.*|.*sh.*|em_sh'], 32, 'any' , ArchSH4)
+register_arch([r'.*sh4.*|.*sh.*|em_sh','sh4'], 32, 'any' , ArchSH4)
