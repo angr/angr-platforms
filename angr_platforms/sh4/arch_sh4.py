@@ -66,7 +66,7 @@ class ArchSH4(Arch):
     name = "sh4"
     linux_name = 'sh4'
     triplet = 'sh4-linux-gnu' # ? https://github.com/flashrom/flashrom-buildbot/blob/master/build-libftdi1#L28
-    #instruction_endness = Endness.LE # It's bi-endian, LE/BE but default LE
+    instruction_endness = Endness.LE # It's bi-endian, LE/BE but default LE
     ida_processor = 'sh4'
     max_inst_bytes = 4
     lr_offset = 76

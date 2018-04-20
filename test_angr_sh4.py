@@ -2,115 +2,42 @@
 import logging
 import nose
 import os
-from angr_platforms.sh4 import instrs_sh4, arch_sh4
-import angr
-import angr.project
-from pyvex.lifting.util import *
-from pyvex.lifting import register
-import cle
+from angr_platforms.sh4 import *
+import angr, cle, pyvex
 import IPython
-import pyvex
-
+		
 """
-Lifter class for SH4
-Note: modified to allow for direct lifting
+Test lifting instructions from the start of a binary
+Should end after first BB 
 """
-class LifterSH4(GymratLifter):
+def test_lifting(pth):	
 
-	 instrs = [instrs_sh4.__dict__[x] for x in filter(lambda x: x.startswith("Instruction_"), instrs_sh4.__dict__.keys())]
-	 
-	 """
-	 Reverse the endianness of the input data (SH4 instructions).  Total hack.
-	 """
-	 def cheese(self, binData):
-	 
-		binData = [b for b in binData]
-									 
-		# This skips the last byte if it is unpaired
-		for i in range(0, len(binData) - 1, 2):
-
-			binData[i], binData[i+1] = binData[i+1], binData[i]
-						
-		return ''.join(binData)
-	 
-	 def __init__(self, arch, startPos, toLift = "", max_bytes = 100000, max_inst = 10000, cheese=False):
-		super(LifterSH4, self).__init__(arch, startPos)
-		
-		if len(toLift) > 0:
-		
-			if cheese:
-				toLift = self.cheese(toLift)
-		
-			self.max_bytes = max_bytes
-			self.max_inst = max_inst 
-			self.bytepos = startPos
-			self.irsb = pyvex.IRSB(toLift, startPos, arch)
-			self.data = self.thedata = toLift
-		
-def test_hello():
-	"""
-	End-to-end Hello World path analysis
-	:return:
-	"""
-	1101000100010110
-	
-	import logging
-	#logging.getLogger('pyvex.lifting.util.lifter_helper').setLevel('DEBUG')
-	logging.getLogger('angr').setLevel('DEBUG')
-	logging.getLogger('pyvex').setLevel('DEBUG')
-	
-	# This would lift a single instruction, as specified
-	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x69\x62")
-	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\xd1\x16", max_bytes=2)
-	
-	#l = LifterSH4(arch_sh4.ArchSH4(), 0, "\x2f\x11", cheese=True, max_bytes=2)
-	
-	
-	"""
-	
-	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),'./test_programs/sh4/CADET_00001.sh4')))
-	# '''ld.main_object.entry or 0x400506'''
-	start = ld.main_object.entry #ld.main_object.entry #0x4006a4 #0x400430
-	
+	ld = cle.Loader(str(os.path.join(os.path.dirname(os.path.realpath(__file__)),pth)))
+	start = ld.main_object.entry 
 	bytes = ld.memory.read_bytes(start, 0x1000)
 	bytes=''.join(bytes)
 	
-	l = LifterSH4(arch_sh4.ArchSH4(), start, bytes, cheese=True)
+	l = helpers_sh4.LifterSH4(arch_sh4.ArchSH4(), start, bytes, revBytes=False)
 	
 	irsb = l.lift()
-	#print irsb.statements
 	irsb.pp()
-	
-	"""
 
-	"""l.irsb = pyvex.IRSB('\x63\x68', 0, arch)
+"""
+Lift an arbitrary instruction	
+"""
+def test_lift_one(instr):	
 
-	l.data = l.thedata = "\x63\x68"
-	l.max_bytes = 100
-	l.bytepos = 0
-	l.max_inst = 10000000
-	"""	
+	l = helpers_sh4.LifterSH4(arch_sh4.ArchSH4(), 0, instr, revBytes=True, max_bytes=2)
 	
-	
-	
-	angr.calling_conventions.register_default_cc('sh4', angr.calling_conventions.SimCCCdecl)
-	
-	register(LifterSH4, 'sh4')		
+	irsb = l.lift()
+	irsb.pp()	
 
-	
-	
-	
-	"""
-	irsb = pyvex.IRSB(some_text_data, ld.main_object.entry, ld.main_object.arch)
-	irsb.pp()
-	"""
-	
-	
-	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), './test_programs/sh4/CADET_00001.sh4'))
-	
-	#angr.project.register_default_engine(cle.backends.elf.ELF, angr.engines.SimEngineVEX)
-	
-	# engines_preset = angr.engines.basic_preset.copy()
+"""
+End-to-end path analysis
+"""
+def test_angr(pth):
+		
+	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), pth))
 	
 	p = angr.Project(hellosh4, auto_load_libs=False)
 	entry = p.factory.entry_state()
@@ -121,9 +48,12 @@ def test_hello():
 	except Exception as e:
 		print(e)
 	
-	smgr.explore()
-	
 	IPython.embed()
+	
+	# TODO: step through each instruction and verify that regs have correct values!
+	# Known issues: read/write system calls are probably not working
+	
+	smgr.explore()
 	
 	print(smgr.deadended[0].posix.dumps(1))
 	nose.tools.assert_equals(smgr.deadended[0].posix.dumps(1), 'Hello World!\n')
@@ -145,7 +75,16 @@ def test_1bytecrackme_good():
 
 if __name__ == '__main__':
 	
+	angr.calling_conventions.register_default_cc('sh4', helpers_sh4.SimCCSH4)
+	pyvex.lifting.register(helpers_sh4.LifterSH4, 'sh4')
+	
 	logging.basicConfig(level=logging.INFO)
-	test_hello()
+	logging.getLogger('angr').setLevel('DEBUG')
+	logging.getLogger('pyvex').setLevel('DEBUG')
+	
+	#test_lift_one("\x2f\x11")
+	#test_lifting('./test_programs/sh4/CADET_00001.sh4')
+
+	test_angr('./test_programs/sh4/CADET_00001.sh4')
 	#test_1bytecrackme_good()
 

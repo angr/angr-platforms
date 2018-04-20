@@ -819,7 +819,7 @@ class Instruction_MOVLM(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		rn -= 4
+		rn = rn - 4
 		self.put(rn, rn_name)
 		
 		self.store(rm, rn)
@@ -4313,6 +4313,7 @@ class Instruction_BT(SH4Instruction):
 			
 		if T == 1:
 			self.put(val, 'pc')
+			self.jump(None, val)
 		else:
 			self.inc_pc()
 		
@@ -4355,6 +4356,7 @@ class Instruction_BF(SH4Instruction):
 			
 		if T == 0:
 			self.put(val, 'pc')
+			self.jump(None, val)
 		else:
 			self.inc_pc()
 		
@@ -4391,6 +4393,8 @@ class Instruction_JMP(SH4Instruction):
 		val = rm
 			
 		self.put(val, 'pc')
+		
+		self.jump(None, val)
 
 		# TODO
 		# execute the next instruction first
@@ -4431,6 +4435,8 @@ class Instruction_JSR(SH4Instruction):
 			
 		self.put(val, 'pc')
 		self.put(pc + 4, 'pr')
+		
+		self.jump(None, val, jumpkind=JumpKind.Call)
 
 		# TODO
 		# execute the next instruction first
@@ -4469,13 +4475,15 @@ class Instruction_RTS(SH4Instruction):
 			
 		self.put(val, 'pc')
 
+		self.jump(None, val, jumpkind=JumpKind.Ret)
+		
 		# TODO
 		# execute the next instruction first
 		# self.delay_slot(temp + 2)
 			
 		return val	
 
-class Instruction_CMPEQ_IMM_R0(SH4Instruction):
+class Instruction_CMPEQIM(SH4Instruction):
 
 	bin_format = '10001000iiiiiiii'
 	name='cmp/eq'
