@@ -42,7 +42,8 @@ class SH4Instruction(Instruction):
 	# AO - Added args
 	def __init__(self, bitstrm, arch, addr):
 		super(SH4Instruction, self).__init__(bitstrm, arch, addr)
-		#print(self)
+		print(self)
+		print(self.bin_format)
 
 	# Default flag handling
 	def carry(self, *args):
@@ -307,10 +308,10 @@ class Instruction_EXTS(SH4Instruction):
 			rm = self.get_rreg_val('m',ty=WORD_TYPE,extend=LWORD_TYPE)
 		elif self.data['d'] == '00':
 			self.name = 'extu.b'
-			rm = self.get_rreg_val('m',ty=BYTE_TYPE).cast_to(LWORD_TYPE)
+			rm = self.get_rreg_val('m',ty=BYTE_TYPE,zerox=LWORD_TYPE)
 		elif self.data['d'] == '01':
 			self.name = 'extu.w'
-			rm = self.get_rreg_val('m',ty=WORD_TYPE).cast_to(LWORD_TYPE)
+			rm = self.get_rreg_val('m',ty=WORD_TYPE,zerox=LWORD_TYPE)
 									
 		rm_name = self.get_rreg('m')
 		rn_name = self.get_rreg('n')
@@ -535,7 +536,7 @@ class Instruction_MOVLS4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', ty= HALFBYTE_TYPE,zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn = self.get_rreg_val('n')
 
@@ -568,7 +569,7 @@ class Instruction_MOVL_RN_RM_D(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE,zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
 
@@ -604,7 +605,7 @@ class Instruction_MOVW(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', ty=Type.int_8).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', ty=Type.int_8, extend=LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -643,7 +644,7 @@ class Instruction_MOVWL4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 
 		return d, rm
@@ -677,7 +678,7 @@ class Instruction_MOVBL4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE).cast_to(LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 
 		return d, rm
@@ -708,7 +709,7 @@ class Instruction_MOVBS(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', ty=BYTE_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -726,11 +727,11 @@ class Instruction_MOVBS(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		self.store(rm.cast_to(BYTE_TYPE), rn)
+		self.store(rm, rn)
 			
 		self.inc_pc()
 	
-		return rm.cast_to(BYTE_TYPE)	
+		return rm	
 		
 class Instruction_MOVWS(SH4Instruction):
 
@@ -739,7 +740,7 @@ class Instruction_MOVWS(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', WORD_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -757,11 +758,11 @@ class Instruction_MOVWS(SH4Instruction):
 		Transfers the source operand to the destination. 
 		"""
 		
-		self.store(rm.cast_to(WORD_TYPE), rn)
+		self.store(rm, rn)
 			
 		self.inc_pc()
 	
-		return rm.cast_to(WORD_TYPE)	
+		return rm	
 		
 class Instruction_MOVLS(SH4Instruction):
 
@@ -835,7 +836,7 @@ class Instruction_MOVWM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', WORD_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -856,7 +857,7 @@ class Instruction_MOVWM(SH4Instruction):
 		rn -= 2
 		self.put(rn, rn_name)
 		
-		self.store(rm.cast_to(WORD_TYPE), rn)
+		self.store(rm, rn)
 					
 		self.inc_pc()
 	
@@ -869,7 +870,7 @@ class Instruction_MOVBM(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', BYTE_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -890,7 +891,7 @@ class Instruction_MOVBM(SH4Instruction):
 		rn -= 1
 		self.put(rn, rn_name)
 		
-		self.store(rm.cast_to(BYTE_TYPE), rn)		
+		self.store(rm, rn)		
 					
 		self.inc_pc()
 	
@@ -1005,7 +1006,7 @@ class Instruction_MOVBS0(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', BYTE_TYPE)
 		rn = self.get_rreg_val('n')
 		r0 = self.get_reg_val('r0')
 		rn_name = self.get_rreg('n')
@@ -1024,11 +1025,11 @@ class Instruction_MOVBS0(SH4Instruction):
 		Transfers the source operand to the destination.
 		"""
 		
-		self.store(rm.cast_to(BYTE_TYPE), rn + r0)
+		self.store(rm, rn + r0)
 							
 		self.inc_pc()
 	
-		return rn + r0	
+		return rm
 
 class Instruction_MOVWS0(SH4Instruction):
 
@@ -1037,7 +1038,7 @@ class Instruction_MOVWS0(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m', WORD_TYPE)
 		rn = self.get_rreg_val('n')
 		r0 = self.get_reg_val('r0')
 		rn_name = self.get_rreg('n')
@@ -1056,12 +1057,11 @@ class Instruction_MOVWS0(SH4Instruction):
 		Transfers the source operand to the destination.
 		"""
 		
-		self.store(rm.cast_to(WORD_TYPE), rn + r0)
+		self.store(rm, rn + r0)
 							
 		self.inc_pc()
 	
-		return rn + r0		
-
+		return rm	
 
 class Instruction_MOVLS0(SH4Instruction):
 
@@ -1089,11 +1089,11 @@ class Instruction_MOVLS0(SH4Instruction):
 		Transfers the source operand to the destination.
 		"""
 		
-		self.store(rm.cast_to(LWORD_TYPE), rn + r0)
+		self.store(rm, rn + r0)
 							
 		self.inc_pc()
 	
-		return rn + r0			
+		return rm	
 		
 class Instruction_MOVBP(SH4Instruction):
 
@@ -1263,7 +1263,7 @@ class Instruction_MOVWS4(SH4Instruction):
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead.  
 		"""
 		
-		self.store(r0.cast_to(Type.int_16), rn + d)
+		self.store(r0.cast_to(Type.int_16), rn + (d << 1))
 			
 		self.inc_pc()
 	
@@ -1294,7 +1294,7 @@ class Instruction_MOVBLG(SH4Instruction):
 		
 		# Check if correct! (load type should handle overflow)
 		
-		val = self.load(gbr + d, BYTE_TYPE)
+		val = self.load(gbr + d, BYTE_TYPE).widen_signed(LWORD_TYPE)
 		self.put(val, 'r0')
 					
 		self.inc_pc()
@@ -1328,7 +1328,7 @@ class Instruction_MOVWLG(SH4Instruction):
 		
 		# Check if correct! (load type should handle overflow)
 		
-		val = self.load(gbr + d, WORD_TYPE)
+		val = self.load(gbr + d, WORD_TYPE).widen_signed(LWORD_TYPE)
 		self.put(val, 'r0')
 					
 		self.inc_pc()
@@ -1397,7 +1397,7 @@ class Instruction_MOVBSG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return r0
+		return r0.cast_to(BYTE_TYPE)
 
 class Instruction_MOVWSG(SH4Instruction):
 
@@ -1431,7 +1431,7 @@ class Instruction_MOVWSG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return r0		
+		return r0.cast_to(WORD_TYPE)	
 
 class Instruction_MOVLSG(SH4Instruction):
 
@@ -1467,8 +1467,6 @@ class Instruction_MOVLSG(SH4Instruction):
 	
 		return r0			
 		
-# TODO - how to deal with .word? 4005f0 
-
 # TODO Floating-Point Control Instructions
 
 class Instruction_LDS_FPUL(SH4Instruction):

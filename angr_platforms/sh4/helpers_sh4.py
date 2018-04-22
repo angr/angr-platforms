@@ -14,6 +14,22 @@ class SimCCSH4(SimCC):
 	RETURN_VAL = SimRegArg('r0', 4)
 	ARCH = ArchSH4
 
+class SimCCSH4LinuxSyscall(SimCC):
+    # TODO: Make sure all the information is correct
+	ARG_REGS = [ 'r4', 'r5', 'r6', 'r7' ]
+	FP_ARG_REGS = [ 'fr4', 'fr5','fr6','fr7','fr8','fr9','fr10','fr11']
+	RETURN_ADDR = SimRegArg('pr', 4)
+	RETURN_VAL = SimRegArg('r0', 4)
+
+	@classmethod
+	def _match(cls, arch, args, sp_delta):  # pylint: disable=unused-argument
+		# never appears anywhere except syscalls
+		return False
+
+	@staticmethod
+	def syscall_num(state):
+		return state.regs.r0
+	
 """
 Lifter class for SH4
 Note: modified to allow for direct lifting

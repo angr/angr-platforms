@@ -48,6 +48,8 @@ def test_angr(pth):
 	except Exception as e:
 		print(e)
 	
+	smgr.explore(until=lambda s: s.active[0].addr == 0x400350)
+	
 	IPython.embed()
 	
 	# TODO: step through each instruction and verify that regs have correct values!
@@ -75,7 +77,7 @@ def test_1bytecrackme_good():
 
 if __name__ == '__main__':
 	
-	angr.calling_conventions.register_default_cc('sh4', helpers_sh4.SimCCSH4)
+	angr.calling_conventions.register_default_cc('sh4', helpers_sh4.SimCCSH4LinuxSyscall)
 	pyvex.lifting.register(helpers_sh4.LifterSH4, 'sh4')
 	
 	logging.basicConfig(level=logging.INFO)
