@@ -3,6 +3,8 @@ from arch_sh4 import ArchSH4
 import instrs_sh4
 import pyvex
 from pyvex.lifting.util import *
+import inspect
+from archinfo.arch import Endness
 
 """
 Work in progress calling convention
@@ -66,3 +68,146 @@ class LifterSH4(GymratLifter):
 			self.bytepos = startPos
 			self.irsb = pyvex.IRSB(toLift, startPos, arch)
 			self.data = self.thedata = toLift
+			
+"""
+	Class representing a condition to check register or memory values
+"""
+class Condition():
+
+	__slots__ = ('checkValue','operation','desiredValue')
+	
+	def __init__(self, checkValue, operation, desiredValue):
+	
+		self.operation = operation
+		self.checkValue = checkValue
+		self.desiredValue = desiredValue
+		
+	def toString(self, actualValue):
+	
+		checkValue = self.checkValue
+		if isinstance(checkValue, int):
+			checkValue = "mem[%s]" % hex(checkValue)
+	
+		if callable(self.desiredValue):
+			desiredValue = inspect.getsource(self.desiredValue)
+		else:
+			desiredValue = hex(self.desiredValue)
+	
+		return "%s (%s) %s %s" % (checkValue, actualValue, self.operation, desiredValue)
+		
+"""
+	Class that runs a binary while checking conditions on register/mem values
+"""
+class ConditionChecker():
+
+	smgr = None
+	
+	# Previous program counter
+	prevPc = 0
+	
+	# Internal list of conditions
+	conds = {}
+	
+	# Mapping from strings to actual objects in smgr
+	mapping = None
+	
+	# Concretizes PC so that it can be read in our dict
+	def getPc(self):
+
+		return self.smgr.one_active.state.solver.eval(self.smgr.one_active.regs.pc,cast_to=int)
+		
+	def __init__(self, initState):
+	
+		self.smgr = initState
+		self.prevPc = 0
+				
+		self.mapping = {
+			'r15' : lambda : self.smgr.one_active.state.regs.r15,
+			'r14' : lambda : self.smgr.one_active.state.regs.r14,
+			'r13' : lambda : self.smgr.one_active.state.regs.r13,
+			'r12' : lambda : self.smgr.one_active.state.regs.r12,
+			'r11' : lambda : self.smgr.one_active.state.regs.r11,
+			'r10' : lambda : self.smgr.one_active.state.regs.r10,
+			'r9'  : lambda : self.smgr.one_active.state.regs.r9,
+			'r8'  : lambda : self.smgr.one_active.state.regs.r8,
+			'r7'  : lambda : self.smgr.one_active.state.regs.r7,
+			'r6'  : lambda : self.smgr.one_active.state.regs.r6,
+			'r5'  : lambda : self.smgr.one_active.state.regs.r5,
+			'r4'  : lambda : self.smgr.one_active.state.regs.r4,
+			'r3'  : lambda : self.smgr.one_active.state.regs.r3,
+			'r2'  : lambda : self.smgr.one_active.state.regs.r2,
+			'r1'  : lambda : self.smgr.one_active.state.regs.r1,
+			'r0'  : lambda : self.smgr.one_active.state.regs.r0,
+			'pc'  : lambda : self.smgr.one_active.state.regs.pc,
+			'pr'  : lambda : self.smgr.one_active.state.regs.pr
+		}
+	
+	"""
+	Shorthand for getting state
+	"""
+	def s(self):
+	
+		return self.smgr.one_active.state
+				
+	"""
+	Adds a new condition at the specified program counter
+	"""
+	def addCondition(self, pc, cond):
+			
+		# Add condition to dict
+		if pc in self.conds.keys():
+			self.conds[pc].append(cond)
+		else:
+			self.conds[pc] = [cond]
+	
+	def execute(self, instructions=1):
+	
+		for i in range(instructions):
+			# Save current pc as previous
+			pc = self.s().regs.pc
+			
+			self.smgr.step(num_inst=1)
+			self.prevPc = pc
+			self.checkConditions(self.getPc())
+	
+	def checkConditions(self, address):
+	
+		allPassed = True
+			
+		print("---------- PC = %s ----------" % str(hex(address)).replace('L',''))	
+			
+		if address in self.conds.keys():
+		
+			for cond in self.conds[address]:
+			
+				# Register
+				if cond.checkValue in self.mapping.keys():
+					toCheck = self.mapping[cond.checkValue]()
+				# Previous PC
+				elif cond.checkValue == 'prevPc':
+					toCheck = self.prevPc
+				# Memory
+				else:
+					toCheck = self.smgr.one_active.state.memory.load(cond.checkValue, endness = Endness.LE)
+					
+				# 
+				if callable(cond.desiredValue):
+					desiredValue = cond.desiredValue(self)
+				else:
+					desiredValue = cond.desiredValue
+					
+				# TODO refactor operators, maybe
+				if cond.operation == '==':
+					passed = (self.s().solver.eval(toCheck == desiredValue))
+				elif cond.operation == '!=':
+					passed = (self.s().solver.eval(toCheck != desiredValue))
+				else:
+					raise NotImplementedError("Bad operator.")
+					
+				if True or not passed:
+					print("%s condition %s" % ("Passed" if passed else "***FAILED",cond.toString(toCheck)))
+				
+				if not passed:
+					allPassed = False
+					
+		return allPassed

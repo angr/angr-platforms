@@ -4,6 +4,12 @@ from archinfo.tls import TLSArchInfo
 register_simos('SH4', SimMSP430)"""
 
 class ArchSH4(Arch):
+
+    # Used by the lifter to track delayed jumps
+    DELAYED_DEST_PC = None
+    DELAYED_SET 	= False
+    DELAYED_TYPE 	= None
+
     def __init__(self, endness=Endness.LE):
         super(ArchSH4, self).__init__(endness)
         self.ip_offset = 72

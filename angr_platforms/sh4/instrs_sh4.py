@@ -16,6 +16,7 @@ INDEX_TYPE = Type.int_16
 STATUS_REG_IND = 3
 CARRY_BIT_IND = 0
 
+
 ##
 ## NOTE: The bitstream legend for this arch is:
 # m: source
@@ -42,22 +43,25 @@ class SH4Instruction(Instruction):
 	# AO - Added args
 	def __init__(self, bitstrm, arch, addr):
 		super(SH4Instruction, self).__init__(bitstrm, arch, addr)
-		print(self)
-		print(self.bin_format)
-
-	# Default flag handling
-	def carry(self, *args):
-		return None
+		#print(self)
+		#print(self.bin_format)
 
 	# Some common stuff we use around
 	
-	# Adam - Not actually using any of this
+	def get_pc(self):
+		return self.get('pc', REGISTER_TYPE)
 
+	# Adam - Not actually using any of this
+	
+	"""
+	
+	# Default flag handling
+	def carry(self, *args):
+		return None
+	
 	def get_sr(self):
 		return self.get(STATUS_REG_IND, REGISTER_TYPE)
 
-	def get_pc(self):
-		return self.get('pc', REGISTER_TYPE)
 
 	def put_sr(self, val):
 		return self.put(val, STATUS_REG_IND)
@@ -70,10 +74,10 @@ class SH4Instruction(Instruction):
 			self.commit_func(res)
 
 	def compute_flags(self, *args):
-		"""
+		'''
 		Compute the flags touched by each instruction
 		and store them in the status register
-		"""
+		'''
 		c = self.carry(*args)
 		if not c:
 			return
@@ -91,7 +95,8 @@ class SH4Instruction(Instruction):
 		src_name = ArchSH4.register_index[src_num]
 		dst_name = ArchSH4.register_index[dst_num]
 		return src_name, dst_name
-
+	"""
+		
 	@abc.abstractmethod
 	def fetch_operands(self):
 		pass
@@ -101,6 +106,52 @@ class SH4Instruction(Instruction):
 	# Based on instrs in: http://www.shared-ptr.com/sh_insns.html
 	##############################################	
 	
+	"""
+	Wrapper for compute_result, since we need support for delayed branching
+	"""
+	def compute_result(self, *args):
+		
+		ArchSH4.DELAYED_SET = False
+		
+		retVal = self.compute_result2(*args)
+	
+		# Handle a delayed jump, if one has been set
+		if ArchSH4.DELAYED_DEST_PC is not None and not ArchSH4.DELAYED_SET:
+					
+			if isinstance(ArchSH4.DELAYED_DEST_PC, list):
+			
+				# Do something fancy
+				if ArchSH4.DELAYED_DEST_PC[0] == "displace":
+				
+					pc = self.get_reg_val('pc')
+					disp = ArchSH4.DELAYED_DEST_PC[1]
+					
+					pc = pc + 2 + (disp << 1)
+					
+				else:
+				
+					raise NotImplementedError("Unimplemented delay instruction")
+							
+			else:
+				# Copy some register value
+				pc = self.get_reg_val(ArchSH4.DELAYED_DEST_PC)
+		
+			self.put(pc, 'pc')
+			
+			if ArchSH4.DELAYED_TYPE is not None:
+			
+				if ArchSH4.DELAYED_TYPE is False:
+					self.jump(None, pc)
+				else:
+					self.jump(None, pc, jumpkind=ArchSH4.DELAYED_TYPE)
+			
+			# Reset state
+			ArchSH4.DELAYED_DEST_PC = None
+			ArchSH4.DELAYED_TYPE = None
+			ArchSH4.DELAYED_SET = False		
+			
+		return retVal
+			
 	"""
 	Set system flags
 	"""
@@ -142,9 +193,13 @@ class SH4Instruction(Instruction):
 	Increment the PC by 2, which is what most instructions do
 	"""
 	def inc_pc(self):
-		pc_vv = self.get_pc()
-		pc_vv += 2
-		self.put(pc_vv, 'pc')
+	
+		# Only increment the PC if we are not about to jump!
+		if ArchSH4.DELAYED_DEST_PC is None:
+	
+			pc_vv = self.get_pc()
+			pc_vv += 2
+			self.put(pc_vv, 'pc')
 		
 	"""
 	get referenced register name
@@ -234,7 +289,7 @@ class Instruction_SWAP(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, self.get_rreg('m'), self.get_rreg('n'))
 
-	def compute_result(self, rm, rn, rn_name):
+	def compute_result2(self, rm, rn, rn_name):
 	
 		# swap.b
 		if self.data['t'] == 0:
@@ -280,7 +335,7 @@ class Instruction_XTRCT(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, self.get_rreg('m'), self.get_rreg('n'))
 
-	def compute_result(self, rm, rn, rn_name):
+	def compute_result2(self, rm, rn, rn_name):
 		"""
 		Extracts the middle 32 bits from the 64-bit contents of linked general registers Rm and Rn, and stores the result in Rn. 
 		"""
@@ -324,7 +379,7 @@ class Instruction_EXTS(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn_name):
+	def compute_result2(self, rm, rm_name, rn_name):
 		"""
 		Sign-extends the contents of general register Rm and stores the result in Rn. The value of Rm bit 7 is transferred to Rn bits 8 to 31. 
 		
@@ -361,7 +416,7 @@ class Instruction_MOVBL(SH4Instruction):
 			
 		return "%s @%s,%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn_name):
+	def compute_result2(self, rm, rn_name):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -392,7 +447,7 @@ class Instruction_MOVWL(SH4Instruction):
 			
 		return "%s @%s,%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn_name):
+	def compute_result2(self, rm, rn_name):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -423,7 +478,7 @@ class Instruction_MOVLL(SH4Instruction):
 			
 		return "%s @%s,%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn_name):
+	def compute_result2(self, rm, rn_name):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -444,7 +499,7 @@ class Instruction_MOVLI(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', BYTE_TYPE, extend=LWORD_TYPE)
+		d = self.get_rimm_val('d', BYTE_TYPE, zerox=LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -455,7 +510,7 @@ class Instruction_MOVLI(SH4Instruction):
 			
 		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
 
-	def compute_result(self, pc, d, rn_name):
+	def compute_result2(self, pc, d, rn_name):
 		"""
 		Stores immediate data, sign-extended to longword, in general register Rn. The data is stored from memory address (PC + 4 + displacement * 4). The 8-bit displacement is multiplied by four after zero-extension, and so the relative distance from the operand is in the range up to PC + 4 + 1020 bytes. The PC value is the address of this instruction. A value with the lower 2 bits adjusted to 00 is used in address calculation. 
 		"""
@@ -489,7 +544,7 @@ class Instruction_MOV(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn_name):
+	def compute_result2(self, rm, rm_name, rn_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -518,7 +573,7 @@ class Instruction_MOVI(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, rn_name)
 
-	def compute_result(self, i, rn_name):
+	def compute_result2(self, i, rn_name):
 		"""
 		Stores immediate data, sign-extended to longword, in general register Rn. 
 		"""
@@ -548,7 +603,7 @@ class Instruction_MOVLS4(SH4Instruction):
 			
 		return "%s %s,@(%s,%s)" % (self.name, rm, d, rn)
 
-	def compute_result(self, d, rm, rn):
+	def compute_result2(self, d, rm, rn):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
 		"""
@@ -581,7 +636,7 @@ class Instruction_MOVL_RN_RM_D(SH4Instruction):
 			
 		return "%s @(%s,%s), %s" % (self.name, rm, d, rn_name)
 
-	def compute_result(self, d, rm, rn_name):
+	def compute_result2(self, d, rm, rn_name):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
 		"""
@@ -616,7 +671,7 @@ class Instruction_MOVW(SH4Instruction):
 			
 		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
 
-	def compute_result(self, pc, d, rn_name):
+	def compute_result2(self, pc, d, rn_name):
 		"""
 		Stores immediate data, sign-extended to longword, in general register Rn. The data is stored from memory address (PC + 4 + displacement * 2). The 8-bit displacement is multiplied by two after zero-extension, and so the relative distance from the table is in the range up to PC + 4 + 510 bytes. The PC value is the address of this instruction. 
 		"""
@@ -655,7 +710,7 @@ class Instruction_MOVWL4(SH4Instruction):
 			
 		return "%s @(%s,%s),R0" % (self.name, d, rm)
 
-	def compute_result(self, d, rm):
+	def compute_result2(self, d, rm):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register.  
 		"""
@@ -689,7 +744,7 @@ class Instruction_MOVBL4(SH4Instruction):
 			
 		return "%s @(%s,%s),R0" % (self.name, d, rm)
 
-	def compute_result(self, d, rm):
+	def compute_result2(self, d, rm):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is only zero-extended, so a range up to +15 bytes can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -722,7 +777,7 @@ class Instruction_MOVBS(SH4Instruction):
 			
 		return "%s %s,@%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -753,7 +808,7 @@ class Instruction_MOVWS(SH4Instruction):
 			
 		return "%s %s,@%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -784,7 +839,7 @@ class Instruction_MOVLS(SH4Instruction):
 			
 		return "%s %s,@%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -805,17 +860,16 @@ class Instruction_MOVLM(SH4Instruction):
 		rm = self.get_rreg_val('m')
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
-		rm_name = self.get_rreg('m')
 		
-		return rm, rn, rn_name, rm_name
+		return rm, rn, rn_name
 		
 	def disassemble(self):
 	
-		rm, rn, rn_name, rm_name = self.fetch_operands()
+		rm, rn, rn_name = self.fetch_operands()
 			
 		return "%s %s,@-%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -849,7 +903,7 @@ class Instruction_MOVWM(SH4Instruction):
 			
 		return "%s %s,@-%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -883,7 +937,7 @@ class Instruction_MOVBM(SH4Instruction):
 			
 		return "%s %s,@-%s" % (self.name, rm, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -905,31 +959,30 @@ class Instruction_MOVBL0(SH4Instruction):
 	def fetch_operands(self):
 									
 		rm = self.get_rreg_val('m')
-		rn = self.get_rreg_val('n')
 		r0 = self.get_reg_val('r0')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
 		
-		return rm, rn, rn_name, rm_name, r0
+		return rm, rn_name, rm_name, r0
 		
 	def disassemble(self):
 	
-		rm, rn, rn_name, rm_name, r0 = self.fetch_operands()
+		rm, rn_name, rm_name, r0 = self.fetch_operands()
 			
 		return "%s @(r0,%s),%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
 		
-		rn = self.load(rm + r0, BYTE_TYPE).widen_signed(LWORD_TYPE)
+		val = self.load(rm + r0, BYTE_TYPE).widen_signed(LWORD_TYPE)
 			
-		self.put(rn, rn_name)
+		self.put(val, rn_name)
 							
 		self.inc_pc()
 	
-		return rn	
+		return val	
 
 class Instruction_MOVWL0(SH4Instruction):
 
@@ -952,7 +1005,7 @@ class Instruction_MOVWL0(SH4Instruction):
 			
 		return "%s @(r0,%s),%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -986,7 +1039,7 @@ class Instruction_MOVLL0(SH4Instruction):
 			
 		return "%s @(r0,%s),%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -1020,7 +1073,7 @@ class Instruction_MOVBS0(SH4Instruction):
 			
 		return "%s %s,@(r0,%s)" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -1052,7 +1105,7 @@ class Instruction_MOVWS0(SH4Instruction):
 			
 		return "%s %s,@(r0,%s)" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -1084,7 +1137,7 @@ class Instruction_MOVLS0(SH4Instruction):
 			
 		return "%s %s,@(r0,%s)" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name, r0):
+	def compute_result2(self, rm, rn, rn_name, rm_name, r0):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -1115,7 +1168,7 @@ class Instruction_MOVBP(SH4Instruction):
 			
 		return "%s @%s+,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register.
 
@@ -1153,7 +1206,7 @@ class Instruction_MOVWP(SH4Instruction):
 			
 		return "%s @%s+,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register.
 		"""
@@ -1190,7 +1243,7 @@ class Instruction_MOVLP(SH4Instruction):
 			
 		return "%s @%s+,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -1227,7 +1280,7 @@ class Instruction_MOVBS4(SH4Instruction):
 			
 		return "%s r0,@(%s,%s)" % (self.name, d, rn_name)
 
-	def compute_result(self, r0, d, rn_name, rn):
+	def compute_result2(self, r0, d, rn_name, rn):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is only zero-extended, so a range up to +15 bytes can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
 		"""
@@ -1258,7 +1311,7 @@ class Instruction_MOVWS4(SH4Instruction):
 			
 		return "%s r0,@(%s,%s)" % (self.name, d, rn_name)
 
-	def compute_result(self, r0, d, rn_name, rn):
+	def compute_result2(self, r0, d, rn_name, rn):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by two after zero-extension, enabling a range up to +30 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead.  
 		"""
@@ -1287,7 +1340,7 @@ class Instruction_MOVBLG(SH4Instruction):
 			
 		return "%s @(%s,GBR),r0" % (self.name, d)
 
-	def compute_result(self, gbr, d):
+	def compute_result2(self, gbr, d):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be specified. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -1319,7 +1372,7 @@ class Instruction_MOVWLG(SH4Instruction):
 			
 		return "%s @(%s,GBR),r0" % (self.name, d)
 
-	def compute_result(self, gbr, d):
+	def compute_result2(self, gbr, d):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is multiplied by two after zero-extension, enabling a range up to +510 bytes to be specified. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -1353,7 +1406,7 @@ class Instruction_MOVLLG(SH4Instruction):
 			
 		return "%s @(%s,GBR),r0" % (self.name, d)
 
-	def compute_result(self, gbr, d):
+	def compute_result2(self, gbr, d):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is multiplied by four after zero-extension, enabling a range up to +1020 bytes to be specified. 
 		"""
@@ -1386,7 +1439,7 @@ class Instruction_MOVBSG(SH4Instruction):
 			
 		return "%s r0,@(%s,GBR)" % (self.name, d)
 
-	def compute_result(self, gbr, d, r0):
+	def compute_result2(self, gbr, d, r0):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is only zero-extended, so a range up to +255 bytes can be specified. 
 		"""
@@ -1418,7 +1471,7 @@ class Instruction_MOVWSG(SH4Instruction):
 			
 		return "%s r0,@(%s,GBR)" % (self.name, d)
 
-	def compute_result(self, gbr, d, r0):
+	def compute_result2(self, gbr, d, r0):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is multiplied by two after zero-extension, enabling a range up to +510 bytes to be specified. 
 		"""
@@ -1452,7 +1505,7 @@ class Instruction_MOVLSG(SH4Instruction):
 			
 		return "%s r0,@(%s,GBR)" % (self.name, d)
 
-	def compute_result(self, gbr, d, r0):
+	def compute_result2(self, gbr, d, r0):
 		"""
 		Transfers the source operand to the destination. The 8-bit displacement is multiplied by four after zero-extension, enabling a range up to +1020 bytes to be specified. 
 		"""
@@ -1487,7 +1540,7 @@ class Instruction_LDS_FPUL(SH4Instruction):
 			
 		return "%s %s,FPUL" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Loads the source operand into FPU system register FPUL. 
 		"""
@@ -1516,7 +1569,7 @@ class Instruction_LDS_MACL(SH4Instruction):
 			
 		return "%s %s,MACL" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register MACL. 
 		"""
@@ -1545,7 +1598,7 @@ class Instruction_LDS_PR(SH4Instruction):
 			
 		return "%s %s,PR" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register PR. 
 		"""
@@ -1574,7 +1627,7 @@ class Instruction_LDSL_PR(SH4Instruction):
 			
 		return "%s @%s+,PR" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register PR. 
 		"""
@@ -1606,7 +1659,7 @@ class Instruction_LDSL_MACL(SH4Instruction):
 			
 		return "%s @%s+,MACL" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register MACL. 
 		"""
@@ -1638,7 +1691,7 @@ class Instruction_LDS(SH4Instruction):
 			
 		return "%s %s,MACH" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register MACH. 
 		"""
@@ -1667,7 +1720,7 @@ class Instruction_LDSL(SH4Instruction):
 			
 		return "%s @%s+,MACH" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Stores the source operand into the system register MACH. 
 		"""
@@ -1700,7 +1753,7 @@ class Instruction_ROTL(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Rotates the contents of general register Rn one bit to the left, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 
 		"""
@@ -1742,7 +1795,7 @@ class Instruction_ROTR(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Rotates the contents of general register Rn one bit to the right, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 
 		"""
@@ -1784,7 +1837,7 @@ class Instruction_ROTCL(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Rotates the contents of general register Rn one bit to the left through the T bit, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 
 		"""
@@ -1831,7 +1884,7 @@ class Instruction_ROTCR(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Rotates the contents of general register Rn one bit to the right through the T bit, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 
 		"""
@@ -1879,7 +1932,7 @@ class Instruction_SHAD(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rn_name, rn, rm_name, rm):
+	def compute_result2(self, rn_name, rn, rm_name, rm):
 		"""
 		Arithmetically shifts the contents of general register Rn. General register Rm specifies the shift direction and the number of bits to be shifted.
 
@@ -1927,7 +1980,7 @@ class Instruction_SHLD(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rn_name, rn, rm_name, rm):
+	def compute_result2(self, rn_name, rn, rm_name, rm):
 		"""
 		Logically shifts the contents of general register Rn. General register Rm specifies the shift direction and the number of bits to be shifted.
 
@@ -1970,7 +2023,7 @@ class Instruction_SHAR(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Arithmetically shifts the contents of general register Rn one bit to the right and stores the result in Rn. The bit shifted out of the operand is transferred to the T bit. 
 		"""
@@ -2017,7 +2070,7 @@ class Instruction_SHAL(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Arithmetically shifts the contents of general register Rn one bit to the left and stores the result in Rn. The bit shifted out of the operand is transferred to the T bit. 
 		"""
@@ -2054,7 +2107,7 @@ class Instruction_SHLR(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn one bit to the right and stores the result in Rn. The bit shifted out of the operand is transferred to the T bit. 
 		"""
@@ -2091,7 +2144,7 @@ class Instruction_SHLR2(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 2 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded.  
 		"""
@@ -2123,7 +2176,7 @@ class Instruction_SHLR8(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 8 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded.  
 		"""
@@ -2155,7 +2208,7 @@ class Instruction_SHLR16(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 16 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded.  
 		"""
@@ -2188,7 +2241,7 @@ class Instruction_SHLL(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, t, rn_name, rn):
+	def compute_result2(self, t, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn one bit to the left and stores the result in Rn. The bit shifted out of the operand is transferred to the T bit. 
 		"""
@@ -2224,7 +2277,7 @@ class Instruction_SHLL2(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 2 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded.  
 		"""
@@ -2255,7 +2308,7 @@ class Instruction_SHLL8(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 8 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded. 
 		"""
@@ -2286,7 +2339,7 @@ class Instruction_SHLL16(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn_name, rn):
+	def compute_result2(self, rn_name, rn):
 		"""
 		Logically shifts the contents of general register Rn 16 bits to the left and stores the result in Rn. The bits shifted out of the operand are discarded. 
 		"""
@@ -2319,7 +2372,7 @@ class Instruction_MOVT(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, T, rn_name):
+	def compute_result2(self, T, rn_name):
 		"""
 		Stores the T bit in general register Rn. The value of Rn is 1 when T = 1 and 0 when T = 0. 
 		"""
@@ -2350,7 +2403,7 @@ class Instruction_TST(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm, rn)
 
-	def compute_result(self, rm, rn):
+	def compute_result2(self, rm, rn):
 		"""
 		ANDs the contents of general registers Rn and Rm, and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of Rn are not changed. 
 		"""
@@ -2386,7 +2439,7 @@ class Instruction_TST_IMM(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, r0)
 
-	def compute_result(self, i, r0):
+	def compute_result2(self, i, r0):
 		"""
 		ANDs the contents of general register R0 and the zero-extended immediate value and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of Rn are not changed.
 
@@ -2428,7 +2481,7 @@ class Instruction_TST_GBR(SH4Instruction):
 			
 		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
 
-	def compute_result(self, i, r0, gbr):
+	def compute_result2(self, i, r0, gbr):
 		"""
 		ANDs the contents of the memory byte indicated by the indirect GBR address with the zero-extended immediate value and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of the memory byte are not changed. 
 		"""
@@ -2470,7 +2523,7 @@ class Instruction_XOR(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		XORs the contents of general registers Rn and Rm and stores the result in Rn. 
 		"""
@@ -2501,7 +2554,7 @@ class Instruction_XOR_IMM(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, r0)
 
-	def compute_result(self, i, r0):
+	def compute_result2(self, i, r0):
 		"""
 		XORs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
 
@@ -2536,7 +2589,7 @@ class Instruction_XOR_GBR(SH4Instruction):
 			
 		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
 
-	def compute_result(self, i, r0, gbr):
+	def compute_result2(self, i, r0, gbr):
 		"""
 		XORs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
 		"""
@@ -2571,7 +2624,7 @@ class Instruction_NOT(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Finds the one's complement of the contents of general register Rm and stores the result in Rn. That is, it inverts the Rm bits and stores the result in Rn.
 		"""
@@ -2604,7 +2657,7 @@ class Instruction_AND(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		ANDs the contents of general registers Rn and Rm and stores the result in Rn. 
 		"""
@@ -2635,7 +2688,7 @@ class Instruction_AND_IMM(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, r0)
 
-	def compute_result(self, i, r0):
+	def compute_result2(self, i, r0):
 		"""
 		ANDs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
 
@@ -2670,7 +2723,7 @@ class Instruction_AND_GBR(SH4Instruction):
 			
 		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
 
-	def compute_result(self, i, r0, gbr):
+	def compute_result2(self, i, r0, gbr):
 		"""
 		ANDs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
 		"""
@@ -2705,7 +2758,7 @@ class Instruction_OR(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rn, rn_name, rm_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		ORs the contents of general registers Rn and Rm and stores the result in Rn. 
 		"""
@@ -2736,7 +2789,7 @@ class Instruction_OR_IMM(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, r0)
 
-	def compute_result(self, i, r0):
+	def compute_result2(self, i, r0):
 		"""
 		ORs the contents of general register R0 and the zero-extended immediate value and stores the result in R0.
 
@@ -2771,7 +2824,7 @@ class Instruction_OR_GBR(SH4Instruction):
 			
 		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
 
-	def compute_result(self, i, r0, gbr):
+	def compute_result2(self, i, r0, gbr):
 		"""
 		ORs the contents of the memory byte indicated by the indirect GBR address with the immediate value and writes the result back to the memory byte. 
 		"""
@@ -2805,7 +2858,7 @@ class Instruction_MOVA(SH4Instruction):
 			
 		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
 
-	def compute_result(self, pc, d, rn_name):
+	def compute_result2(self, pc, d, rn_name):
 		"""
 		Stores the effective address of the source operand into general register R0. The 8-bit displacement is zero-extended and quadrupled. Consequently, the relative interval from the operand is PC + 1020 bytes. The PC is the address four bytes after this instruction, but the lowest two bits of the PC are fixed at 00.
 		"""
@@ -2836,7 +2889,7 @@ class Instruction_FLDS(SH4Instruction):
 			
 		return "%s %s,FPUL" % (self.name, rm_name)
 
-	def compute_result(self, rm_name, rm):
+	def compute_result2(self, rm_name, rm):
 		"""
 		Transfers the contents of floating-point register FRm into system register FPUL. 
 		"""
@@ -2865,7 +2918,7 @@ class Instruction_FSTS(SH4Instruction):
 			
 		return "%s FPUL,%s" % (self.name, rn_name)
 
-	def compute_result(self, FPUL, rn_name):
+	def compute_result2(self, FPUL, rn_name):
 		"""
 		Transfers the contents of system register FPUL to floating-point register FRn. 
 		"""
@@ -2894,7 +2947,7 @@ class Instruction_STS_FPSCR(SH4Instruction):
 			
 		return "%s FPSCR,%s" % (self.name, rn_name)
 
-	def compute_result(self, fpscr, rn_name):
+	def compute_result2(self, fpscr, rn_name):
 		"""
 		Stores system register FPSCR in the destination. 
 		"""
@@ -2923,7 +2976,7 @@ class Instruction_STS_FPUL(SH4Instruction):
 			
 		return "%s FPUL,%s" % (self.name, rn_name)
 
-	def compute_result(self, fpul, rn_name):
+	def compute_result2(self, fpul, rn_name):
 		"""
 		Stores system register FPUL in the destination. 
 		"""
@@ -2952,7 +3005,7 @@ class Instruction_STS_MACH(SH4Instruction):
 			
 		return "%s mach,%s" % (self.name, rn_name)
 
-	def compute_result(self, mach, rn_name):
+	def compute_result2(self, mach, rn_name):
 		"""
 		Stores system register MACH in the destination. 
 		"""
@@ -2981,7 +3034,7 @@ class Instruction_STS_MACL(SH4Instruction):
 			
 		return "%s macl,%s" % (self.name, rn_name)
 
-	def compute_result(self, macl, rn_name):
+	def compute_result2(self, macl, rn_name):
 		"""
 		Stores system register MACL in the destination. 
 		"""
@@ -3010,7 +3063,7 @@ class Instruction_STS_PR(SH4Instruction):
 			
 		return "%s pr,%s" % (self.name, rn_name)
 
-	def compute_result(self, pr, rn_name):
+	def compute_result2(self, pr, rn_name):
 		"""
 		Stores system register PR in the destination. 
 		"""
@@ -3040,7 +3093,7 @@ class Instruction_STSL_MACH(SH4Instruction):
 			
 		return "%s mach,@-%s" % (self.name, rn_name)
 
-	def compute_result(self, mach, rn_name):
+	def compute_result2(self, mach, rn_name):
 		"""
 		Stores system register MACH in the destination. 
 		"""
@@ -3074,7 +3127,7 @@ class Instruction_STSL_MACL(SH4Instruction):
 			
 		return "%s MACL,@-%s" % (self.name, rn_name)
 
-	def compute_result(self, macl, rn_name):
+	def compute_result2(self, macl, rn_name):
 		"""
 		Stores system register MACL in the destination. 
 		"""
@@ -3108,7 +3161,7 @@ class Instruction_STSL_PR(SH4Instruction):
 			
 		return "%s pr,@-%s" % (self.name, rn_name)
 
-	def compute_result(self, pr, rn, rn_name):
+	def compute_result2(self, pr, rn, rn_name):
 		"""
 		Stores system register pr in the destination. 
 		"""
@@ -3134,7 +3187,7 @@ class Instruction_CLRMAC(SH4Instruction):
 	def disassemble(self):
 		return self.name
 
-	def compute_result(self):
+	def compute_result2(self):
 		"""
 		Clears the MACH and MACL registers. 
 		"""
@@ -3155,7 +3208,7 @@ class Instruction_CLRS(SH4Instruction):
 	def disassemble(self):
 		return self.name
 
-	def compute_result(self):
+	def compute_result2(self):
 		"""
 		Clears the S bit
 		"""
@@ -3175,7 +3228,7 @@ class Instruction_CLRT(SH4Instruction):
 	def disassemble(self):
 		return self.name
 
-	def compute_result(self):
+	def compute_result2(self):
 		"""
 		Clears the T bit
 		"""
@@ -3196,7 +3249,7 @@ class Instruction_NOP(SH4Instruction):
 	def disassemble(self):
 		return self.name
 
-	def compute_result(self):
+	def compute_result2(self):
 		"""
 		No operation
 		"""
@@ -3223,7 +3276,7 @@ class Instruction_NEG(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Finds the two's complement of the contents of general register Rm and stores the result in Rn. That is, it subtracts Rm from 0 and stores the result in Rn. 
 		"""
@@ -3256,7 +3309,7 @@ class Instruction_NEG_C(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, T, rm, rm_name, rn_name):
+	def compute_result2(self, T, rm, rm_name, rn_name):
 		"""
 		Subtracts the contents of general register Rm and the T bit from 0 and stores the result in Rn. A borrow resulting from the operation is reflected in the T bit. This instruction can be used for sign inversion of a value exceeding 32 bits.
 
@@ -3301,7 +3354,7 @@ class Instruction_SUB(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Subtracts the contents of general register Rm from the contents of general register Rn and stores the result in Rn. For immediate data subtraction, ADD #imm,Rn should be used. 
 		"""
@@ -3334,7 +3387,7 @@ class Instruction_DMULU(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Performs 32-bit multiplication of the contents of general register Rn by the contents of Rm, and stores the 64-bit result in the MACH and MACL registers. The multiplication is performed as an unsigned arithmetic operation. 
 		"""
@@ -3389,7 +3442,7 @@ class Instruction_DMULS(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Performs 32-bit multiplication of the contents of general register Rn by the contents of Rm, and stores the 64-bit result in the MACH and MACL registers. The multiplication is performed as a signed arithmetic operation. 
 		"""
@@ -3469,7 +3522,7 @@ class Instruction_MUL(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Performs 32-bit multiplication of the contents of general registers Rn and Rm, and stores the lower 32 bits of the result in the MACL register. The contents of MACH are not changed. 
 		"""
@@ -3512,7 +3565,7 @@ class Instruction_MUL_W(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Performs 16-bit multiplication of the contents of general registers Rn and Rm, and stores the 32-bit result in the MACL register. The multiplication is performed as a signed arithmetic operation. The contents of MACH are not changed. 
 		
@@ -3551,7 +3604,7 @@ class Instruction_MAC_L(SH4Instruction):
 			
 		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+	def compute_result2(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
 		"""
 		Performs signed multiplication of the 32-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 64-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 4 each time they are read.
 
@@ -3678,7 +3731,7 @@ class Instruction_MAC_W(SH4Instruction):
 			
 		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+	def compute_result2(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
 		"""
 		Performs signed multiplication of the 16-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 32-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 2 each time they are read.
 
@@ -3764,7 +3817,7 @@ class Instruction_DIV0S(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Performs initial settings for signed division. This instruction is followed by a DIV1 instruction that executes 1-digit division, for example, and repeated division steps are executed to find the quotient. See the description of the DIV1 instruction for details.
 
@@ -3803,7 +3856,7 @@ class Instruction_DIV0U(SH4Instruction):
 		
 		return "%s" % (self.name)
 
-	def compute_result(self, garbage):
+	def compute_result2(self, garbage):
 		"""
 		Performs initial settings for unsigned division. This instruction is followed by a DIV1 instruction that executes 1-digit division, for example, and repeated division steps are executed to find the quotient. See the description of the DIV1 instruction for details.  
 		"""
@@ -3838,7 +3891,7 @@ class Instruction_DIV1(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name, q, t, m):
+	def compute_result2(self, rn, rm, rn_name, rm_name, q, t, m):
 		"""
 		Performs 1-digit division (1-step division) of the 32-bit contents of general register Rn (dividend) by the contents of Rm (divisor). The quotient is obtained by repeated execution of this instruction alone or in combination with other instructions. The specified registers and the M, Q, and T bits must not be modified during these repeated executions.
 
@@ -3931,7 +3984,7 @@ class Instruction_DT(SH4Instruction):
 			
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn, rn_name):
+	def compute_result2(self, rn, rn_name):
 		"""
 		Decrements the contents of general register Rn by 1 and compares the result with zero. If the result is zero, the T bit is set to 1. If the result is nonzero, the T bit is cleared to 0. 
 		"""
@@ -3969,7 +4022,7 @@ class Instruction_ADD(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rm_name)
 
-	def compute_result(self, rn, rm, rn_name, rm_name):
+	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
 		Adds together the contents of general registers Rn and Rm and stores the result in Rn. 
 		"""
@@ -4001,12 +4054,12 @@ class Instruction_ADDI(SH4Instruction):
 			
 		return "%s #%s,%s" % (self.name, i, rn_name)
 
-	def compute_result(self, i, rn, rn_name):
+	def compute_result2(self, i, rn, rn_name):
 		"""
 		Adds together the contents of general register Rn and the immediate value and stores the result in Rn. The 8-bit immediate value is sign-extended to 32 bits, which allows it to be used for immediate subtraction or decrement operations. 
 		"""
 		
-		val = i & rn
+		val = i + rn
 		
 		self.put(val, rn_name)
 	
@@ -4035,7 +4088,7 @@ class Instruction_SUB_C(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, T, rm, rm_name, rn, rn_name):
+	def compute_result2(self, T, rm, rm_name, rn, rn_name):
 		"""
 		Subtracts the contents of general register Rm and the T bit from the contents of general register Rn, and stores the result in Rn. A borrow resulting from the operation is reflected in the T bit. This instruction is used for subtractions exceeding 32 bits.
 
@@ -4082,7 +4135,7 @@ class Instruction_SUB_V(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Subtracts the contents of general register Rm from the contents of general register Rn, and stores the result in Rn. If underflow occurs, the T bit is set. 
 		"""
@@ -4145,7 +4198,7 @@ class Instruction_ADD_C(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, T, rm, rm_name, rn, rn_name):
+	def compute_result2(self, T, rm, rm_name, rn, rn_name):
 		"""
 		Adds together the contents of general registers Rn and Rm and the T bit, and stores the result in Rn. A carry resulting from the operation is reflected in the T bit. This instruction can be used to implement additions exceeding 32 bits. 
 		"""
@@ -4189,7 +4242,7 @@ class Instruction_ADD_V(SH4Instruction):
 			
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Adds together the contents of general registers Rn and Rm and stores the result in Rn. If overflow occurs, the T bit is set. 
 		"""
@@ -4238,18 +4291,17 @@ class Instruction_BRA(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d')
+		d = self.get_rimm_val('d', Type.int_12, extend=LWORD_TYPE)
 		
-		return pc, d
+		return [d]
 		
 	def disassemble(self):
 	
-		pc, d = self.fetch_operands()
+		d = self.fetch_operands()
 			
-		return "%s PC+4+%s" % (self.name, d * 2)
+		return "%s PC+4+%s" % (self.name, d[0] * 2)
 
-	def compute_result(self, pc, d):
+	def compute_result2(self, d):
 		"""
 		This is an unconditional branch instruction. The branch destination is address (PC + 4 + displacement * 2). The PC source value is the BRA instruction address. As the 12-bit displacement is multiplied by two after sign-extension, the branch destination can be located in the range from -4096 to +4094 bytes from the BRA instruction. If the branch destination cannot be reached, this branch can be performed with a JMP instruction.
 
@@ -4257,23 +4309,17 @@ class Instruction_BRA(SH4Instruction):
 		As this is a delayed branch instruction, the instruction following this instruction is executed before the branch destination instruction. 
 		"""
 
-		temp = pc
-
-		if (d & 0x800) == 0:
-			disp = (0x00000FFF & d)
-		else:
-			disp = (0xFFFFF000 | d)
-
-		val = pc + 4 + (disp << 1)
+		#if (d & 0x800) == 0:
+		#	d = (0x00000FFF & d)
+		#else:
+		#	d = (0xFFFFF000 | d)
+		
+		self.inc_pc()
+		# When this gets executed, pc will be incremented by 2 already
+		ArchSH4.DELAYED_DEST_PC = ["displace", d]
+		ArchSH4.DELAYED_SET = True
+		
 			
-		self.put(val, 'pc')
-
-		# TODO
-		# execute the next instruction first
-		# self.delay_slot(temp + 2)
-			
-		return val			
-
 class Instruction_BT(SH4Instruction):
 
 	bin_format = '10001001dddddddd'
@@ -4293,7 +4339,7 @@ class Instruction_BT(SH4Instruction):
 			
 		return "%s %s" % (self.name, d)
 
-	def compute_result(self, pc, d, T):
+	def compute_result2(self, pc, d, T):
 		"""
 		Description
 		This is a conditional branch instruction that references the T bit. The branch is taken if T = 1, and not taken if T = 0. The branch destination is address (PC + 4 + displacement * 2). The PC source value is the BT instruction address. As the 8-bit displacement is multiplied by two after sign-extension, the branch destination can be located in the range from -256 to +254 bytes from the BT instruction.
@@ -4336,7 +4382,7 @@ class Instruction_BF(SH4Instruction):
 			
 		return "%s %s" % (self.name, d)
 
-	def compute_result(self, pc, d, T):
+	def compute_result2(self, pc, d, T):
 		"""
 		Description
 		This is a conditional branch instruction that references the T bit. The branch is taken if T = 0, and not taken if T = 1. The branch destination is address (PC + 4 + displacement * 2). The PC source value is the BF instruction address. As the 8-bit displacement is multiplied by two after sign-extension, the branch destination can be located in the range from -256 to +254 bytes from the BF instruction.
@@ -4367,18 +4413,18 @@ class Instruction_JMP(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		rm = self.get_rreg_val('m')
-		pc = self.get_reg_val('pc')
+		#rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
 		
-		return rm, pc
+		return [rm_name]
 		
 	def disassemble(self):
 	
-		rm, pc = self.fetch_operands()
+		rm_name = self.fetch_operands()
 			
-		return "%s %s" % (self.name, rm)
+		return "%s @%s" % (self.name, rm_name)
 
-	def compute_result(self, rm, pc):
+	def compute_result2(self, rm_name):
 		"""
 		Unconditionally makes a delayed branch to the address specified by Rm.
 
@@ -4386,20 +4432,11 @@ class Instruction_JMP(SH4Instruction):
 		As this is a delayed branch instruction, the instruction following this instruction is executed before the branch destination instruction. 
 		"""
 
-		temp = pc
-
-		val = rm
-			
-		self.put(val, 'pc')
-		
-		self.jump(None, val)
-
-		# TODO
-		# execute the next instruction first
-		# self.delay_slot(temp + 2)
-			
-		return val
-
+		self.inc_pc()
+		ArchSH4.DELAYED_DEST_PC = rm_name
+		ArchSH4.DELAYED_TYPE = False
+		ArchSH4.DELAYED_SET = True
+					
 class Instruction_JSR(SH4Instruction):
 
 	bin_format = '0100mmmm00001011'
@@ -4407,18 +4444,18 @@ class Instruction_JSR(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m')
 		pc = self.get_reg_val('pc')
 		
-		return rm, pc
+		return rm_name, pc
 		
 	def disassemble(self):
 	
-		rm, pc = self.fetch_operands()
+		rm_name, pc = self.fetch_operands()
 			
-		return "%s %s" % (self.name, rm)
+		return "%s %s" % (self.name, rm_name)
 
-	def compute_result(self, rm, pc):
+	def compute_result2(self, rm_name, pc):
 		"""
 		Description
 		Makes a delayed branch to the subroutine procedure at the specified address after execution of the following instruction. Return address (PC + 4) is saved in PR, and a branch is made to the address indicated by general register Rm. JSR is used in combination with RTS for subroutine procedure calls.
@@ -4426,39 +4463,27 @@ class Instruction_JSR(SH4Instruction):
 		Note
 		As this is a delayed branch instruction, the instruction following this instruction is executed before the branch destination instruction. 
 		"""
-
-		temp = pc
-
-		val = rm
-			
-		self.put(val, 'pc')
-		self.put(pc + 4, 'pr')
 		
-		self.jump(None, val, jumpkind=JumpKind.Call)
-
-		# TODO
-		# execute the next instruction first
-		# self.delay_slot(temp + 2)
-			
-		return val				
-
+		self.put(pc + 4, 'pr')
+		self.inc_pc()
+		ArchSH4.DELAYED_DEST_PC = rm_name
+		ArchSH4.DELAYED_TYPE = JumpKind.Call
+		ArchSH4.DELAYED_SET = True
+	
 class Instruction_RTS(SH4Instruction):
 
 	bin_format = '0000000000001011'
 	name='rts'
 	
 	def fetch_operands(self):
-		
-		pr = self.get_reg_val('pr')
-		pc = self.get_reg_val('pc')
-		
-		return pr, pc
+			
+		return []
 		
 	def disassemble(self):
 				
 		return self.name
 
-	def compute_result(self, pr, pc):
+	def compute_result2(self):
 		"""
 		Description
 		Returns from a subroutine procedure by restoring the PC from PR. Processing continues from the address indicated by the restored PC value. This instruction can be used to return from a subroutine procedure called by a BSR or JSR instruction to the source of the call.
@@ -4467,19 +4492,12 @@ class Instruction_RTS(SH4Instruction):
 		As this is a delayed branch instruction, the instruction following this instruction is executed before the branch destination instruction. 		
 		"""
 
-		temp = pc
-
-		val = pr
-			
-		self.put(val, 'pc')
-
-		self.jump(None, val, jumpkind=JumpKind.Ret)
-		
-		# TODO
-		# execute the next instruction first
-		# self.delay_slot(temp + 2)
-			
-		return val	
+		# inc_pc MUST() happen before we set ArchSH4.DELAYED_DEST_PC
+		# always set DELAYED_SET to True if lifting a delayed branch instruction
+		self.inc_pc()
+		ArchSH4.DELAYED_TYPE = JumpKind.Ret
+		ArchSH4.DELAYED_DEST_PC = 'pr'	
+		ArchSH4.DELAYED_SET = True
 
 class Instruction_CMPEQIM(SH4Instruction):
 
@@ -4499,7 +4517,7 @@ class Instruction_CMPEQIM(SH4Instruction):
 				
 		return "%s #%s,r0" % (self.name)
 
-	def compute_result(self, r0, i):
+	def compute_result2(self, r0, i):
 		"""
 		Compares general register R0 and the sign-extended 8-bit immediate data and sets the T bit if the values are equal. If they are not equal the T bit is cleared. The contents of R0 are not changed.  		
 		"""
@@ -4538,7 +4556,7 @@ class Instruction_CMPEQ(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if they are equal. The contents of Rn and Rm are not changed. 	
 		"""
@@ -4572,7 +4590,7 @@ class Instruction_CMPHS(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater or equal Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 		
 		"""
@@ -4609,7 +4627,7 @@ class Instruction_CMPGE(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater or equal Rm. The values for the comparison are interpreted as signed integer values. The contents of Rn and Rm are not changed. 		
 		"""
@@ -4643,7 +4661,7 @@ class Instruction_CMPSTR(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if any of the 4 bytes in Rn are equal to the corresponding byte in Rm. The contents of Rn and Rm are not changed.
 
@@ -4687,7 +4705,7 @@ class Instruction_CMPHI(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 			
 		"""
@@ -4724,7 +4742,7 @@ class Instruction_CMPGT(SH4Instruction):
 				
 		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result(self, rm, rm_name, rn, rn_name):
+	def compute_result2(self, rm, rm_name, rn, rn_name):
 		"""
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm. The values for the comparison are interpreted as signed integer values. The contents of Rn and Rm are not changed. 		
 		"""
@@ -4756,7 +4774,7 @@ class Instruction_CMPPL(SH4Instruction):
 				
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn, rn_name):
+	def compute_result2(self, rn, rn_name):
 		"""
 		Compares general register Rn and sets the T bit if Rn is greater than 0. The value in Rn for the comparison is interpreted as signed integer. The contents of Rn are not changed. 	
 		"""
@@ -4788,7 +4806,7 @@ class Instruction_CMPPZ(SH4Instruction):
 				
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn, rn_name):
+	def compute_result2(self, rn, rn_name):
 		"""
 		Compares general register Rn and sets the T bit if Rn is greater than or equal to 0. The value in Rn for the comparison is interpreted as signed integer. The contents of Rn are not changed. 	
 		"""
@@ -4821,7 +4839,7 @@ class Instruction_ROTL(SH4Instruction):
 				
 		return "%s %s" % (self.name, rn_name)
 
-	def compute_result(self, rn, rn_name):
+	def compute_result2(self, rn, rn_name):
 		"""
 		Rotates the contents of general register Rn one bit to the left, and stores the result in Rn. The bit rotated out of the operand is transferred to the T bit. 	
 		"""
@@ -4867,7 +4885,7 @@ class Instruction_WORD(SH4Instruction):
 			
 		return ".word %s" % (self.name, d)
 
-	def compute_result(self, pc, d):
+	def compute_result2(self, pc, d):
 		"""
 		Stores 1 word of data at the PC location
 		"""
@@ -4890,7 +4908,7 @@ class Instruction_MOV_Rm_Rn(SH4Instruction):
 	bin_format = '0a10nnnnmmmm0css'
 	name = 'mov'
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		adr_mode = self.data['a']
 		const = self.data['c']
 		dst_num = int(self.data['n'], 2)
@@ -5049,7 +5067,7 @@ class Instruction_XOR_Rm_Rn(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src, dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5083,7 +5101,7 @@ class Instruction_XOR_imm(SH4Instruction):
 		self.name = self.name if self.data['s'] == '10' else self.name + '.b'
 		return self.addr. self.name, ['#imm', 'R0']
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5107,7 +5125,7 @@ class Instruction_TST(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src, dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5146,7 +5164,7 @@ class Instruction_TST_imm(SH4Instruction):
 		self.name = self.name if self.data['s'] == '10' else self.name + '.b'
 		return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5174,7 +5192,7 @@ class Instruction_OR(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src , dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5211,7 +5229,7 @@ class Instruction_OR_imm(SH4Instruction):
 		self.name = self.name if self.data['s'] == '10' else self.name + '.b'
 		return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5235,7 +5253,7 @@ class Instruction_AND(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src , dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5272,7 +5290,7 @@ class Instruction_AND_imm(SH4Instruction):
 		self.name = self.name if self.data['s'] == '10' else self.name + '.b'
 		return self.addr. self.name, ['#imm', 'R0' if self.data['s'] == '10' else '@(R0, GBR)']
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5299,7 +5317,7 @@ class Instruction_SUB(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src , dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5362,7 +5380,7 @@ class Instruction_MUL(SH4Instruction):
 		src, dst = self.resolve_reg(self.data['m'], self.data['n'])
 		return self.addr. self.name, [src , dst]
 
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		pc_vv = self.get_pc()
 		pc_vv += 2
 		self.put(pc_vv, 'pc')
@@ -5390,7 +5408,7 @@ class Instruction_CMP_Rm_Rn(SH4Instruction):
 	'''
 	bin_format = '0011nnnnmmmmggss'
 	name = 'cmp/'
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		# s -> 00 (eq), s -> 01 (signed), s -> 11 (unsigned)
 		# g -> >= (ge), g -> > (g)
 		sign = self.data['s']
@@ -5461,7 +5479,7 @@ class Instruction_CMP_Rm_Rn(SH4Instruction):
 	'''
 	bin_format = '0011nnnnmmmmggss'
 	name = 'cmp/'
-	def compute_result(self, src, dst):
+	def compute_result2(self, src, dst):
 		# s -> 00 (eq), s -> 01 (signed), s -> 11 (unsigned)
 		# g -> >= (ge), g -> > (g)
 		sign = self.data['s']

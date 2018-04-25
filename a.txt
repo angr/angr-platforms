@@ -302,17 +302,9 @@ Disassembly of section .plt:
 
 00400350 <read@plt-0x1c>:
   400350:	05 d0       	mov.l	400368 <read@plt-0x4>,r0	! 411004
-  #1101nnnndddddddd
-  # now r0 is 411004
   400352:	02 60       	mov.l	@r0,r0
-  # 0110nnnnmmmm0010
-  # now r0 is 0
-  ->400354:	06 2f       	mov.l	r0,@-r15
-  # 0010nnnnmmmm0110
-  
+  400354:	06 2f       	mov.l	r0,@-r15
   400356:	03 d0       	mov.l	400364 <read@plt-0x8>,r0	! 411008
-  #1101nnnndddddddd
-  
   400358:	02 60       	mov.l	@r0,r0
   40035a:	2b 40       	jmp	@r0
   40035c:	f6 60       	mov.l	@r15+,r0
@@ -554,7 +546,7 @@ Disassembly of section .text:
   40050c:	e3 61       	mov	r14,r1
   40050e:	10 71       	add	#16,r1
   400510:	ff e2       	mov	#-1,r2
-  400512:	2f 11       	mov.l	r2,@(60,r1)  
+  400512:	2f 11       	mov.l	r2,@(60,r1)
   400514:	e3 61       	mov	r14,r1
   400516:	10 71       	add	#16,r1
   400518:	01 e2       	mov	#1,r2
