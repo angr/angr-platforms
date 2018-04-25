@@ -72,7 +72,7 @@ class LifterSH4(GymratLifter):
 """
 	Class representing a condition to check register or memory values
 """
-class Condition():
+class Cond():
 
 	__slots__ = ('checkValue','operation','desiredValue')
 	
@@ -111,6 +111,9 @@ class ConditionChecker():
 	# Mapping from strings to actual objects in smgr
 	mapping = None
 	
+	# Save all lifted instructions
+	instrs = set()
+	
 	# Concretizes PC so that it can be read in our dict
 	def getPc(self):
 
@@ -139,7 +142,8 @@ class ConditionChecker():
 			'r1'  : lambda : self.smgr.one_active.state.regs.r1,
 			'r0'  : lambda : self.smgr.one_active.state.regs.r0,
 			'pc'  : lambda : self.smgr.one_active.state.regs.pc,
-			'pr'  : lambda : self.smgr.one_active.state.regs.pr
+			'pr'  : lambda : self.smgr.one_active.state.regs.pr,
+			'sr'  : lambda : self.smgr.one_active.state.regs.sr
 		}
 	
 	"""
@@ -148,11 +152,25 @@ class ConditionChecker():
 	def s(self):
 	
 		return self.smgr.one_active.state
+	
+	"""
+	Shorthand for getting a memory value
+	"""	
+	def mem(self, addr):
+	
+		return self.s().memory.load(addr, endness = Endness.LE)
+		
+	"""
+	Shorthand for getting a register
+	"""	
+	def reg(self):
+	
+		return self.s().regs
 				
 	"""
 	Adds a new condition at the specified program counter
 	"""
-	def addCondition(self, pc, cond):
+	def addCond(self, pc, cond):
 			
 		# Add condition to dict
 		if pc in self.conds.keys():
@@ -160,6 +178,9 @@ class ConditionChecker():
 		else:
 			self.conds[pc] = [cond]
 	
+	"""
+	Steps simulation manager and checks conditions
+	"""
 	def execute(self, instructions=1):
 	
 		for i in range(instructions):
@@ -170,11 +191,19 @@ class ConditionChecker():
 			self.prevPc = pc
 			self.checkConditions(self.getPc())
 	
+	"""
+	Checks all conditions at the given address
+	"""
 	def checkConditions(self, address):
 	
 		allPassed = True
+		
+		instrString = str(ArchSH4.LAST_LIFTED_INSTR.__class__).split('_')[-1][:-2]
 			
-		print("---------- PC = %s ----------" % str(hex(address)).replace('L',''))	
+		print("---------- PC = %s ---------- (%s)" % (str(hex(address)).replace('L',''),instrString))	
+		
+		# For debugging purposes, save instructions we've lifted
+		self.instrs.add(instrString)
 			
 		if address in self.conds.keys():
 		
@@ -201,6 +230,8 @@ class ConditionChecker():
 					passed = (self.s().solver.eval(toCheck == desiredValue))
 				elif cond.operation == '!=':
 					passed = (self.s().solver.eval(toCheck != desiredValue))
+				elif cond.operation == '& == 0':
+					passed = ((self.s().solver.eval(toCheck & desiredValue)) == 0)
 				else:
 					raise NotImplementedError("Bad operator.")
 					

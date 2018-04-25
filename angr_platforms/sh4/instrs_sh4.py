@@ -111,10 +111,13 @@ class SH4Instruction(Instruction):
 	"""
 	def compute_result(self, *args):
 		
+		# For testing purposes only
+		ArchSH4.LAST_LIFTED_INSTR = self
+		
 		ArchSH4.DELAYED_SET = False
 		
 		retVal = self.compute_result2(*args)
-	
+			
 		# Handle a delayed jump, if one has been set
 		if ArchSH4.DELAYED_DEST_PC is not None and not ArchSH4.DELAYED_SET:
 					
@@ -617,14 +620,14 @@ class Instruction_MOVLS4(SH4Instruction):
 	
 		return rm	
 		
-class Instruction_MOVL_RN_RM_D(SH4Instruction):
+class Instruction_MOVLL4(SH4Instruction):
 
 	bin_format = '0101nnnnmmmmdddd'
 	name='mov.l'
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE,zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', BYTE_TYPE,zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
 
@@ -645,7 +648,7 @@ class Instruction_MOVL_RN_RM_D(SH4Instruction):
 		toRead = ( rm + (d << 2) );
 		
 		val = self.load(toRead, Type.int_32)
-		
+				
 		self.put(val, rn_name)
 					
 		self.inc_pc()
@@ -2410,17 +2413,13 @@ class Instruction_TST(SH4Instruction):
 		
 		# TODO - should we do this and skip the compute_flags method?
 		
-		if rm & rn:
+		if (rm & rn) == 0:
 			self.set_flags(T=1)
-			val = 1
 		else:
 			self.set_flags(T=0)
-			val = 0
 							
 		self.inc_pc()
-	
-		return val
-		
+			
 class Instruction_TST_IMM(SH4Instruction):
 
 	bin_format = '11001000iiiiiiii'
@@ -3142,7 +3141,7 @@ class Instruction_STSL_MACL(SH4Instruction):
 	
 		return macl			
 
-class Instruction_STSL_PR(SH4Instruction):
+class Instruction_STSLPR(SH4Instruction):
 
 	bin_format = '0100nnnn00100010'
 	name='sts.l'

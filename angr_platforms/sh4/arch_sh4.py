@@ -9,7 +9,7 @@ class ArchSH4(Arch):
     DELAYED_DEST_PC = None
     DELAYED_SET 	= False
     DELAYED_TYPE 	= None
-
+	
     def __init__(self, endness=Endness.LE):
         super(ArchSH4, self).__init__(endness)
         self.ip_offset = 72

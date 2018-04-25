@@ -7,7 +7,7 @@ import angr, cle, pyvex
 import IPython
 from archinfo.arch import Endness
 
-from angr_platforms.sh4.helpers_sh4 import Condition, ConditionChecker
+from angr_platforms.sh4.helpers_sh4 import Cond, ConditionChecker
 					
 		
 """
@@ -44,7 +44,8 @@ def test_angr(pth):
 	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), pth))
 	
 	p = angr.Project(hellosh4, auto_load_libs=True)
-	entry = p.factory.entry_state()
+	#entry = p.factory.entry_state()
+	entry = p.factory.blank_state(addr=0x400436)
 	smgr = p.factory.simgr(entry)
 	
 	try:
@@ -55,47 +56,96 @@ def test_angr(pth):
 	#4004ce
 	
 	c = ConditionChecker(smgr)
-	c.addCondition(0x400c10, Condition('r1', '==', 0x400bac))
-	c.addCondition(0x400c10, Condition(0x400c2c, '==', 0x400bac))
-	c.addCondition(0x400c10, Condition('prevPc', '==', 0x400c0e))
-	c.addCondition(0x400bac, Condition('prevPc', '==', 0x400c12))
-	c.addCondition(0x400bb4, Condition('r15', '==', 0x7ffeffa8 - 12))
-	c.addCondition(0x400bb6, Condition('r14', '==', 0x7ffeffa8 - 12))
-	c.addCondition(0x400bb8, Condition('r8', '==', 0x7ffeff9c))
-	c.addCondition(0x400bba, Condition('r8', '==', 0x7ffeff9c - 52))
-	c.addCondition(0x400bbc, Condition('r3', '==', 0x1000))
-	c.addCondition(0x400bbe, Condition('r2', '==', 0x4347c000))
-	c.addCondition(0x400bc0, Condition('r1', '==', 0))
-	c.addCondition(0x400bc2, Condition(0x7ffeff9c + 4, '==', 0))
-	c.addCondition(0x400bc4, Condition('r1', '==', -1))
-	c.addCondition(0x400bc6, Condition(0x7ffeff9c, '==', -1))
-	c.addCondition(0x400bc8, Condition('r7', '==', 50))
-	c.addCondition(0x400bca, Condition('r6', '==', 3))
-	c.addCondition(0x400bce, Condition('r5', '==', lambda c: c.s().regs.r3))
-	c.addCondition(0x400bce, Condition('r5', '==', 0x1000))
-	c.addCondition(0x400bce, Condition('r4', '==', 0x4347c000))
-	c.addCondition(0x400bd0, Condition('r1', '==', 0x4003dc))
-	c.addCondition(0x4003dc, Condition('prevPc', '==', 0x400bd2))
-	c.addCondition(0x4003de, Condition('r0', '==', 0x41101c))
-	c.addCondition(0x4003e0, Condition('r0', '==', 0x4003e4))
-	c.addCondition(0x4003e2, Condition('r1', '==', 0x400350))
-	c.addCondition(0x4003e4, Condition('prevPc', '==', 0x4003e2))
-	c.addCondition(0x4003e6, Condition('r0', '==', 0x400350))
-	c.addCondition(0x4003e8, Condition('r1', '==', 0x30))
-	c.addCondition(0x400350, Condition('prevPc', '==', 0x4003e4))
-	c.addCondition(0x400352, Condition('r0', '==', 0x411004))
-	c.addCondition(0x400354, Condition('r0', '!=', 0))
-	c.addCondition(0x400354, Condition('r15', '==', 0x7ffeffa8 - 12))
-	c.addCondition(0x400356, Condition('r15', '==', 0x7ffeffa8 - 16))
-	c.addCondition(0x400358, Condition('r0', '==', 0x411008))
-	c.addCondition(0x40035a, Condition('r0', '!=', 0))
+	c.addCond(0x400c10, Cond('r1', '==', 0x400bac))
+	c.addCond(0x400c10, Cond(0x400c2c, '==', 0x400bac))
+	c.addCond(0x400c10, Cond('prevPc', '==', 0x400c0e))
+	c.addCond(0x400bac, Cond('prevPc', '==', 0x400c12))
+	c.addCond(0x400bb4, Cond('r15', '==', 0x7ffeffa8 - 12))
+	c.addCond(0x400bb6, Cond('r14', '==', 0x7ffeffa8 - 12))
+	c.addCond(0x400bb8, Cond('r8', '==', 0x7ffeff9c))
+	c.addCond(0x400bba, Cond('r8', '==', 0x7ffeff9c - 52))
+	c.addCond(0x400bbc, Cond('r3', '==', 0x1000))
+	c.addCond(0x400bbe, Cond('r2', '==', 0x4347c000))
+	c.addCond(0x400bc0, Cond('r1', '==', 0))
+	c.addCond(0x400bc2, Cond(0x7ffeff9c + 4, '==', 0))
+	c.addCond(0x400bc4, Cond('r1', '==', -1))
+	c.addCond(0x400bc6, Cond(0x7ffeff9c, '==', -1))
+	c.addCond(0x400bc8, Cond('r7', '==', 50))
+	c.addCond(0x400bca, Cond('r6', '==', 3))
+	c.addCond(0x400bce, Cond('r5', '==', lambda c: c.s().regs.r3))
+	c.addCond(0x400bce, Cond('r5', '==', 0x1000))
+	c.addCond(0x400bce, Cond('r4', '==', 0x4347c000))
+	c.addCond(0x400bd0, Cond('r1', '==', 0x4003dc))
+	c.addCond(0x4003dc, Cond('prevPc', '==', 0x400bd2))
+	c.addCond(0x4003de, Cond('r0', '==', 0x41101c))
+	c.addCond(0x4003e0, Cond('r0', '==', 0x4003e4))
+	c.addCond(0x4003e2, Cond('r1', '==', 0x400350))
+	c.addCond(0x4003e4, Cond('prevPc', '==', 0x4003e2))
+	c.addCond(0x4003e6, Cond('r0', '==', 0x400350))
+	c.addCond(0x4003e8, Cond('r1', '==', 0x30))
+	c.addCond(0x400350, Cond('prevPc', '==', 0x4003e4))
+	c.addCond(0x400352, Cond('r0', '==', 0x411004))
+	c.addCond(0x400354, Cond('r0', '!=', 0))
+	c.addCond(0x400354, Cond('r15', '==', 0x7ffeffa8 - 12))
+	c.addCond(0x400356, Cond('r15', '==', 0x7ffeffa8 - 16))
+	c.addCond(0x400358, Cond('r0', '==', 0x411008))
+	c.addCond(0x40035a, Cond('r0', '!=', 0))
 	
+	
+	#c.execute(36)
+
 	# static hooker
+	
+	# below assuming entry point is at 0x400436
+	
+	c.addCond(0x400438, Cond('r15', '==', 0x7fff0000 - 4))
+	c.addCond(0x40043a, Cond('r14', '==', lambda c: c.s().regs.r15))
+	c.addCond(0x40043c, Cond('r1', '==', 0x400c38))
+	c.addCond(0x40043e, Cond('r6', '==', 31))
+	c.addCond(0x400440, Cond('r5', '==', lambda c: c.s().regs.r1))
+	c.addCond(0x400442, Cond('r4', '==', 1))
+	c.addCond(0x400444, Cond('r1', '==', 0x04006a4))
+	c.addCond(0x400446, Cond('prevPc', '==', 0x400444))
+	c.addCond(0x400446, Cond('pr', '==', 0x400444+4))
+	c.addCond(0x4006a4, Cond('prevPc', '==', 0x400444+2))
+	c.addCond(0x4006aa, Cond('r15', '==', 0x7fff0000 - 16))
+	c.addCond(0x4006ac, Cond('r15', '==', 0x7fff0000 - 40))
+	c.addCond(0x4006b0, Cond('r14', '==', lambda c: c.s().regs.r15))
+	c.addCond(0x4006b0, Cond('r1', '==', lambda c: c.s().regs.r14))
+	c.addCond(0x4006b2, Cond('r1', '==', lambda c: c.s().regs.r14 - 40))
+	c.addCond(0x4006b4, Cond('r4', '==', lambda c: c.mem(c.reg().r1 + 48)))
+	c.addCond(0x4006b6, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006b8, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006ba, Cond('r5', '==', lambda c: c.mem(c.reg().r1 + 44)))
+	c.addCond(0x4006bc, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006be, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006c0, Cond('r6', '==', lambda c: c.mem(c.reg().r1 + 40)))
+	c.addCond(0x4006c2, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006c4, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006c6, Cond('r2', '==', 0))
+	c.addCond(0x4006c8, Cond('r2', '==', lambda c: c.mem(c.reg().r1 + 60)))
+	c.addCond(0x4006ca, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006cc, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006ce, Cond('r2', '==', 0))
+	c.addCond(0x4006d0, Cond('r2', '==', lambda c: c.mem(c.reg().r1 + 52)))
+	c.addCond(0x4006d2, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006d4, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006d6, Cond('r1', '==', lambda c: c.mem(c.reg().r1 + 44)))
+	c.addCond(0x4006d8, Cond('sr', '& == 0', 0))
+
 	
 	c.execute(36)
 	
-	print(c.smgr.one_active.state.memory.load(0x411004, endness=Endness.LE))
-	print(c.smgr.one_active.state.memory.load(0x411008, endness=Endness.LE))
+	print(c.instrs)
+
+	# TODO - why is the cond failing?
+	
+	print(p.factory.block(0x4006d4).vex)
+
+
+	
+	#print(c.smgr.one_active.state.memory.load(0x411004, endness=Endness.LE))
+	#print(c.smgr.one_active.state.memory.load(0x411008, endness=Endness.LE))
 
 	IPython.embed()
 	
