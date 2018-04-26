@@ -130,24 +130,43 @@ def test_angr(pth):
 	c.addCond(0x4006d0, Cond('r2', '==', lambda c: c.mem(c.reg().r1 + 52)))
 	c.addCond(0x4006d2, Cond('r1', '==', lambda c: c.reg().r14))
 	c.addCond(0x4006d4, Cond('r1', '==', lambda c: c.reg().r14 - 40))
-	c.addCond(0x4006d6, Cond('r1', '==', lambda c: c.mem(c.reg().r1 + 44)))
-	c.addCond(0x4006d8, Cond('sr', '& == 0', 0))
+	c.addCond(0x4006d6, Cond('r1', '==', lambda c: c.mem(0x7ffeffb0 + 44)))
+	c.addCond(0x4006d8, Cond('sr', '& 1', 0))
+	c.addCond(0x4006e0, Cond('prevPc', '==', 0x4006d8))
+	c.addCond(0x4006e2, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006e4, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006e6, Cond('r1', '==', lambda c: c.mem(c.reg().r14)))
+	c.addCond(0x4006e8, Cond('sr', '& 1', 0))	
+	c.addCond(0x40075e, Cond('prevPc', '==', 0x4006e8))
+	
+	c.addCond(0x400760, Cond('r2', '==', lambda c: c.reg().r14))
+	c.addCond(0x400762, Cond('r2', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x400764, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x400766, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x400768, Cond('r2', '==', lambda c: c.mem(c.reg().r14 + 20)))
+	c.addCond(0x40076a, Cond('r1', '==', lambda c: c.mem(c.reg().r14)))
+	c.addCond(0x40076c, Cond('sr', '& 1', 0))	
+	c.addCond(0x4006f0, Cond('prevPc', '==', 0x40076c))
+	c.addCond(0x4006f2, Cond('r2', '==', lambda c: c.reg().r14))
+
 
 	
-	c.execute(36)
+	c.execute(58)
+	
+	#print(p.factory.block(0x4006d8).vex)
+	
+	#print(p.factory.block(0x4006d8).vex)
 	
 	print(c.instrs)
 
-	# TODO - why is the cond failing?
+	IPython.embed()
+
 	
-	print(p.factory.block(0x4006d4).vex)
-
-
+	# TODO - why is the cond failing?
 	
 	#print(c.smgr.one_active.state.memory.load(0x411004, endness=Endness.LE))
 	#print(c.smgr.one_active.state.memory.load(0x411008, endness=Endness.LE))
 
-	IPython.embed()
 	
 	#print(smgr.one_active.state.regs.pc)
 	
@@ -202,6 +221,7 @@ if __name__ == '__main__':
 	
 	
 	#test_lift_one("\x2f\x11")
+	#test_lift_one("\x2f\x08")
 
 	test_angr('./test_programs/sh4/CADET_00001.sh4')
 	#test_1bytecrackme_good()

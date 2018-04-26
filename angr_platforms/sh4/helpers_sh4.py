@@ -143,7 +143,8 @@ class ConditionChecker():
 			'r0'  : lambda : self.smgr.one_active.state.regs.r0,
 			'pc'  : lambda : self.smgr.one_active.state.regs.pc,
 			'pr'  : lambda : self.smgr.one_active.state.regs.pr,
-			'sr'  : lambda : self.smgr.one_active.state.regs.sr
+			'sr'  : lambda : self.smgr.one_active.state.regs.sr,
+			'fpul'  : lambda : self.smgr.one_active.state.regs.fpul
 		}
 	
 	"""
@@ -218,8 +219,8 @@ class ConditionChecker():
 				# Memory
 				else:
 					toCheck = self.smgr.one_active.state.memory.load(cond.checkValue, endness = Endness.LE)
-					
-				# 
+				
+				# Support for lambdas
 				if callable(cond.desiredValue):
 					desiredValue = cond.desiredValue(self)
 				else:
@@ -230,8 +231,8 @@ class ConditionChecker():
 					passed = (self.s().solver.eval(toCheck == desiredValue))
 				elif cond.operation == '!=':
 					passed = (self.s().solver.eval(toCheck != desiredValue))
-				elif cond.operation == '& == 0':
-					passed = ((self.s().solver.eval(toCheck & desiredValue)) == 0)
+				elif cond.operation == '& 1':
+					passed = ((self.s().solver.eval(toCheck & 1)) == desiredValue)
 				else:
 					raise NotImplementedError("Bad operator.")
 					
