@@ -31,11 +31,24 @@ Lift an arbitrary instruction
 """
 def test_lift_one(instr):	
 
-	l = helpers_sh4.LifterSH4(arch_sh4.ArchSH4(), 0, instr, revBytes=True, max_bytes=2)
+	l = helpers_sh4.LifterSH4(arch_sh4.ArchSH4(), 0, instr, revBytes=False, max_bytes=4)
 	
-	irsb = l.lift()
-	irsb.pp()	
+	return l.lift()
+	#.pp()
 
+def test_angr2(pth):
+
+	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), pth))
+	
+	p = angr.Project(hellosh4, auto_load_libs=True)
+	entry = p.factory.entry_state()
+	smgr = p.factory.simgr(entry)
+	
+	p.hook_symbol('read', angr.SIM_PROCEDURES['posix']['read']())
+	p.hook_symbol('write', angr.SIM_PROCEDURES['posix']['write']())
+	
+	IPython.embed()
+		
 """
 End-to-end path analysis
 """
@@ -47,6 +60,13 @@ def test_angr(pth):
 	#entry = p.factory.entry_state()
 	entry = p.factory.blank_state(addr=0x400436)
 	smgr = p.factory.simgr(entry)
+	
+	#project.hook(0x40036c, angr.SIM_PROCEDURES['glibc']['__libc_start_main']())
+	project.hook_symbol('read', angr.SIM_PROCEDURES['posix']['read']())
+	project.hook_symbol('write', angr.SIM_PROCEDURES['posix']['write']())
+	project.hook_symbol('mmap', angr.SIM_PROCEDURES['posix']['mmap']())
+	#project.hook_symbol('munmap', angr.SIM_PROCEDURES['posix']['munmap']())
+
 	
 	try:
 		irsb = p.factory.block(p.entry).vex
@@ -90,7 +110,6 @@ def test_angr(pth):
 	c.addCond(0x400356, Cond('r15', '==', 0x7ffeffa8 - 16))
 	c.addCond(0x400358, Cond('r0', '==', 0x411008))
 	c.addCond(0x40035a, Cond('r0', '!=', 0))
-	
 	
 	#c.execute(36)
 
@@ -138,7 +157,6 @@ def test_angr(pth):
 	c.addCond(0x4006e6, Cond('r1', '==', lambda c: c.mem(c.reg().r14)))
 	c.addCond(0x4006e8, Cond('sr', '& 1', 0))	
 	c.addCond(0x40075e, Cond('prevPc', '==', 0x4006e8))
-	
 	c.addCond(0x400760, Cond('r2', '==', lambda c: c.reg().r14))
 	c.addCond(0x400762, Cond('r2', '==', lambda c: c.reg().r14 - 40))
 	c.addCond(0x400764, Cond('r1', '==', lambda c: c.reg().r14))
@@ -148,10 +166,29 @@ def test_angr(pth):
 	c.addCond(0x40076c, Cond('sr', '& 1', 0))	
 	c.addCond(0x4006f0, Cond('prevPc', '==', 0x40076c))
 	c.addCond(0x4006f2, Cond('r2', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006f4, Cond('r2', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006f6, Cond('r1', '==', lambda c: c.reg().r14))
+	c.addCond(0x4006f8, Cond('r1', '==', lambda c: c.reg().r14 - 40))
+	c.addCond(0x4006fa, Cond('r2', '==', lambda c: c.mem(c.reg().r14 + 4)))
+	c.addCond(0x4006fc, Cond('r1', '==', lambda c: c.mem(c.reg().r14 + 20)))
+	c.addCond(0x4006fe, Cond('r2', '==', lambda c: c.reg().r3))
+	c.addCond(0x400700, Cond('r3', '==', lambda c: c.reg().r1 + c.reg().r2))
+	c.addCond(0x400700, Cond('r2', '!=', lambda c: c.reg().r14))
+	c.addCond(0x400702, Cond('r2', '==', lambda c: c.reg().r14))
+	c.addCond(0x400704, Cond('r2', '==', lambda c: c.reg().r14 - 40))
+
+	#r2 = mem[r14]
+	#r1 = mem[r14+20]
+	#r2 = mem[r14] - mem[r14+20]
+	
+	c.addCond(0x40070e, Cond('r2', '==', lambda c: c.mem(c.reg().r14) - c.mem(c.reg().r14 + 20)))
+	c.addCond(0x4003fc, Cond('r0', '==', 0x400400))
+	c.addCond(0x400400, Cond('prevPc', '==', 0x4003fe))
+	c.addCond(0x400350, Cond('prevPc', '==', lambda c: c.mem(0x411020)))
 
 
 	
-	c.execute(58)
+	c.execute(113)
 	
 	#print(p.factory.block(0x4006d8).vex)
 	
@@ -224,5 +261,7 @@ if __name__ == '__main__':
 	#test_lift_one("\x2f\x08")
 
 	test_angr('./test_programs/sh4/CADET_00001.sh4')
+
+	test_angr2('./test_programs/sh4/CADET_00001.sh4')
 	#test_1bytecrackme_good()
 

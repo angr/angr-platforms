@@ -119,8 +119,30 @@ class ArchSH4(Arch):
         'vbr',
         'mach',
         'macl',
-        'sr'
-    ]
+        'sr']
+	
+    fregister_index = [
+        'fr0',
+        'fr1',
+        'fr2',
+        'fr3',
+        'fr4',
+        'fr5',
+        'fr6',
+        'fr7',
+        'fr8',
+        'fr9',
+        'fr10',
+        'fr11',
+        'fr12',
+        'fr13',
+        'fr14',
+        'fr15',
+        'ssr',
+        'spc',
+        'dbr',
+        'sgr']
+	
     register_names = {
         8: 'r0',
         12: 'r1',

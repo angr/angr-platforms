@@ -74,7 +74,7 @@ class LifterSH4(GymratLifter):
 """
 class Cond():
 
-	__slots__ = ('checkValue','operation','desiredValue')
+	__slots__ = ('i','checkValue','operation','desiredValue')
 	
 	def __init__(self, checkValue, operation, desiredValue):
 	
@@ -113,6 +113,10 @@ class ConditionChecker():
 	
 	# Save all lifted instructions
 	instrs = set()
+	
+	# Number of conditions seen so far
+	count = 0
+	execCount = 0
 	
 	# Concretizes PC so that it can be read in our dict
 	def getPc(self):
@@ -173,6 +177,10 @@ class ConditionChecker():
 	"""
 	def addCond(self, pc, cond):
 			
+		# Give this condition an index
+		cond.i = self.count
+		self.count+=1
+			
 		# Add condition to dict
 		if pc in self.conds.keys():
 			self.conds[pc].append(cond)
@@ -183,7 +191,7 @@ class ConditionChecker():
 	Steps simulation manager and checks conditions
 	"""
 	def execute(self, instructions=1):
-	
+		
 		for i in range(instructions):
 			# Save current pc as previous
 			pc = self.s().regs.pc
@@ -201,7 +209,7 @@ class ConditionChecker():
 		
 		instrString = str(ArchSH4.LAST_LIFTED_INSTR.__class__).split('_')[-1][:-2]
 			
-		print("---------- PC = %s ---------- (%s)" % (str(hex(address)).replace('L',''),instrString))	
+		print("---------- PC = %s ---------- (%s)%s" % (str(hex(address)).replace('L',''),instrString,"*" if instrString not in self.instrs else ""))	
 		
 		# For debugging purposes, save instructions we've lifted
 		self.instrs.add(instrString)
@@ -209,6 +217,12 @@ class ConditionChecker():
 		if address in self.conds.keys():
 		
 			for cond in self.conds[address]:
+			
+				# Don't execute any condition twice
+				if cond.i < self.execCount:
+					continue
+			
+				self.execCount += 1
 			
 				# Register
 				if cond.checkValue in self.mapping.keys():

@@ -16,7 +16,6 @@ INDEX_TYPE = Type.int_16
 STATUS_REG_IND = 3
 CARRY_BIT_IND = 0
 
-
 ##
 ## NOTE: The bitstream legend for this arch is:
 # m: source
@@ -29,10 +28,6 @@ CARRY_BIT_IND = 0
 # g: > or >=
 # c: constant post/pre increment
 
-# Lots of things are going to be interpreted as signed immediates. Here's a quickie to load them
-def bits_to_signed_int(s):
-	return Bits(bin=s).int
-
 class SH4Instruction(Instruction):
 
 	commit_func = None
@@ -43,6 +38,7 @@ class SH4Instruction(Instruction):
 	# AO - Added args
 	def __init__(self, bitstrm, arch, addr):
 		super(SH4Instruction, self).__init__(bitstrm, arch, addr)
+
 		#print(self)
 		#print(self.bin_format)
 
@@ -51,7 +47,11 @@ class SH4Instruction(Instruction):
 	def get_pc(self):
 		return self.get('pc', REGISTER_TYPE)
 
-	# Adam - Not actually using any of this
+	# Lots of things are going to be interpreted as signed immediates. Here's a quickie to load them
+	def bits_to_int(self, letter, signed=True):
+		b = Bits(bin=self.data[letter])
+		
+		return b.int if signed else b.uint
 	
 	"""
 	
@@ -61,7 +61,6 @@ class SH4Instruction(Instruction):
 	
 	def get_sr(self):
 		return self.get(STATUS_REG_IND, REGISTER_TYPE)
-
 
 	def put_sr(self, val):
 		return self.put(val, STATUS_REG_IND)
@@ -102,7 +101,7 @@ class SH4Instruction(Instruction):
 		pass
 		
 	##############################################		
-	# Adam's Code		
+	# AO's Code		
 	# Based on instrs in: http://www.shared-ptr.com/sh_insns.html
 	##############################################	
 	
@@ -213,16 +212,16 @@ class SH4Instruction(Instruction):
 	Gets the name of the register referenced by the specified letter
 	in the instruction's bin_format
 	"""
-	def get_rreg(self, letter):
-		return self.resolve_one_reg(int(self.data[letter], 2))
+	def get_rreg(self, letter, float=False):
+		return self.resolve_one_reg(int(self.data[letter], 2), float)
 			
 	"""
 	get referenced register value
 	Gets the VexValue of the register referenced by the specified letter
 	in the instruction's bin_format
 	"""
-	def get_rreg_val(self, letter, ty = Type.int_32, extend = False, zerox = False):
-		val = self.get(self.get_rreg(letter), ty)
+	def get_rreg_val(self, letter, ty = Type.int_32, extend = False, zerox = False, float=False):
+		val = self.get(self.get_rreg(letter, float), ty)
 		
 		if extend:
 			val = val.widen_signed(extend)
@@ -231,14 +230,15 @@ class SH4Instruction(Instruction):
 			val = val.cast_to(zerox, signed=False)
 			
 		return val
-		
+
 	"""
 	get referenced immediate value
 	Gets the VexValue of the immediate value referenced by the specified letter in the instruction's bin_format
 	"""
-	def get_rimm_val(self, letter, ty = Type.int_32, extend = False, zerox = False):
-		val = self.constant(int(self.data[letter], 2), ty)
-		
+	def get_rimm_val(self, letter, ty = Type.int_32, extend = False, zerox = False, signed = True):
+		#val = self.constant(int(self.data[letter], 2), ty)
+		val = self.constant(self.bits_to_int(letter, signed), ty)
+			
 		if extend:
 			ty = extend
 			val = val.widen_signed(extend)
@@ -267,7 +267,10 @@ class SH4Instruction(Instruction):
 	"""
 	Converts the integer code of a register to its name
 	"""
-	def resolve_one_reg(self, int_code):
+	def resolve_one_reg(self, int_code, float=False):
+		if float:
+			return ArchSH4.fregister_index[int_code]
+	
 		return ArchSH4.register_index[int_code]
 		
 """
@@ -404,9 +407,7 @@ class Instruction_EXTS(SH4Instruction):
 		self.put(rm, rn_name)
 					
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVBL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0000'
@@ -416,16 +417,17 @@ class Instruction_MOVBL(SH4Instruction):
 									
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
-
-		return rm, rn_name
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn_name, rm_name
 		
 	def disassemble(self):
 	
-		rm, rn_name = self.fetch_operands()
+		rm, rn_name,rm_name = self.fetch_operands()
 			
-		return "%s @%s,%s" % (self.name, rm, rn_name)
+		return "%s @%s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rm, rn_name):
+	def compute_result2(self, rm, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -435,9 +437,7 @@ class Instruction_MOVBL(SH4Instruction):
 		self.put(val.widen_signed(Type.int_32), rn_name)
 	
 		self.inc_pc()
-	
-		return val	
-		
+			
 class Instruction_MOVWL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0001'
@@ -447,14 +447,15 @@ class Instruction_MOVWL(SH4Instruction):
 									
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
-
-		return rm, rn_name
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn_name, rm_name
 		
 	def disassemble(self):
 	
-		rm, rn_name = self.fetch_operands()
+		rm, rn_name,rm_name = self.fetch_operands()
 			
-		return "%s @%s,%s" % (self.name, rm, rn_name)
+		return "%s @%s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rm, rn_name):
 		"""
@@ -466,9 +467,7 @@ class Instruction_MOVWL(SH4Instruction):
 		self.put(val.widen_signed(Type.int_32), rn_name)
 	
 		self.inc_pc()
-	
-		return val	
-		
+			
 class Instruction_MOVLL(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0010'
@@ -478,16 +477,17 @@ class Instruction_MOVLL(SH4Instruction):
 									
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
-
-		return rm, rn_name
+		rm_name = self.get_rreg('m')
+		
+		return rm, rn_name, rm_name
 		
 	def disassemble(self):
 	
-		rm, rn_name = self.fetch_operands()
+		rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s @%s,%s" % (self.name, rm, rn_name)
+		return "%s @%s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rm, rn_name):
+	def compute_result2(self, rm, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination.
 		"""
@@ -498,8 +498,6 @@ class Instruction_MOVLL(SH4Instruction):
 	
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOVLI(SH4Instruction):
 
 	bin_format = '1101nnnndddddddd'
@@ -508,7 +506,7 @@ class Instruction_MOVLI(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', BYTE_TYPE, zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', BYTE_TYPE, signed=False, zerox=LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -517,7 +515,7 @@ class Instruction_MOVLI(SH4Instruction):
 	
 		pc, d, rn_name = self.fetch_operands()
 			
-		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
+		return "%s @(%s,%s & 0xFFFFFFFC),%s" % (self.name, self.bits_to_int('d',False) * 4 + 4, 'pc', rn_name)
 
 	def compute_result2(self, pc, d, rn_name):
 		"""
@@ -532,8 +530,6 @@ class Instruction_MOVLI(SH4Instruction):
 	
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOV(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0011'
@@ -561,9 +557,7 @@ class Instruction_MOV(SH4Instruction):
 		self.put(rm, rn_name)
 					
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVI(SH4Instruction):
 
 	bin_format = '1110nnnniiiiiiii'
@@ -580,7 +574,7 @@ class Instruction_MOVI(SH4Instruction):
 	
 		i, rn_name = self.fetch_operands()
 			
-		return "%s #%s,%s" % (self.name, i, rn_name)
+		return "%s #%s,%s" % (self.name, self.bits_to_int('i'), rn_name)
 
 	def compute_result2(self, i, rn_name):
 		"""
@@ -590,9 +584,7 @@ class Instruction_MOVI(SH4Instruction):
 		self.put(i, rn_name)
 					
 		self.inc_pc()
-	
-		return i	
-		
+			
 class Instruction_MOVLS4(SH4Instruction):
 
 	bin_format = '0001nnnnmmmmdddd'
@@ -600,19 +592,21 @@ class Instruction_MOVLS4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', ty= HALFBYTE_TYPE,zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', ty= HALFBYTE_TYPE,signed=False,zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn = self.get_rreg_val('n')
+		rm_name = self.get_rreg('m')
+		rn_name = self.get_rreg('n')
 
-		return d, rm, rn
+		return d, rm, rn, rm_name, rn_name
 		
 	def disassemble(self):
 	
-		d, rm, rn = self.fetch_operands()
+		d, rm, rn, rm_name, rn_name = self.fetch_operands()
 			
-		return "%s %s,@(%s,%s)" % (self.name, rm, d, rn)
+		return "%s %s,@(%s,%s)" % (self.name, rm_name, self.bits_to_int('d',False)*4, rn_name)
 
-	def compute_result2(self, d, rm, rn):
+	def compute_result2(self, d, rm, rn, rm_name, rn_name):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
 		"""
@@ -633,25 +627,25 @@ class Instruction_MOVLL4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE,zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, signed=False, zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
 
-		return d, rm, rn_name
+		return d, rm, rn_name, rm_name
 		
 	def disassemble(self):
 	
-		d, rm, rn_name = self.fetch_operands()
+		d, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s @(%s,%s), %s" % (self.name, rm, d, rn_name)
+		return "%s @(%s,%s),%s" % (self.name, self.bits_to_int('d', False) * 4, rm_name, rn_name)
 
-	def compute_result2(self, d, rm, rn_name):
+	def compute_result2(self, d, rm, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is multiplied by four after zero-extension, enabling a range up to +60 bytes to be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. 
 		"""
 		
-		#d = (0x000000F & d);
-		toRead = ( rm + (d << 2) );
+		toRead = rm + (d << 2) 
 		
 		val = self.load(toRead, Type.int_32)
 				
@@ -659,8 +653,6 @@ class Instruction_MOVLL4(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOVW(SH4Instruction):
 
 	bin_format = '1001nnnndddddddd'
@@ -669,7 +661,7 @@ class Instruction_MOVW(SH4Instruction):
 	def fetch_operands(self):
 									
 		pc = self.get_reg_val('pc')
-		d = self.get_rimm_val('d', ty=Type.int_8, extend=LWORD_TYPE)
+		d = self.get_rimm_val('d', ty=Type.int_8, signed=False, zerox=LWORD_TYPE)
 		rn_name = self.get_rreg('n')
 
 		return pc, d, rn_name
@@ -678,7 +670,7 @@ class Instruction_MOVW(SH4Instruction):
 	
 		pc, d, rn_name = self.fetch_operands()
 			
-		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
+		return "%s @(%s,%s),%s" % (self.name, self.bits_to_int('d', False) * 2 + 4, 'pc', rn_name)
 
 	def compute_result2(self, pc, d, rn_name):
 		"""
@@ -690,17 +682,16 @@ class Instruction_MOVW(SH4Instruction):
 		
 		val = self.load(toRead, Type.int_16)
 		
-		if (val & 0x8000) == 0:
-			val = val & 0x0000FFFF
-		else:
-			val = val | 0xFFFF0000
+		# Probably not needed give the cast above
+		#if (val & 0x8000) == 0:
+		#	val = val & 0x0000FFFF
+		#else:
+		#	val = val | 0xFFFF0000
 		
-		self.put(val, rn_name)
+		self.put(val.widen_signed(LWORD_TYPE), rn_name)
 	
 		self.inc_pc()
 	
-		return val		
-
 class Instruction_MOVWL4(SH4Instruction):
 
 	bin_format = '10000101mmmmdddd'
@@ -708,7 +699,7 @@ class Instruction_MOVWL4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, signed=False, zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
 
 		return d, rm
@@ -717,7 +708,7 @@ class Instruction_MOVWL4(SH4Instruction):
 	
 		d, rm = self.fetch_operands()
 			
-		return "%s @(%s,%s),R0" % (self.name, d, rm)
+		return "%s @(%s,%s),r0" % (self.name, self.bits_to_int('d', False), rm)
 
 	def compute_result2(self, d, rm):
 		"""
@@ -726,15 +717,12 @@ class Instruction_MOVWL4(SH4Instruction):
 		
 		toRead = ( rm + (d << 1) );
 				
-		# This should be 16 bit, but that should be handled below
 		val = self.load(toRead, Type.int_16)
 		
 		self.put(val, 'r0')
 			
 		self.inc_pc()
-	
-		return val	
-		
+			
 class Instruction_MOVBL4(SH4Instruction):
 
 	bin_format = '10000100mmmmdddd'
@@ -742,18 +730,19 @@ class Instruction_MOVBL4(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		d = self.get_rimm_val('d', HALFBYTE_TYPE, zerox=LWORD_TYPE)
+		d = self.get_rimm_val('d', HALFBYTE_TYPE, signed=False, zerox=LWORD_TYPE)
 		rm = self.get_rreg_val('m')
-
-		return d, rm
+		rm_name = self.get_rreg('m')
+		
+		return d, rm, rm_name
 		
 	def disassemble(self):
 	
-		d, rm = self.fetch_operands()
+		d, rm, rm_name = self.fetch_operands()
 			
-		return "%s @(%s,%s),R0" % (self.name, d, rm)
+		return "%s @(%s,%s),r0" % (self.name, self.bits_to_int('d', False), rm_name)
 
-	def compute_result2(self, d, rm):
+	def compute_result2(self, d, rm, rm_name):
 		"""
 		Transfers the source operand to the destination. The 4-bit displacement is only zero-extended, so a range up to +15 bytes can be specified. If a memory operand cannot be reached, the @(R0,Rn) mode can be used instead. The loaded data is sign-extended to 32 bit before being stored in the destination register. 
 		"""
@@ -763,9 +752,7 @@ class Instruction_MOVBL4(SH4Instruction):
 		self.put(val, 'r0')
 			
 		self.inc_pc()
-	
-		return val	
-		
+			
 class Instruction_MOVBS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0000'
@@ -794,9 +781,7 @@ class Instruction_MOVBS(SH4Instruction):
 		self.store(rm, rn)
 			
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVWS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0001'
@@ -825,9 +810,7 @@ class Instruction_MOVWS(SH4Instruction):
 		self.store(rm, rn)
 			
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVLS(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0010'
@@ -856,9 +839,7 @@ class Instruction_MOVLS(SH4Instruction):
 		self.store(rm, rn)
 			
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVLM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0110'
@@ -869,16 +850,17 @@ class Instruction_MOVLM(SH4Instruction):
 		rm = self.get_rreg_val('m')
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
 		
-		return rm, rn, rn_name
+		return rm, rn, rn_name, rm_name
 		
 	def disassemble(self):
 	
-		rm, rn, rn_name = self.fetch_operands()
+		rm, rn, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,@-%s" % (self.name, rm, rn_name)
+		return "%s %s,@-%s" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rm, rn, rn_name):
+	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
 		Transfers the source operand to the destination. 
 		"""
@@ -890,8 +872,6 @@ class Instruction_MOVLM(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return rm	
-
 class Instruction_MOVWM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0101'
@@ -910,7 +890,7 @@ class Instruction_MOVWM(SH4Instruction):
 	
 		rm, rn, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,@-%s" % (self.name, rm, rn_name)
+		return "%s %s,@-%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
@@ -924,8 +904,6 @@ class Instruction_MOVWM(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return rm		
-
 class Instruction_MOVBM(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0100'
@@ -944,7 +922,7 @@ class Instruction_MOVBM(SH4Instruction):
 	
 		rm, rn, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,@-%s" % (self.name, rm, rn_name)
+		return "%s %s,@-%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rm, rn, rn_name, rm_name):
 		"""
@@ -958,8 +936,6 @@ class Instruction_MOVBM(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return rm	
-
 class Instruction_MOVBL0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm1100'
@@ -991,8 +967,6 @@ class Instruction_MOVBL0(SH4Instruction):
 							
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOVWL0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm1101'
@@ -1025,8 +999,6 @@ class Instruction_MOVWL0(SH4Instruction):
 							
 		self.inc_pc()
 	
-		return rn	
-
 class Instruction_MOVLL0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm1110'
@@ -1059,8 +1031,6 @@ class Instruction_MOVLL0(SH4Instruction):
 							
 		self.inc_pc()
 	
-		return rm	
-
 class Instruction_MOVBS0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm0100'
@@ -1091,8 +1061,6 @@ class Instruction_MOVBS0(SH4Instruction):
 							
 		self.inc_pc()
 	
-		return rm
-
 class Instruction_MOVWS0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm0101'
@@ -1123,8 +1091,6 @@ class Instruction_MOVWS0(SH4Instruction):
 							
 		self.inc_pc()
 	
-		return rm	
-
 class Instruction_MOVLS0(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm0110'
@@ -1154,9 +1120,7 @@ class Instruction_MOVLS0(SH4Instruction):
 		self.store(rm, rn + r0)
 							
 		self.inc_pc()
-	
-		return rm	
-		
+			
 class Instruction_MOVBP(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0100'
@@ -1192,9 +1156,7 @@ class Instruction_MOVBP(SH4Instruction):
 			self.put(rm+1,rm_name)
 							
 		self.inc_pc()
-	
-		return rn			
-		
+			
 class Instruction_MOVWP(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0101'
@@ -1229,9 +1191,7 @@ class Instruction_MOVWP(SH4Instruction):
 			self.put(rm+2,rm_name)
 							
 		self.inc_pc()
-	
-		return rn			
-		
+			
 class Instruction_MOVLP(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm0110'
@@ -1266,9 +1226,7 @@ class Instruction_MOVLP(SH4Instruction):
 			self.put(rm+4,rm_name)
 							
 		self.inc_pc()
-	
-		return rn	
-		
+			
 class Instruction_MOVBS4(SH4Instruction):
 
 	bin_format = '10000000nnnndddd'
@@ -1287,7 +1245,7 @@ class Instruction_MOVBS4(SH4Instruction):
 	
 		r0, d, rn_name, rn = self.fetch_operands()
 			
-		return "%s r0,@(%s,%s)" % (self.name, d, rn_name)
+		return "%s r0,@(%s,%s)" % (self.name, self.bits_to_int('d'), rn_name)
 
 	def compute_result2(self, r0, d, rn_name, rn):
 		"""
@@ -1297,9 +1255,7 @@ class Instruction_MOVBS4(SH4Instruction):
 		self.store(r0.cast_to(Type.int_8), rn + d)
 			
 		self.inc_pc()
-	
-		return r0	
-		
+			
 class Instruction_MOVWS4(SH4Instruction):
 
 	bin_format = '10000001nnnndddd'
@@ -1318,7 +1274,7 @@ class Instruction_MOVWS4(SH4Instruction):
 	
 		r0, d, rn_name, rn = self.fetch_operands()
 			
-		return "%s r0,@(%s,%s)" % (self.name, d, rn_name)
+		return "%s r0,@(%s,%s)" % (self.name, self.bits_to_int('d'), rn_name)
 
 	def compute_result2(self, r0, d, rn_name, rn):
 		"""
@@ -1328,9 +1284,7 @@ class Instruction_MOVWS4(SH4Instruction):
 		self.store(r0.cast_to(Type.int_16), rn + (d << 1))
 			
 		self.inc_pc()
-	
-		return r0	
-		
+			
 class Instruction_MOVBLG(SH4Instruction):
 
 	bin_format = '11000100dddddddd'
@@ -1347,7 +1301,7 @@ class Instruction_MOVBLG(SH4Instruction):
 	
 		gbr, d = self.fetch_operands()
 			
-		return "%s @(%s,GBR),r0" % (self.name, d)
+		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d):
 		"""
@@ -1361,8 +1315,6 @@ class Instruction_MOVBLG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOVWLG(SH4Instruction):
 
 	bin_format = '11000101dddddddd'
@@ -1379,7 +1331,7 @@ class Instruction_MOVWLG(SH4Instruction):
 	
 		gbr, d = self.fetch_operands()
 			
-		return "%s @(%s,GBR),r0" % (self.name, d)
+		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d):
 		"""
@@ -1395,8 +1347,6 @@ class Instruction_MOVWLG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val	
-
 class Instruction_MOVLLG(SH4Instruction):
 
 	bin_format = '11000110dddddddd'
@@ -1413,7 +1363,7 @@ class Instruction_MOVLLG(SH4Instruction):
 	
 		gbr, d = self.fetch_operands()
 			
-		return "%s @(%s,GBR),r0" % (self.name, d)
+		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d):
 		"""
@@ -1427,8 +1377,6 @@ class Instruction_MOVLLG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val		
-
 class Instruction_MOVBSG(SH4Instruction):
 
 	bin_format = '11000000dddddddd'
@@ -1446,7 +1394,7 @@ class Instruction_MOVBSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, d)
+		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1459,8 +1407,6 @@ class Instruction_MOVBSG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return r0.cast_to(BYTE_TYPE)
-
 class Instruction_MOVWSG(SH4Instruction):
 
 	bin_format = '11000001dddddddd'
@@ -1478,7 +1424,7 @@ class Instruction_MOVWSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, d)
+		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1493,8 +1439,6 @@ class Instruction_MOVWSG(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return r0.cast_to(WORD_TYPE)	
-
 class Instruction_MOVLSG(SH4Instruction):
 
 	bin_format = '11000010dddddddd'
@@ -1512,7 +1456,7 @@ class Instruction_MOVLSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, d)
+		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1522,14 +1466,11 @@ class Instruction_MOVLSG(SH4Instruction):
 		d = d << 2
 		
 		# Check if correct!
-		
 		self.store(r0.cast_to(LWORD_TYPE), gbr + d)
 					
 		self.inc_pc()
-	
-		return r0			
-		
-# TODO Floating-Point Control Instructions
+			
+# TODO Floating-Point Control Instructions - not implemented
 
 class Instruction_LDSFPUL(SH4Instruction):
 
@@ -1547,7 +1488,7 @@ class Instruction_LDSFPUL(SH4Instruction):
 	
 		rm_name, rm = self.fetch_operands()
 			
-		return "%s %s,FPUL" % (self.name, rm_name)
+		return "%s %s,fpul" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, rm):
 		"""
@@ -1558,9 +1499,7 @@ class Instruction_LDSFPUL(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return rm
-
-class Instruction_LDS_MACL(SH4Instruction):
+class Instruction_LDSMACL(SH4Instruction):
 
 	bin_format = '0100mmmm00011010'
 	name='lds'
@@ -1576,7 +1515,7 @@ class Instruction_LDS_MACL(SH4Instruction):
 	
 		rm_name, rm = self.fetch_operands()
 			
-		return "%s %s,MACL" % (self.name, rm_name)
+		return "%s %s,macl" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, rm):
 		"""
@@ -1586,10 +1525,8 @@ class Instruction_LDS_MACL(SH4Instruction):
 		self.put(rm, 'macl')
 					
 		self.inc_pc()
-	
-		return rm
-		
-class Instruction_LDS_PR(SH4Instruction):
+			
+class Instruction_LDSPR(SH4Instruction):
 
 	bin_format = '0100mmmm00101010'
 	name='lds'
@@ -1605,7 +1542,7 @@ class Instruction_LDS_PR(SH4Instruction):
 	
 		rm_name, rm = self.fetch_operands()
 			
-		return "%s %s,PR" % (self.name, rm_name)
+		return "%s %s,pr" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, rm):
 		"""
@@ -1615,10 +1552,8 @@ class Instruction_LDS_PR(SH4Instruction):
 		self.put(rm, 'pr')
 					
 		self.inc_pc()
-	
-		return rm
-		
-class Instruction_LDSL_PR(SH4Instruction):
+			
+class Instruction_LDSLPR(SH4Instruction):
 
 	bin_format = '0100mmmm00100110'
 	name='lds.l'
@@ -1634,7 +1569,7 @@ class Instruction_LDSL_PR(SH4Instruction):
 	
 		rm_name, rm = self.fetch_operands()
 			
-		return "%s @%s+,PR" % (self.name, rm_name)
+		return "%s @%s+,pr" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, rm):
 		"""
@@ -1647,10 +1582,8 @@ class Instruction_LDSL_PR(SH4Instruction):
 		self.put(rm+4, rm_name)
 					
 		self.inc_pc()
-	
-		return val
-		
-class Instruction_LDSL_MACL(SH4Instruction):
+			
+class Instruction_LDSLMACL(SH4Instruction):
 
 	bin_format = '0100mmmm00010110'
 	name='lds.l'
@@ -1680,8 +1613,6 @@ class Instruction_LDSL_MACL(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val
-
 class Instruction_LDS(SH4Instruction):
 
 	bin_format = '0100mmmm00001010'
@@ -1708,9 +1639,7 @@ class Instruction_LDS(SH4Instruction):
 		self.put(rm, 'mach')
 					
 		self.inc_pc()
-	
-		return rm
-		
+			
 class Instruction_LDSL(SH4Instruction):
 
 	bin_format = '0100mmmm00000110'
@@ -1741,8 +1670,6 @@ class Instruction_LDSL(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return val
-
 class Instruction_ROTL(SH4Instruction):
 
 	bin_format = '0100nnnn00000100'
@@ -1836,7 +1763,7 @@ class Instruction_ROTCL(SH4Instruction):
 		srT1 = self.set_flags(sr, T=1)
 		srT0 = self.set_flags(sr, T=0)
 		
-		self.put_conditional((rn & 0x80000000) == 0), srT0, srT1, 'sr')
+		self.put_conditional((rn & 0x80000000) == 0, srT0, srT1, 'sr')
 		
 		self.put_conditional(t == 1, (rn << 1) | 0x00000001, (rn << 1) & 0xFFFFFFFE, rn_name)
 							
@@ -1870,7 +1797,7 @@ class Instruction_ROTCR(SH4Instruction):
 		srT1 = self.set_flags(sr, T=1)
 		srT0 = self.set_flags(sr, T=0)
 		
-		self.put_conditional((rn & 0x00000001) == 0), srT0, srT1, 'sr')
+		self.put_conditional((rn & 0x00000001) == 0, srT0, srT1, 'sr')
 		
 		self.put_conditional(t == 1, (rn >> 1) | 0x80000000, (rn >> 1) & 0x7FFFFFFF, rn_name)
 							
@@ -1933,9 +1860,7 @@ class Instruction_SHAD(SH4Instruction):
 		"""
 					
 		self.inc_pc()
-	
-		return rn
-		
+			
 class Instruction_SHLD(SH4Instruction):
 
 	bin_format = '0100nnnnmmmm1101'
@@ -1986,8 +1911,6 @@ class Instruction_SHLD(SH4Instruction):
 					
 		self.inc_pc()
 	
-		return rn
-
 class Instruction_SHAR(SH4Instruction):
 
 	bin_format = '0100nnnn00100001'
@@ -2204,7 +2127,6 @@ class Instruction_SHLL(SH4Instruction):
 		self.put(rn << 1, rn_name)
 					
 		self.inc_pc()
-	
 		
 class Instruction_SHLL2(SH4Instruction):
 
@@ -2295,8 +2217,6 @@ class Instruction_MOVT(SH4Instruction):
 	def fetch_operands(self):
 									
 		rn_name = self.get_rreg('n')
-		
-		# TODO - this operation must return either 0 or 1 as 32 bit
 		T = self.get_flag('T')
 
 		return T, rn_name
@@ -2328,16 +2248,18 @@ class Instruction_TST(SH4Instruction):
 		rn = self.get_rreg_val('n')
 		rm = self.get_rreg_val('m')
 		sr = self.get_reg_val('sr')
+		rn_name = self.get_rreg('n')
+		rm_name = self.get_rreg('m')
 		
-		return rm, rn, sr
+		return rm, rn, sr, rm_name, rn_name
 		
 	def disassemble(self):
 	
-		rm, rn, sr = self.fetch_operands()
+		rm, rn, sr, rm_name, rn_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm, rn, sr)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rm, rn, sr):
+	def compute_result2(self, rm, rn, sr, rm_name, rn_name):
 		"""
 		ANDs the contents of general registers Rn and Rm, and sets the T bit if the result is zero. If the result is nonzero, the T bit is cleared. The contents of Rn are not changed. 
 		"""
@@ -2361,7 +2283,7 @@ class Instruction_TST(SH4Instruction):
 		
 		self.inc_pc()
 					
-class Instruction_TST_IMM(SH4Instruction):
+class Instruction_TSTIMM(SH4Instruction):
 
 	bin_format = '11001000iiiiiiii'
 	name='tst'
@@ -2386,9 +2308,7 @@ class Instruction_TST_IMM(SH4Instruction):
 		Note
 		Since the 8-bit immediate value is zero-extended, this instruction can only be used to test the lower 8 bits of R0.  
 		"""
-		
-		# TODO - should we do this and skip the compute_flags method?
-				
+						
 		srT = self.set_flags(sr, T=1)
 		srF = self.set_flags(sr, T=0)
 		
@@ -2396,7 +2316,7 @@ class Instruction_TST_IMM(SH4Instruction):
 		
 		self.inc_pc()
 		
-class Instruction_TST_GBR(SH4Instruction):
+class Instruction_TSTGBR(SH4Instruction):
 
 	bin_format = '11001100iiiiiiii'
 	name='tst'
@@ -2459,9 +2379,8 @@ class Instruction_XOR(SH4Instruction):
 		self.put(rm ^ rn, rn_name)
 							
 		self.inc_pc()
-	
 		
-class Instruction_XOR_IMM(SH4Instruction):
+class Instruction_XORIMM(SH4Instruction):
 
 	bin_format = '11001010iiiiiiii'
 	name='xor'
@@ -2477,7 +2396,7 @@ class Instruction_XOR_IMM(SH4Instruction):
 	
 		i, r0 = self.fetch_operands()
 			
-		return "%s #%s,%s" % (self.name, i, r0)
+		return "%s #%s,r0" % (self.name, i)
 
 	def compute_result2(self, i, r0):
 		"""
@@ -2491,7 +2410,7 @@ class Instruction_XOR_IMM(SH4Instruction):
 							
 		self.inc_pc()
 			
-class Instruction_XOR_GBR(SH4Instruction):
+class Instruction_XORGBR(SH4Instruction):
 
 	bin_format = '11001110iiiiiiii'
 	name='xor.b'
@@ -2508,7 +2427,7 @@ class Instruction_XOR_GBR(SH4Instruction):
 	
 		i, r0, gbr = self.fetch_operands()
 			
-		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+		return "%s #%s,@(r0,gbr)" % (self.name, i)
 
 	def compute_result2(self, i, r0, gbr):
 		"""
@@ -2517,7 +2436,7 @@ class Instruction_XOR_GBR(SH4Instruction):
 		
 		temp = self.load(r0 + gbr, BYTE_TYPE)
 		
-		temp = temp & i
+		temp = temp ^ i
 		
 		self.store(temp, r0 + gbr)
 							
@@ -2581,7 +2500,7 @@ class Instruction_AND(SH4Instruction):
 							
 		self.inc_pc()
 			
-class Instruction_AND_IMM(SH4Instruction):
+class Instruction_ANDIMM(SH4Instruction):
 
 	bin_format = '11001001iiiiiiii'
 	name='and'
@@ -2597,7 +2516,7 @@ class Instruction_AND_IMM(SH4Instruction):
 	
 		i, r0 = self.fetch_operands()
 			
-		return "%s #%s,%s" % (self.name, i, r0)
+		return "%s #%s,r0" % (self.name, i)
 
 	def compute_result2(self, i, r0):
 		"""
@@ -2611,7 +2530,7 @@ class Instruction_AND_IMM(SH4Instruction):
 							
 		self.inc_pc()
 			
-class Instruction_AND_GBR(SH4Instruction):
+class Instruction_ANDGBR(SH4Instruction):
 
 	bin_format = '11001101iiiiiiii'
 	name='and.b'
@@ -2628,7 +2547,7 @@ class Instruction_AND_GBR(SH4Instruction):
 	
 		i, r0, gbr = self.fetch_operands()
 			
-		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+		return "%s #%s,@(r0,gbr)" % (self.name, i)
 
 	def compute_result2(self, i, r0, gbr):
 		"""
@@ -2672,7 +2591,7 @@ class Instruction_OR(SH4Instruction):
 							
 		self.inc_pc()
 			
-class Instruction_OR_IMM(SH4Instruction):
+class Instruction_ORIMM(SH4Instruction):
 
 	bin_format = '11001011iiiiiiii'
 	name='or'
@@ -2688,7 +2607,7 @@ class Instruction_OR_IMM(SH4Instruction):
 	
 		i, r0 = self.fetch_operands()
 			
-		return "%s #%s,%s" % (self.name, i, r0)
+		return "%s #%s,r0" % (self.name, i)
 
 	def compute_result2(self, i, r0):
 		"""
@@ -2702,7 +2621,7 @@ class Instruction_OR_IMM(SH4Instruction):
 							
 		self.inc_pc()
 			
-class Instruction_OR_GBR(SH4Instruction):
+class Instruction_ORGBR(SH4Instruction):
 
 	bin_format = '11001111iiiiiiii'
 	name='or.b'
@@ -2719,7 +2638,7 @@ class Instruction_OR_GBR(SH4Instruction):
 	
 		i, r0, gbr = self.fetch_operands()
 			
-		return "%s #%s,@(%s,%s)" % (self.name, i, r0, gbr)
+		return "%s #%s,@(r0,gbr)" % (self.name, i)
 
 	def compute_result2(self, i, r0, gbr):
 		"""
@@ -2751,7 +2670,7 @@ class Instruction_MOVA(SH4Instruction):
 	
 		pc, d, rn_name = self.fetch_operands()
 			
-		return "%s @(%s,%s),%s" % (self.name, d, pc, rn_name)
+		return "%s @(%s,pc),%s" % (self.name, d, rn_name)
 
 	def compute_result2(self, pc, d, rn_name):
 		"""
@@ -2771,8 +2690,8 @@ class Instruction_FLDS(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm_name = self.get_rreg('m')
-		rm = self.get_rreg_val('m')
+		rm_name = self.get_rreg('m', float=True)
+		rm = self.get_rreg_val('m', float=True)
 
 		return rm_name, rm
 		
@@ -2780,7 +2699,7 @@ class Instruction_FLDS(SH4Instruction):
 	
 		rm_name, rm = self.fetch_operands()
 			
-		return "%s %s,FPUL" % (self.name, rm_name)
+		return "%s %s,fpul" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, rm):
 		"""
@@ -2861,7 +2780,7 @@ class Instruction_STSFPUL(SH4Instruction):
 	
 		fpul, rn_name = self.fetch_operands()
 			
-		return "%s FPUL,%s" % (self.name, rn_name)
+		return "%s fpul,%s" % (self.name, rn_name)
 
 	def compute_result2(self, fpul, rn_name):
 		"""
@@ -2872,7 +2791,7 @@ class Instruction_STSFPUL(SH4Instruction):
 	
 		self.inc_pc()
 			
-class Instruction_STS_MACH(SH4Instruction):
+class Instruction_STSMACH(SH4Instruction):
 
 	bin_format = '0000nnnn00001010'
 	name='sts'
@@ -2899,7 +2818,7 @@ class Instruction_STS_MACH(SH4Instruction):
 	
 		self.inc_pc()
 			
-class Instruction_STS_MACL(SH4Instruction):
+class Instruction_STSMACL(SH4Instruction):
 
 	bin_format = '0000nnnn00011010'
 	name='sts'
@@ -2926,7 +2845,7 @@ class Instruction_STS_MACL(SH4Instruction):
 	
 		self.inc_pc()
 			
-class Instruction_STS_PR(SH4Instruction):
+class Instruction_STSPR(SH4Instruction):
 
 	bin_format = '0000nnnn00101010'
 	name='sts'
@@ -2953,7 +2872,7 @@ class Instruction_STS_PR(SH4Instruction):
 	
 		self.inc_pc()
 			
-class Instruction_STSL_MACH(SH4Instruction):
+class Instruction_STSLMACH(SH4Instruction):
 
 	bin_format = '0100nnnn00000010'
 	name='sts.l'
@@ -2985,7 +2904,7 @@ class Instruction_STSL_MACH(SH4Instruction):
 					
 		self.inc_pc()
 	
-class Instruction_STSL_MACL(SH4Instruction):
+class Instruction_STSLMACL(SH4Instruction):
 
 	bin_format = '0100nnnn00000010'
 	name='sts.l'
@@ -3065,8 +2984,8 @@ class Instruction_CLRMAC(SH4Instruction):
 		Clears the MACH and MACL registers. 
 		"""
 				
-		self.put(0, 'mach')
-		self.put(0, 'macl')
+		self.put(self.constant(0, LWORD_TYPE), 'mach')
+		self.put(self.constant(0, LWORD_TYPE), 'macl')
 							
 		self.inc_pc()
 		
@@ -3120,6 +3039,31 @@ class Instruction_CLRT(SH4Instruction):
 							
 		self.inc_pc()
 		
+class Instruction_SETT(SH4Instruction):
+
+	bin_format = '0000000000011000'
+	name='sett'
+	
+	def fetch_operands(self):	
+
+		sr = self.get_reg_val('sr')
+		return [sr]
+		
+	def disassemble(self):
+	
+		return self.name
+
+	def compute_result2(self, sr):
+		"""
+		Sets the T bit = 1
+		"""
+		
+		sr = self.set_flags(sr, T=1)
+		
+		self.put(sr, 'sr')
+							
+		self.inc_pc()
+		
 class Instruction_NOP(SH4Instruction):
 
 	bin_format = '0000000000001001'
@@ -3157,7 +3101,7 @@ class Instruction_NEG(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3168,8 +3112,7 @@ class Instruction_NEG(SH4Instruction):
 	
 		self.inc_pc()
 	
-# TODO fixme!	
-class Instruction_NEG_C(SH4Instruction):
+class Instruction_NEGC(SH4Instruction):
 
 	bin_format = '0110nnnnmmmm1010'
 	name='negc'
@@ -3179,10 +3122,10 @@ class Instruction_NEG_C(SH4Instruction):
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
 		rm = self.get_rreg_val('m')
-		T = self.get_flag('T')
 		sr = self.get_reg_val('sr')
+		T = self.get_flag('T', sr)
 		
-		return T, rm, rm_name, rn, rn_name, sr
+		return T, rm, rm_name, rn_name, sr
 		
 	def disassemble(self):
 	
@@ -3228,7 +3171,7 @@ class Instruction_SUB(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3258,7 +3201,7 @@ class Instruction_DMULU(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3296,7 +3239,7 @@ class Instruction_DMULS(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3319,7 +3262,7 @@ class Instruction_DMULS(SH4Instruction):
 class Instruction_MUL(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm0111'
-	name='mul'
+	name='mul.l'
 	
 	def fetch_operands(self):
 			
@@ -3334,7 +3277,7 @@ class Instruction_MUL(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3344,10 +3287,8 @@ class Instruction_MUL(SH4Instruction):
 		self.put(rn * rm, 'macl')
 	
 		self.inc_pc()
-	
-		return val	
-		
-class Instruction_MUL_W(SH4Instruction):
+			
+class Instruction_MULW(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm111d'
 	name='mul?.w'
@@ -3375,7 +3316,7 @@ class Instruction_MUL_W(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3388,8 +3329,8 @@ class Instruction_MUL_W(SH4Instruction):
 	
 		self.inc_pc()
 			
-# TODO - this is probably not fully correct
-class Instruction_MAC_L(SH4Instruction):
+# TODO - check this
+class Instruction_MACL(SH4Instruction):
 
 	bin_format = '0000nnnnmmmm1111'
 	name='mac.l'
@@ -3401,18 +3342,16 @@ class Instruction_MAC_L(SH4Instruction):
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
 		S = self.get_flag('S')
-		MACH = self.get_reg_val('mach')
-		MACL = self.get_reg_val('macl')
-		
-		return rn, rm, rn_name, rm_name, S, MACH, MACL
+
+		return rn, rm, rn_name, rm_name, S
 		
 	def disassemble(self):
 	
-		rn, rm, rn_name, rm_name, _, _, _ = self.fetch_operands()
+		rn, rm, rn_name, rm_name, _ = self.fetch_operands()
 			
-		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
+		return "%s @%s+,@%s+" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+	def compute_result2(self, rn, rm, rn_name, rm_name, S):
 		"""
 		Performs signed multiplication of the 32-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 64-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 4 each time they are read.
 
@@ -3424,99 +3363,28 @@ class Instruction_MAC_L(SH4Instruction):
 		On SH4, when MAC*/MUL* is followed by an STS.L MAC*,@-Rn instruction, the latency of MAC*/MUL* is 5 cycles. In the case of consecutive executions of MAC.W/MAC.L, the latency is decreased to 2 cycles. 
 		"""
 		
-		tempn = self.load(rn, LWORD_TYPE)
-		tempm = self.load(rm, LWORD_TYPE)
+		tempn = self.load(rn, Type.int_64)
+		tempm = self.load(rm, Type.int_64)
 
 		self.put(rn + 4, rn_name)
 		self.put(rm + 4, rm_name)
-
-		if (tempn ^ tempm) < 0:
-			fnLmL = -1
-		else:
-			fnLmL = 0
-
-		if (tempn < 0):
-			tempn = 0 - tempn
-		if (tempm < 0):
-			tempm = 0 - tempm
-
-		temp1 = tempn
-		temp2 = tempm
-
-		RnL = temp1 & 0x0000FFFF
-		RnH = (temp1 >> 16) & 0x0000FFFF
-		RmL = temp2 & 0x0000FFFF
-		RmH = (temp2 >> 16) & 0x0000FFFF
-		temp0 = RmL * RnL
-		temp1 = RmH * RnL
-		temp2 = RmL * RnH
-		temp3 = RmH * RnH
-
-		Res2 = 0
-
-		Res1 = temp1 + temp2
-		if (Res1 < temp1):
-			Res2 += 0x00010000
-
-		temp1 = (Res1 << 16) & 0xFFFF0000
-
-		Res0 = temp0 + temp1;
-		if (Res0 < temp0):
-			Res2+=1
-
-		Res2 = Res2 + ((Res1 >> 16) & 0x0000FFFF) + temp3;
-
-		if(fnLmL < 0):
 		
-			Res2 = ~Res2;
-			if (Res0 == 0):
-				Res2+=1
-			else:
-				Res0 = (~Res0) + 1
+		res = tempn * tempm
 		
-
-		if S == 1:
+		res2 = res & 0x0000FFFFFFFFFFFF
 		
-			Res0 = MACL + Res0;
-			if (MACL > Res0):
-				Res2+=1
-
-			Res2 += MACH & 0x0000FFFF;
-
-			if ((Res2 < 0) and (Res2 < 0xFFFF8000)):
-				Res2 = 0xFFFF8000
-				Res0 = 0x00000000
-
-			if ((Res2 > 0) and (Res2 > 0x00007FFF)):
-			
-				Res2 = 0x00007FFF
-				Res0 = 0xFFFFFFFF
-
-			MACH = (Res2 & 0x0000FFFF) | (MACH & 0xFFFF0000)
-			MACL = Res0
-						
-			self.put(MACH, 'mach')
-			self.put(MACL, 'macl')
-
-		else:
+		upper = (res & 0xFFFFFFFF00000000) >> 32
+		lower = (res & 0x00000000FFFFFFFF)
+		upper2 = (res2 & 0xFFFFFFFF00000000) >> 32
+		lower2 = (res2 & 0x00000000FFFFFFFF)
 		
-			Res0 = MACL + Res0
-			if (MACL > Res0):
-				Res2 +=1
-
-			Res2 += MACH;
-			MACH = Res2
-			MACL = Res0
-			
-			self.put(MACH, 'mach')
-			self.put(MACL, 'macl')
+		self.put_conditional(S, upper2.cast_to(LWORD_TYPE), upper.cast_to(LWORD_TYPE), 'mach')
+		self.put_conditional(S, lower2.cast_to(LWORD_TYPE), lower.cast_to(LWORD_TYPE), 'macl')
 		
 		self.inc_pc()
-	
-		return MACH, MACL	
-	
-# TODO - this is probably not fully correct
-class Instruction_MAC_W(SH4Instruction):
+		
+# TODO - check logic, may need another condition
+class Instruction_MACW(SH4Instruction):
 
 	bin_format = '0100nnnnmmmm1111'
 	name='mac.w'
@@ -3528,18 +3396,16 @@ class Instruction_MAC_W(SH4Instruction):
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
 		S = self.get_flag('S')
-		MACH = self.get_reg_val('mach')
-		MACL = self.get_reg_val('macl')
 		
-		return rn, rm, rn_name, rm_name, S, MACH, MACL
+		return rn, rm, rn_name, rm_name, S
 		
 	def disassemble(self):
 	
-		rn, rm, rn_name, rm_name, _, _, _ = self.fetch_operands()
+		rn, rm, rn_name, rm_name, _ = self.fetch_operands()
 			
-		return "%s @%s+,@%s+" % (self.name, rm_name, rm_name)
+		return "%s @%s+,@%s+" % (self.name, rm_name, rn_name)
 
-	def compute_result2(self, rn, rm, rn_name, rm_name, S, MACH, MACL):
+	def compute_result2(self, rn, rm, rn_name, rm_name, S):
 		"""
 		Performs signed multiplication of the 16-bit operands whose addresses are the contents of general registers Rm and Rn, adds the 32-bit result to the MAC register contents, and stores the result in the MAC register. Operands Rm and Rn are each incremented by 2 each time they are read.
 
@@ -3559,52 +3425,22 @@ class Instruction_MAC_W(SH4Instruction):
 		self.put(rn + 2, rn_name)
 		self.put(rm + 2, rm_name)
 		
-		templ = MACL;
-		tempm = tempn * tempm;
-
-		if MACL >= 0:
-			dest = 0
-		else:
-			dest = 1
-
-		if tempm >= 0:
-			src = 0
-			tempn = 0
-		else:
-			src = 1
-			tempn = 0xFFFFFFFF
+		res = tempn * tempm
 		
-		src += dest;
-		MACL += tempm;
-
-		if MACL >= 0:
-			ans = 0
-		else:
-			ans = 1
-
-		ans += dest;
-
-		if (S == 1):
+		res2 = res & 0x00000000FFFFFFFF
 		
-			if (ans == 1):
-			
-				if (src == 0):
-					MACL = 0x7FFFFFFF
-				if (src == 2):
-					MACL = 0x80000000
+		upper = (res & 0xFFFFFFFF00000000) >> 32
+		lower = (res & 0x00000000FFFFFFFF)
+		upper2 = (res2 & 0xFFFFFFFF00000000) >> 32
 		
-		else:
-			MACH += tempn;
-			if (templ > MACL):
-				MACH += 1	
+		self.put_conditional(S and res2 > 0x7FFFFFFF, self.constant(0x00000001), upper.cast_to(LWORD_TYPE), 'mach')
 		
-		self.put(MACH, 'mach')
-		self.put(MACL, 'macl')
+		self.put_conditional(S and res2 > 0x7FFFFFFF, self.constant(0x7FFFFFFF), lower.cast_to(LWORD_TYPE), 'macl')
+		
+		self.put_conditional(S and res2 < 0x80000000, self.constant(0x80000000), lower.cast_to(LWORD_TYPE), 'macl')
 		
 		self.inc_pc()
-		
-		return MACH, MACL	
-		
+				
 class Instruction_DIV0S(SH4Instruction):
 
 	bin_format = '0010nnnnmmmm0111'
@@ -3623,7 +3459,7 @@ class Instruction_DIV0S(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3648,16 +3484,17 @@ class Instruction_DIV0S(SH4Instruction):
 		
 		self.put_conditional((rm & 0x80000000) == 0, srM0, srM1, 'sr')
 
-		# Pass SR so we only have to read once
 		sr = self.get_reg_val('sr')
 
+		# Pass SR so we only have to read once
 		m = self.get_flag('M', sr)
 		q = self.get_flag('Q', sr)
 
-		# TODO check correctness
-		t = 0 if (((m== q) & (q==0)) | (q*m>0)) else 1
+		srT0 = self.set_flags(sr, T=0)
+		srT1 = self.set_flags(sr, T=1)
 		
-		self.put(self.set_flags(sr, T=t), 'sr')
+		# TODO check correctness - maybe just use rm and rn?
+		self.put_conditional(((m == q) and (q==0)) or (q*m>0), srT0, srT1, 'sr')
 			
 		self.inc_pc()
 			
@@ -3685,8 +3522,6 @@ class Instruction_DIV0U(SH4Instruction):
 	
 		self.inc_pc()
 	
-		return val	
-
 # TODO check this!
 class Instruction_DIV1(SH4Instruction):
 
@@ -3710,7 +3545,7 @@ class Instruction_DIV1(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name, _, _, _, _ = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name, q, t, m, sr):
 		"""
@@ -3791,7 +3626,7 @@ class Instruction_ADD(SH4Instruction):
 	
 		rn, rm, rn_name, rm_name = self.fetch_operands()
 			
-		return "%s %s,%s" % (self.name, rm_name, rm_name)
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
 
 	def compute_result2(self, rn, rm, rn_name, rm_name):
 		"""
@@ -3801,7 +3636,37 @@ class Instruction_ADD(SH4Instruction):
 		self.put(rn + rm, rn_name)
 	
 		self.inc_pc()
+		
+class Instruction_FADD(SH4Instruction):
+
+	bin_format = '1111nnnnmmmm0000'
+	name='fadd'
 	
+	def fetch_operands(self):
+			
+		rn = self.get_rreg_val('n', Type.ieee_float_32, float=True)
+		rm = self.get_rreg_val('m', Type.ieee_float_32, float=True)
+		rn_name = self.get_rreg('n', float=True)
+		rm_name = self.get_rreg('m', float=True)
+
+		return rn, rm, rn_name, rm_name
+		
+	def disassemble(self):
+	
+		rn, rm, rn_name, rm_name = self.fetch_operands()
+			
+		return "%s %s,%s" % (self.name, rm_name, rn_name)
+
+	def compute_result2(self, rn, rm, rn_name, rm_name):
+		"""
+		Arithmetically adds the two single-precision floating-point numbers in FRn and FRm, and stores the result in FRn.
+		"""
+		
+		# TODO this crashes pyvex
+		#self.put(rn + rm, rn_name)
+	
+		self.inc_pc()
+		
 class Instruction_ADDI(SH4Instruction):
 
 	bin_format = '0111nnnniiiiiiii'
@@ -3819,7 +3684,7 @@ class Instruction_ADDI(SH4Instruction):
 	
 		i,rn, rn_name = self.fetch_operands()
 			
-		return "%s #%s,%s" % (self.name, i, rn_name)
+		return "%s #%s,%s" % (self.name, self.bits_to_int('i'), rn_name)
 
 	def compute_result2(self, i, rn, rn_name):
 		"""
@@ -3830,7 +3695,7 @@ class Instruction_ADDI(SH4Instruction):
 	
 		self.inc_pc()
 			
-class Instruction_SUB_C(SH4Instruction):
+class Instruction_SUBC(SH4Instruction):
 
 	bin_format = '0011nnnnmmmm1010'
 	name='subc'
@@ -3874,7 +3739,7 @@ class Instruction_SUB_C(SH4Instruction):
 			
 		self.inc_pc()
 			
-class Instruction_SUB_V(SH4Instruction):
+class Instruction_SUBV(SH4Instruction):
 
 	bin_format = '0011nnnnmmmm1011'
 	name='subv'
@@ -3912,7 +3777,7 @@ class Instruction_SUB_V(SH4Instruction):
 		
 		self.inc_pc()
 	
-class Instruction_ADD_C(SH4Instruction):
+class Instruction_ADDC(SH4Instruction):
 
 	bin_format = '0011nnnnmmmm1110'
 	name='addc'
@@ -3952,7 +3817,7 @@ class Instruction_ADD_C(SH4Instruction):
 		
 		self.inc_pc()
 	
-class Instruction_ADD_V(SH4Instruction):
+class Instruction_ADDV(SH4Instruction):
 
 	bin_format = '0011nnnnmmmm1111'
 	name='addv'
@@ -3997,7 +3862,7 @@ class Instruction_BRA(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		d = int(self.data['d'], 2)
+		d = self.bits_to_int('d')
 		
 		return [d]
 		
@@ -4005,7 +3870,7 @@ class Instruction_BRA(SH4Instruction):
 	
 		d = self.fetch_operands()
 			
-		return "%s PC+4+%s" % (self.name, d[0] * 2)
+		return "%s pc+%s" % (self.name, d[0] * 2 + 4)
 
 	def compute_result2(self, d):
 		"""
@@ -4035,7 +3900,8 @@ class Instruction_BT(SH4Instruction):
 	def fetch_operands(self):
 		
 		sr = self.get_reg_val('sr')
-		d = int(self.data['d'], 2)
+		# Must be constant!
+		d = self.bits_to_int('d')
 		
 		return sr,d
 		
@@ -4043,8 +3909,7 @@ class Instruction_BT(SH4Instruction):
 	
 		sr,d = self.fetch_operands()
 			
-		# TODO - make pretty
-		return "%s %s" % (self.name, d)
+		return "%s %s" % (self.name, self.bits_to_int('d') * 2 + 4)
 
 	def compute_result2(self, sr, d):
 		"""
@@ -4055,10 +3920,12 @@ class Instruction_BT(SH4Instruction):
 		If the branch destination cannot be reached, the branch must be handled by using BF in combination with a BRA or JMP instruction, for example. 
 		"""
 		
+		"""
 		if ((d & 0x80) == 0):
 			d = (0x000000FF & d)
 		else:
 			d = (0xFFFFFF00 | d)
+		"""
 		
 		addr = self.constant(self.addr + 4 + (d << 1), LWORD_TYPE)
 				
@@ -4076,7 +3943,7 @@ class Instruction_BF(SH4Instruction):
 	def fetch_operands(self):
 		
 		sr = self.get_reg_val('sr')
-		d = int(self.data['d'], 2)
+		d = self.bits_to_int('d')
 		
 		return sr,d
 		
@@ -4084,8 +3951,7 @@ class Instruction_BF(SH4Instruction):
 	
 		sr,d = self.fetch_operands()
 			
-		# TODO - make pretty
-		return "%s %s" % (self.name, d)
+		return "%s %s" % (self.name, self.bits_to_int('d') * 2 + 4)
 
 	def compute_result2(self, sr, d):
 		"""
@@ -4096,10 +3962,12 @@ class Instruction_BF(SH4Instruction):
 		If the branch destination cannot be reached, the branch must be handled by using BF in combination with a BRA or JMP instruction, for example. 
 		"""
 		
+		"""
 		if ((d & 0x80) == 0):
 			d = (0x000000FF & d)
 		else:
 			d = (0xFFFFFF00 | d)
+		"""
 		
 		addr = self.constant(self.addr + 4 + (d << 1), LWORD_TYPE)
 				
@@ -4124,7 +3992,7 @@ class Instruction_JMP(SH4Instruction):
 	
 		rm_name = self.fetch_operands()
 			
-		return "%s @%s" % (self.name, rm_name)
+		return "%s @%s" % (self.name, rm_name[0])
 
 	def compute_result2(self, rm_name):
 		"""
@@ -4155,7 +4023,7 @@ class Instruction_JSR(SH4Instruction):
 	
 		rm_name, pc = self.fetch_operands()
 			
-		return "%s %s" % (self.name, rm_name)
+		return "%s @%s" % (self.name, rm_name)
 
 	def compute_result2(self, rm_name, pc):
 		"""
@@ -4579,7 +4447,7 @@ class Instruction_WORD(SH4Instruction):
 		return d	
 '''	
 ##############################################		
-# End Adam's Code		
+# End AO's Code		
 ##############################################		
 	
 '''	
@@ -5147,7 +5015,6 @@ class Instruction_CMP_Rm_Rn(SH4Instruction):
 	# decide on the value of T-bit in SR reg
 	def carry(self, src, dst, ret):
 		
-		# Adam 
 		#if src == dst:
 		pass
 
@@ -5218,6 +5085,5 @@ class Instruction_CMP_Rm_Rn(SH4Instruction):
 	# decide on the value of T-bit in SR reg
 	def carry(self, src, dst, ret):
 		#if src == dst:
-		# Adam
 		pass
 """
