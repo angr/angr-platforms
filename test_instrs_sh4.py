@@ -1,4 +1,19 @@
+#!/usr/bin/python
 import re
+from angr_platforms.sh4 import *
+
+"""
+Test our lifter against objdump's disassembly
+Input: a objdump -D text file
+Author: bob123456678
+Language: python 2.7
+
+For each instruction, it prints:
+-instruction bytes
+-vex irsb
+-our disassembly
+-objdump's disassembly
+"""
 
 # Reads an objdump file, gets all instructions from non-system code segments
 def readObjdump(fn):
@@ -50,19 +65,27 @@ def readObjdump(fn):
 
     return relevantInstrs
 	
+"""
+Lift an arbitrary instruction (up to 4 bytes if delayed branch)	
+"""
+def test_lift_one(instr):	
+
+	l = helpers_sh4.LifterSH4(arch_sh4.ArchSH4(), 0, instr, revBytes=False, max_bytes=4)
+	
+	return l.irsb
+	#.pp()
+	
 # run comparisongs
 if __name__ == '__main__':
 
-	from test_angr_sh4 import test_lift_one, arch_sh4
-
-	# Instructions that we manually tested
-	skip = ['MOVLS','SETT','TST','JSR','MOVT','CMPPZ','XOR','MOVBL4','NEGC','MOVWL','MOVBL','AND','SHAR','STSFPUL','SUB','MOVLL','CMPHS','MOVW','JMP','NOP','MOVBS4','MOVBL0','MOVWS0','CMPHI','CMPEQ','SUBC','MOVBS','MOVBL0','LDSFPUL','MOVBS0','RTS','MOV','ADD','MOVLI','SHLL','MOVLS4','BF','BT','MOVLL4','EXTS','ADDI', 'CMPGT','MOVI','BRA','FLDS','LDSLPR','MOVLM','FSTS','MOVLP','STSLPR','MOVBSG']
+	# Instructions that we previously tested
+	# skip = ['MOVLS','SETT','TST','JSR','MOVT','CMPPZ','XOR','MOVBL4','NEGC','MOVWL','MOVBL','AND','SHAR','STSFPUL','SUB','MOVLL','CMPHS','MOVW','JMP','NOP','MOVBS4','MOVBL0','MOVWS0','CMPHI','CMPEQ','SUBC','MOVBS','MOVBL0','LDSFPUL','MOVBS0','RTS','MOV','ADD','MOVLI','SHLL','MOVLS4','BF','BT','MOVLL4','EXTS','ADDI', 'CMPGT','MOVI','BRA','FLDS','LDSLPR','MOVLM','FSTS','MOVLP','STSLPR','MOVBSG']
 	skip = []
 	
 	seen = set()
 	step = True if raw_input("Step (y/n)?") == "y" else False
 
-	for instruction in readObjdump('disasm.txt').values():
+	for instruction in readObjdump('./test_programs/sh4/disasm.txt').values():
 
 		try:
 			instr = instruction['byte0'] + instruction['byte1']
@@ -104,7 +127,9 @@ if __name__ == '__main__':
 			print("=" * 50)
 			
 			if step:
-				raw_input("Press enter to continue to next...")
+				c = raw_input("Press enter to continue to next...")
+				if c == "c":
+					step = False
 					
 		except Exception as e:
 		
@@ -112,5 +137,9 @@ if __name__ == '__main__':
 			print("ERROR decoding instruction at %s!" % instruction['addr'])
 			break
 
-	print("Lifted the following instructions: ")
+	print("Lifted the following %s instruction classes: " % len(seen))
 	print(sorted(seen))
+	
+# This is how you would manually test one instruction
+#test_lift_one("\x11\x2f").pp()
+#test_lift_one("\x08\x2f").pp()

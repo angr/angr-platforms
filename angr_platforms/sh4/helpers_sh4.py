@@ -4,7 +4,13 @@ import instrs_sh4
 import pyvex
 from pyvex.lifting.util import *
 import inspect
+import angr
 from archinfo.arch import Endness
+
+"""
+Lifter and other helper classes for angr SH4 support
+Author: bob123456678
+"""
 
 """
 Work in progress calling convention
@@ -41,7 +47,7 @@ class LifterSH4(GymratLifter):
 	 instrs = [instrs_sh4.__dict__[x] for x in filter(lambda x: x.startswith("Instruction_"), instrs_sh4.__dict__.keys())]
 	 
 	 """
-	 Reverse the endianness of the input data (SH4 instructions).  Total hack.
+	 Reverse the order of the input data (SH4 instructions).
 	 Note: only needed if we are loading manually	
 	 """
 	 def revBytes(self, binData):
@@ -70,7 +76,7 @@ class LifterSH4(GymratLifter):
 			self.data = self.thedata = toLift
 			
 """
-	Class representing a condition to check register or memory values
+Class representing a condition to check register or memory values
 """
 class Cond():
 
@@ -87,6 +93,8 @@ class Cond():
 		checkValue = self.checkValue
 		if isinstance(checkValue, int):
 			checkValue = "mem[%s]" % hex(checkValue)
+		elif callable(checkValue):
+			checkValue = inspect.getsource(checkValue)
 	
 		if callable(self.desiredValue):
 			desiredValue = inspect.getsource(self.desiredValue)
@@ -96,7 +104,7 @@ class Cond():
 		return "%s (%s) %s %s" % (checkValue, actualValue, self.operation, desiredValue)
 		
 """
-	Class that runs a binary while checking conditions on register/mem values
+Class that runs a binary using a simulation manager while checking conditions on register/mem values
 """
 class ConditionChecker():
 
@@ -197,6 +205,8 @@ class ConditionChecker():
 			pc = self.s().regs.pc
 			
 			self.smgr.step(num_inst=1)
+			
+			# Todo- we can probably use state.history instead!
 			self.prevPc = pc
 			self.checkConditions(self.getPc())
 	
@@ -230,6 +240,9 @@ class ConditionChecker():
 				# Previous PC
 				elif cond.checkValue == 'prevPc':
 					toCheck = self.prevPc
+				# Lambda
+				elif callable(cond.checkValue):
+					toCheck = cond.checkValue(self)
 				# Memory
 				else:
 					toCheck = self.smgr.one_active.state.memory.load(cond.checkValue, endness = Endness.LE)
@@ -257,3 +270,7 @@ class ConditionChecker():
 					allPassed = False
 					
 		return allPassed
+	
+# We need to register the CC and lifter with angr	
+angr.calling_conventions.register_default_cc('sh4', SimCCSH4LinuxSyscall)
+pyvex.lifting.register(LifterSH4, 'sh4')

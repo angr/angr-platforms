@@ -1,8 +1,11 @@
 from archinfo.arch import register_arch, Arch, Endness
 from archinfo.tls import TLSArchInfo
-"""from angr.simos import register_simos
-register_simos('SH4', SimMSP430)"""
 
+"""
+SH4 architecture class
+Author: pwnslinger, bob123456678
+Floating-point reg definitions are not tested
+"""
 class ArchSH4(Arch):
 
     # Used by the lifter to track delayed jumps
@@ -84,7 +87,7 @@ class ArchSH4(Arch):
     # there's another return called RTE used to return from change to
     # supervisor mode exceptions, but RTS is used in combination with RTS for
     # subroutine procedure calls
-	# AO: commented this out due to weird crash
+	# commented this out due to weird crash
     #ret_instruction = "\x0b00" # RTS (ReTurn from Subroutine)
     #nop_instruction = "\x0900"
     instruction_alignment = 1
