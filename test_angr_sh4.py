@@ -38,44 +38,114 @@ def test_lift_one(instr):
 
 def test_angr2(pth):
 
+	def check():
+		goto=set()
+		avoid=set()
+		for i in range(len(smgr.active)):
+
+			 a = smgr.active[i].posix.dumps(0)
+			 if a[0:-1] == a[-2::-1]:
+				 print(smgr.active[i].state.regs.pc)
+				 print str(smgr.active[i].posix.dumps(0))
+				 goto.add(smgr.active[i].state.regs.pc)
+				 print(i)
+			 else:
+				 avoid.add(smgr.active[i].state.regs.pc)
+				 
+		return goto-avoid
+			
 	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), pth))
 	
 	p = angr.Project(hellosh4, auto_load_libs=True)
 	entry = p.factory.entry_state()
 	smgr = p.factory.simgr(entry)
+	smgr2 = p.factory.simgr(entry)
+
 	
-	p.hook_symbol('read', angr.SIM_PROCEDURES['posix']['read']())
-	p.hook_symbol('write', angr.SIM_PROCEDURES['posix']['write']())
+	#smgr.use_technique(angr.exploration_techniques.dfs.DFS())
 	
+	smgr.use_technique(angr.exploration_techniques.lengthlimiter.LengthLimiter(175))
+	smgr2.use_technique(angr.exploration_techniques.lengthlimiter.LengthLimiter(175))
+	
+	#p.hook(0x40036c, angr.SIM_PROCEDURES['glibc']['__libc_start_main']())
+	p.hook(0x40036c, angr.SIM_PROCEDURES['posix']['read']())
+	p.hook(0x400350, angr.SIM_PROCEDURES['posix']['read']())
+	p.hook(0x4003f8, angr.SIM_PROCEDURES['posix']['write']())
+	p.hook(0x4003dc, angr.SIM_PROCEDURES['posix']['mmap']())
+	p.hook(0x400414, angr.SIM_PROCEDURES['linux_kernel']['munmap']())
+	p.hook(0x400b28, angr.SIM_PROCEDURES['cgc']['random']())
+	p.hook(0x400aa0, angr.SIM_PROCEDURES['cgc']['fdwait']())
+	p.hook(0x4009c0, angr.SIM_PROCEDURES['cgc']['allocate']())
+	p.hook(0x400a58, angr.SIM_PROCEDURES['cgc']['deallocate']())
+	p.hook(0x400918, angr.SIM_PROCEDURES['cgc']['transmit']())
+	p.hook(0x400890, angr.SIM_PROCEDURES['cgc']['receive']())
+	p.hook(0x4009a0, angr.SIM_PROCEDURES['cgc']['_terminate']())
+
+	#p.hook_symbol('write', angr.SIM_PROCEDURES['write']['munmap']())
+	
+	#smgr.explore()
+	#print(list(map(hex,smgr.one_deadended.history.bbl_addrs)))
+	
+	#list(map(hex,smgr.deadended[4].history.bbl_addrs))
+	
+	#smgr.step(n=100)
+	#smgr.explore(find=0x4004ce)
+	#smgr.explore(find=0x4004b2,avoid=[0x40049e])
+	
+	#smgr.explore(find=0x4006e0, avoid=[0x40062c])
+	
+	#400770
+	
+	"""
+	 goto=set()
+    ...: avoid=set()
+    ...: for i in range(60):
+    ...:
+    ...:     a = smgr.active[i].posix.dumps(0)
+    ...:     if a[0:-1] == a[-2::-1]:
+    ...:         print(smgr.active[i].state.regs.pc)
+    ...:         print str(smgr.active[i].posix.dumps(0))
+    ...:         goto.add(smgr.active[i].state.regs.pc)
+    ...:     else:
+    ...:         avoid.add(smgr.active[i].state.regs.pc)
+	"""
+	
+	#print(smgr.found[0].state.posix.dumps(0))
+	
+	#smgr.step(n=100)
+	
+	#c = ConditionChecker(smgr)
+	#c.execute(1000)
+	
+	smgr.run(n=150,avoid=lambda s: "Yes" in s.posix.dumps(1) or "Nope" in s.posix.dumps(1),find=lambda s: "EASTER" in s.posix.dumps(1))
+	
+	smgr2.run(n=150,avoid=lambda s: "EASTER" in s.posix.dumps(1) or "Nope" in s.posix.dumps(1),find=lambda s: "Yes" in s.posix.dumps(1))
+
 	IPython.embed()
 		
 """
-End-to-end path analysis
+Dynamically test our lifter using a condition checker
+Run this as a sanity check before starting symbolic exploration
 """
-def test_angr(pth):
+def test_dynamic(pth):
 		
 	hellosh4 = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), pth))
 	
 	p = angr.Project(hellosh4, auto_load_libs=True)
-	#entry = p.factory.entry_state()
 	entry = p.factory.blank_state(addr=0x400436)
 	smgr = p.factory.simgr(entry)
-	
-	#project.hook(0x40036c, angr.SIM_PROCEDURES['glibc']['__libc_start_main']())
-	project.hook_symbol('read', angr.SIM_PROCEDURES['posix']['read']())
-	project.hook_symbol('write', angr.SIM_PROCEDURES['posix']['write']())
-	project.hook_symbol('mmap', angr.SIM_PROCEDURES['posix']['mmap']())
-	#project.hook_symbol('munmap', angr.SIM_PROCEDURES['posix']['munmap']())
 
-	
+	entry2 = p.factory.entry_state()
+	smgr2 = p.factory.simgr(entry)
+		
 	try:
 		irsb = p.factory.block(p.entry).vex
 	except Exception as e:
 		print(e)
 	
-	#4004ce
+	# below assuming entry point is at 4004ce
 	
-	c = ConditionChecker(smgr)
+	c = ConditionChecker(smgr2)
 	c.addCond(0x400c10, Cond('r1', '==', 0x400bac))
 	c.addCond(0x400c10, Cond(0x400c2c, '==', 0x400bac))
 	c.addCond(0x400c10, Cond('prevPc', '==', 0x400c0e))
@@ -111,11 +181,11 @@ def test_angr(pth):
 	c.addCond(0x400358, Cond('r0', '==', 0x411008))
 	c.addCond(0x40035a, Cond('r0', '!=', 0))
 	
-	#c.execute(36)
-
-	# static hooker
+	c.execute(36)
 	
 	# below assuming entry point is at 0x400436
+	
+	c = ConditionChecker(smgr)
 	
 	c.addCond(0x400438, Cond('r15', '==', 0x7fff0000 - 4))
 	c.addCond(0x40043a, Cond('r14', '==', lambda c: c.s().regs.r15))
@@ -175,26 +245,22 @@ def test_angr(pth):
 	c.addCond(0x400700, Cond('r3', '==', lambda c: c.reg().r1 + c.reg().r2))
 	c.addCond(0x400700, Cond('r2', '!=', lambda c: c.reg().r14))
 	c.addCond(0x400702, Cond('r2', '==', lambda c: c.reg().r14))
-	c.addCond(0x400704, Cond('r2', '==', lambda c: c.reg().r14 - 40))
-
-	#r2 = mem[r14]
-	#r1 = mem[r14+20]
-	#r2 = mem[r14] - mem[r14+20]
-	
+	c.addCond(0x400704, Cond('r2', '==', lambda c: c.reg().r14 - 40))	
 	c.addCond(0x40070e, Cond('r2', '==', lambda c: c.mem(c.reg().r14) - c.mem(c.reg().r14 + 20)))
 	c.addCond(0x4003fc, Cond('r0', '==', 0x400400))
 	c.addCond(0x400400, Cond('prevPc', '==', 0x4003fe))
 	c.addCond(0x400350, Cond('prevPc', '==', lambda c: c.mem(0x411020)))
 
 
-	
+	# Instruction 114 will try to jump to missing GOT entry
 	c.execute(113)
 	
 	#print(p.factory.block(0x4006d8).vex)
 	
 	#print(p.factory.block(0x4006d8).vex)
 	
-	print(c.instrs)
+	print("Instructions tested:")
+	print(sorted(c.instrs))
 
 	IPython.embed()
 
@@ -241,7 +307,6 @@ def test_1bytecrackme_good():
 	smgr.stash(from_stash="deadended", to_stash="bad", filter_func=bad_states)
 	nose.tools.assert_equals("\n", smgr.deadended[0].posix.dumps(0))
 
-
 if __name__ == '__main__':
 	
 	angr.calling_conventions.register_default_cc('sh4', helpers_sh4.SimCCSH4LinuxSyscall)
@@ -256,12 +321,10 @@ if __name__ == '__main__':
 	#test_lifting('./test_programs/sh4/CADET_00001.sh4', 0x40055e, 4)
 	#test_lifting('./test_programs/sh4/CADET_00001.sh4', 0x400ba0, 4)
 	
-	
 	#test_lift_one("\x2f\x11")
 	#test_lift_one("\x2f\x08")
 
-	test_angr('./test_programs/sh4/CADET_00001.sh4')
+	#test_angr('./test_programs/sh4/CADET_00001.sh4')
 
 	test_angr2('./test_programs/sh4/CADET_00001.sh4')
 	#test_1bytecrackme_good()
-

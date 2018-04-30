@@ -39,11 +39,7 @@ class SH4Instruction(Instruction):
 	def __init__(self, bitstrm, arch, addr):
 		super(SH4Instruction, self).__init__(bitstrm, arch, addr)
 
-		#print(self)
-		#print(self.bin_format)
-
 	# Some common stuff we use around
-	
 	def get_pc(self):
 		return self.get('pc', REGISTER_TYPE)
 
@@ -52,7 +48,7 @@ class SH4Instruction(Instruction):
 		b = Bits(bin=self.data[letter])
 		
 		return b.int if signed else b.uint
-	
+		
 	"""
 	
 	# Default flag handling
@@ -103,6 +99,7 @@ class SH4Instruction(Instruction):
 	##############################################		
 	# AO's Code		
 	# Based on instrs in: http://www.shared-ptr.com/sh_insns.html
+	# and code by pwnslinger
 	##############################################	
 	
 	"""
@@ -137,7 +134,7 @@ class SH4Instruction(Instruction):
 				# Do something fancy
 				if ArchSH4.DELAYED_DEST_PC[0] == "displace":
 				
-					pc = self.constant(ArchSH4.DELAYED_DEST_PC[1], LWORD_TYPE)
+					pc = self.constant(self.addr + ArchSH4.DELAYED_DEST_PC[1], LWORD_TYPE)
 					
 				else:
 				
@@ -220,14 +217,17 @@ class SH4Instruction(Instruction):
 	Gets the VexValue of the register referenced by the specified letter
 	in the instruction's bin_format
 	"""
-	def get_rreg_val(self, letter, ty = Type.int_32, extend = False, zerox = False, float=False):
+	def get_rreg_val(self, letter, ty = Type.int_32, extend = False, zerox = False, float=False, signed=None):
 		val = self.get(self.get_rreg(letter, float), ty)
+		
+		if signed is not None:
+			val = val.cast_to(ty, signed=signed)
 		
 		if extend:
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			val = val.cast_to(zerox, signed=False)
+			val = val.cast_to(zerox)
 			
 		return val
 
@@ -240,12 +240,10 @@ class SH4Instruction(Instruction):
 		val = self.constant(self.bits_to_int(letter, signed), ty)
 			
 		if extend:
-			ty = extend
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			ty = zerox
-			val = val.cast_to(zerox, signed=False)
+			val = val.cast_to(zerox)
 			
 		return val
 		
@@ -253,14 +251,17 @@ class SH4Instruction(Instruction):
 	get register value
 	Gets the VexValue of the register with the specified name
 	"""
-	def get_reg_val(self, regname, ty = Type.int_32, extend = False, zerox = False):
+	def get_reg_val(self, regname, ty = Type.int_32, extend = False, zerox = False, signed=None):
 		val = self.get(regname, ty)
+		
+		if signed is not None:
+			val = val.cast_to(ty, signed=signed)
 		
 		if extend:
 			val = val.widen_signed(extend)
 			
 		if zerox:
-			val = val.cast_to(zerox, signed=False)
+			val = val.cast_to(zerox)
 			
 		return val
 			
@@ -708,7 +709,7 @@ class Instruction_MOVWL4(SH4Instruction):
 	
 		d, rm = self.fetch_operands()
 			
-		return "%s @(%s,%s),r0" % (self.name, self.bits_to_int('d', False), rm)
+		return "%s @(%s,%s),r0" % (self.name, self.bits_to_int('d', False) * 2, rm)
 
 	def compute_result2(self, d, rm):
 		"""
@@ -760,7 +761,7 @@ class Instruction_MOVBS(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m', ty=BYTE_TYPE)
+		rm = self.get_rreg_val('m', ty=BYTE_TYPE,extend=LWORD_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -789,7 +790,7 @@ class Instruction_MOVWS(SH4Instruction):
 	
 	def fetch_operands(self):
 									
-		rm = self.get_rreg_val('m', WORD_TYPE)
+		rm = self.get_rreg_val('m', ty=WORD_TYPE, extend=LWORD_TYPE)
 		rn = self.get_rreg_val('n')
 		rn_name = self.get_rreg('n')
 		rm_name = self.get_rreg('m')
@@ -1274,7 +1275,7 @@ class Instruction_MOVWS4(SH4Instruction):
 	
 		r0, d, rn_name, rn = self.fetch_operands()
 			
-		return "%s r0,@(%s,%s)" % (self.name, self.bits_to_int('d'), rn_name)
+		return "%s r0,@(%s,%s)" % (self.name, self.bits_to_int('d') * 2, rn_name)
 
 	def compute_result2(self, r0, d, rn_name, rn):
 		"""
@@ -1331,7 +1332,7 @@ class Instruction_MOVWLG(SH4Instruction):
 	
 		gbr, d = self.fetch_operands()
 			
-		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d'))
+		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d') * 2)
 
 	def compute_result2(self, gbr, d):
 		"""
@@ -1363,7 +1364,7 @@ class Instruction_MOVLLG(SH4Instruction):
 	
 		gbr, d = self.fetch_operands()
 			
-		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d'))
+		return "%s @(%s,GBR),r0" % (self.name, self.bits_to_int('d') * 4)
 
 	def compute_result2(self, gbr, d):
 		"""
@@ -1385,7 +1386,7 @@ class Instruction_MOVBSG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return gbr, d, r0
@@ -1394,7 +1395,7 @@ class Instruction_MOVBSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
+		return "%s r0,@(%s,gbr)" % (self.name, self.bits_to_int('d'))
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1415,7 +1416,7 @@ class Instruction_MOVWSG(SH4Instruction):
 	def fetch_operands(self):
 									
 		gbr = self.get_reg_val('gbr')
-		d = self.get_rimm_val('d', Type.int_16, zerox=Type.int_32)
+		d = self.get_rimm_val('d', Type.int_8, zerox=Type.int_32)
 		r0 = self.get_reg_val('r0')
 		
 		return gbr, d, r0
@@ -1424,7 +1425,7 @@ class Instruction_MOVWSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
+		return "%s r0,@(%s,gbr)" % (self.name, self.bits_to_int('d') * 2)
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1456,7 +1457,7 @@ class Instruction_MOVLSG(SH4Instruction):
 	
 		gbr, d,r0 = self.fetch_operands()
 			
-		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d'))
+		return "%s r0,@(%s,GBR)" % (self.name, self.bits_to_int('d') * 2)
 
 	def compute_result2(self, gbr, d, r0):
 		"""
@@ -1470,7 +1471,7 @@ class Instruction_MOVLSG(SH4Instruction):
 					
 		self.inc_pc()
 			
-# TODO Floating-Point Control Instructions - not implemented
+# TODO Floating-Point Instructions - not implemented
 
 class Instruction_LDSFPUL(SH4Instruction):
 
@@ -2718,7 +2719,7 @@ class Instruction_FSTS(SH4Instruction):
 	def fetch_operands(self):
 									
 		FPUL = self.get_reg_val('fpul')
-		rn_name = self.get_rreg('n')
+		rn_name = self.get_rreg('n',float=True)
 
 		return FPUL, rn_name
 		
@@ -2726,7 +2727,7 @@ class Instruction_FSTS(SH4Instruction):
 	
 		FPUL, rn_name = self.fetch_operands()
 			
-		return "%s FPUL,%s" % (self.name, rn_name)
+		return "%s fpul,%s" % (self.name, rn_name)
 
 	def compute_result2(self, FPUL, rn_name):
 		"""
@@ -3864,8 +3865,14 @@ class Instruction_BRA(SH4Instruction):
 		
 		d = self.bits_to_int('d')
 		
-		return [d]
+		# Sign extend
+		if (d & 0x800) == 0:
+			d = (0x00000FFF & d)
+		else:
+			d = (0xFFFFF000 | d)
 		
+		return [d]
+				
 	def disassemble(self):
 	
 		d = self.fetch_operands()
@@ -3880,17 +3887,14 @@ class Instruction_BRA(SH4Instruction):
 		As this is a delayed branch instruction, the instruction following this instruction is executed before the branch destination instruction. 
 		"""
 
-		if (d & 0x800) == 0:
-			d = (0x00000FFF & d)
-		else:
-			d = (0xFFFFF000 | d)
-		
-		d = 4 + (d << 1)
+		# only +2 because the jump offset will be relative to the next instr
+		d = 2 + (d << 1)
 		
 		self.inc_pc()
 		# When this gets executed, pc will be incremented by 2 already
 		ArchSH4.DELAYED_DEST_PC = ["displace", d]
 		ArchSH4.DELAYED_SET = True
+		ArchSH4.DELAYED_TYPE = False
 			
 class Instruction_BT(SH4Instruction):
 
@@ -3903,13 +3907,20 @@ class Instruction_BT(SH4Instruction):
 		# Must be constant!
 		d = self.bits_to_int('d')
 		
+		if ((d & 0x80) == 0):
+			d = (0x000000FF & d)
+		else:
+			d = (0xFFFFFF00 | d)
+			
+		d = d * 2 + 4
+		
 		return sr,d
 		
 	def disassemble(self):
 	
 		sr,d = self.fetch_operands()
 			
-		return "%s %s" % (self.name, self.bits_to_int('d') * 2 + 4)
+		return "%s pc+%s" % (self.name, d)
 
 	def compute_result2(self, sr, d):
 		"""
@@ -3920,14 +3931,7 @@ class Instruction_BT(SH4Instruction):
 		If the branch destination cannot be reached, the branch must be handled by using BF in combination with a BRA or JMP instruction, for example. 
 		"""
 		
-		"""
-		if ((d & 0x80) == 0):
-			d = (0x000000FF & d)
-		else:
-			d = (0xFFFFFF00 | d)
-		"""
-		
-		addr = self.constant(self.addr + 4 + (d << 1), LWORD_TYPE)
+		addr = self.constant(self.addr + d, LWORD_TYPE)
 				
 		# self.inc_pc()
 		# PC +2 has to happen if we don't branch (done below)
@@ -3943,7 +3947,15 @@ class Instruction_BF(SH4Instruction):
 	def fetch_operands(self):
 		
 		sr = self.get_reg_val('sr')
+		# Must be constant!
 		d = self.bits_to_int('d')
+		
+		if ((d & 0x80) == 0):
+			d = (0x000000FF & d)
+		else:
+			d = (0xFFFFFF00 | d)
+			
+		d = d * 2 + 4
 		
 		return sr,d
 		
@@ -3951,7 +3963,7 @@ class Instruction_BF(SH4Instruction):
 	
 		sr,d = self.fetch_operands()
 			
-		return "%s %s" % (self.name, self.bits_to_int('d') * 2 + 4)
+		return "%s pc+%s" % (self.name, d)
 
 	def compute_result2(self, sr, d):
 		"""
@@ -3962,14 +3974,7 @@ class Instruction_BF(SH4Instruction):
 		If the branch destination cannot be reached, the branch must be handled by using BF in combination with a BRA or JMP instruction, for example. 
 		"""
 		
-		"""
-		if ((d & 0x80) == 0):
-			d = (0x000000FF & d)
-		else:
-			d = (0xFFFFFF00 | d)
-		"""
-		
-		addr = self.constant(self.addr + 4 + (d << 1), LWORD_TYPE)
+		addr = self.constant(self.addr + d, LWORD_TYPE)
 				
 		self.jump((sr & 1) == 0, addr)
 		self.jump((sr & 1) == 1, self.constant(self.addr + 2, LWORD_TYPE))
@@ -4076,8 +4081,8 @@ class Instruction_CMPEQIM(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		r0 = self.get_reg_val('r0')
-		i = self.get_rimm_val('i')
+		r0 = self.get_reg_val('r0', signed=True)
+		i = self.get_rimm_val('i',BYTE_TYPE,signed=True,extend=LWORD_TYPE)
 		sr = self.get_reg_val('sr')
 		
 		return r0, i, sr
@@ -4093,15 +4098,15 @@ class Instruction_CMPEQIM(SH4Instruction):
 		Compares general register R0 and the sign-extended 8-bit immediate data and sets the T bit if the values are equal. If they are not equal the T bit is cleared. The contents of R0 are not changed.  		
 		"""
 
-		if ((i & 0x80) == 0):
-			imm = (0x000000FF & i);
-		else:
-			imm = (0xFFFFFF00 | i);
+		#if ((i & 0x80) == 0):
+		#	i = (0x000000FF & i);
+		#else:
+		#	i = (0xFFFFFF00 | i);
 			
 		srT = self.set_flags(sr, T=1)
 		srF = self.set_flags(sr, T=0)
 		
-		self.put_conditional(r0 == imm, srT, srF, 'sr')
+		self.put_conditional(r0 == i, srT, srF, 'sr')
 
 		self.inc_pc()					
 
@@ -4146,9 +4151,9 @@ class Instruction_CMPHS(SH4Instruction):
 	def fetch_operands(self):
 		
 		rn_name = self.get_rreg('n')
-		rn = self.get_rreg_val('n')
+		rn = self.get_rreg_val('n',signed=False)
 		rm_name = self.get_rreg('m')
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m',signed=False)
 		sr = self.get_reg_val('sr')
 		
 		return rm, rm_name, rn, rn_name, sr
@@ -4164,8 +4169,8 @@ class Instruction_CMPHS(SH4Instruction):
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater or equal Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 		
 		"""
 		
-		rm = rm.cast_to(LWORD_TYPE, signed=False)
-		rn = rn.cast_to(LWORD_TYPE, signed=False)
+		#rm = rm.cast_to(LWORD_TYPE, signed=False)
+		#rn = rn.cast_to(LWORD_TYPE, signed=False)
 
 		srT = self.set_flags(sr, T=1)
 		srF = self.set_flags(sr, T=0)
@@ -4181,9 +4186,9 @@ class Instruction_CMPGE(SH4Instruction):
 	
 	def fetch_operands(self):
 		
-		rn_name = self.get_rreg('n')
+		rn_name = self.get_rreg('n',signed=True)
 		rn = self.get_rreg_val('n')
-		rm_name = self.get_rreg('m')
+		rm_name = self.get_rreg('m',signed=True)
 		rm = self.get_rreg_val('m')
 		sr = self.get_reg_val('sr')
 		
@@ -4258,9 +4263,9 @@ class Instruction_CMPHI(SH4Instruction):
 	def fetch_operands(self):
 		
 		rn_name = self.get_rreg('n')
-		rn = self.get_rreg_val('n')
+		rn = self.get_rreg_val('n', signed=False)
 		rm_name = self.get_rreg('m')
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m',signed=False)
 		sr = self.get_reg_val('sr')
 		
 		return rm, rm_name, rn, rn_name, sr
@@ -4276,8 +4281,8 @@ class Instruction_CMPHI(SH4Instruction):
 		Compares general registers Rn and Rm, and sets the T bit if Rn is greater Rm. The values for the comparison are interpreted as unsigned integer values. The contents of Rn and Rm are not changed. 			
 		"""
 				
-		rm = rm.cast_to(LWORD_TYPE, signed=False)
-		rn = rn.cast_to(LWORD_TYPE, signed=False)
+		#rm = rm.cast_to(LWORD_TYPE, signed=False)
+		#rn = rn.cast_to(LWORD_TYPE, signed=False)
 		
 		srT = self.set_flags(sr, T=1)
 		srF = self.set_flags(sr, T=0)
@@ -4294,9 +4299,9 @@ class Instruction_CMPGT(SH4Instruction):
 	def fetch_operands(self):
 		
 		rn_name = self.get_rreg('n')
-		rn = self.get_rreg_val('n')
+		rn = self.get_rreg_val('n',signed=True)
 		rm_name = self.get_rreg('m')
-		rm = self.get_rreg_val('m')
+		rm = self.get_rreg_val('m',signed=True)
 		sr = self.get_reg_val('sr')
 		
 		return rm, rm_name, rn, rn_name, sr
@@ -4327,7 +4332,7 @@ class Instruction_CMPPL(SH4Instruction):
 	def fetch_operands(self):
 		
 		rn_name = self.get_rreg('n')
-		rn = self.get_rreg_val('n')
+		rn = self.get_rreg_val('n',signed=True)
 		sr = self.get_reg_val('sr')
 		
 		return rn, rn_name, sr
@@ -4356,7 +4361,7 @@ class Instruction_CMPPZ(SH4Instruction):
 	def fetch_operands(self):
 		
 		rn_name = self.get_rreg('n')
-		rn = self.get_rreg_val('n')
+		rn = self.get_rreg_val('n',signed=True)
 		sr = self.get_reg_val('sr')
 		
 		return rn, rn_name, sr

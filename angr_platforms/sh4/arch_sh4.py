@@ -74,7 +74,7 @@ class ArchSH4(Arch):
     triplet = 'sh4-linux-gnu' # ? https://github.com/flashrom/flashrom-buildbot/blob/master/build-libftdi1#L28
     instruction_endness = Endness.LE # It's bi-endian, LE/BE but default LE
     ida_processor = 'sh4'
-    max_inst_bytes = 4
+    max_inst_bytes = 2
     lr_offset = 76
     ip_offset = 72
     sp_offset = 68
@@ -84,9 +84,9 @@ class ArchSH4(Arch):
     # there's another return called RTE used to return from change to
     # supervisor mode exceptions, but RTS is used in combination with RTS for
     # subroutine procedure calls
-	# Adam: commented this out due to weird crash
-    #ret_instruction = b"\x0b\x00" # RTS (ReTurn from Subroutine)
-    #nop_instruction = b"\x09\x00"
+	# AO: commented this out due to weird crash
+    #ret_instruction = "\x0b00" # RTS (ReTurn from Subroutine)
+    #nop_instruction = "\x0900"
     instruction_alignment = 1
     persistent_regs = [ 'r8', 'r9', 'r10', 'r11', 'r12', 'r13' ] # does it mean permanent registers ?
 
