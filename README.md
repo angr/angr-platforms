@@ -1,5 +1,7 @@
 This is a SH4 lifter for angr/pyvex.
 
+Written by Adam O. (bob123456678)
+
 Drop these files into an angr workspace, then run either of the test scripts to test the lifter.
 
 Additional work is needed to complete floating-point instructions.
