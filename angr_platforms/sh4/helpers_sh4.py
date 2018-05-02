@@ -88,7 +88,7 @@ class Cond():
 		self.checkValue = checkValue
 		self.desiredValue = desiredValue
 		
-	def toString(self, actualValue):
+	def pp(self, actualValue):
 	
 		checkValue = self.checkValue
 		if isinstance(checkValue, int):
@@ -183,7 +183,7 @@ class ConditionChecker():
 	"""
 	Adds a new condition at the specified program counter
 	"""
-	def addCond(self, pc, cond):
+	def add_cond(self, pc, cond):
 			
 		# Give this condition an index
 		cond.i = self.count
@@ -204,16 +204,17 @@ class ConditionChecker():
 			# Save current pc as previous
 			pc = self.s().regs.pc
 			
+			# TODO - we can pass *args, and also add support for .explore / .run
 			self.smgr.step(num_inst=1)
 			
-			# Todo- we can probably use state.history instead!
+			# TODO - we can probably use state.history instead!
 			self.prevPc = pc
-			self.checkConditions(self.getPc())
+			self.check_conditions(self.getPc())
 	
 	"""
 	Checks all conditions at the given address
 	"""
-	def checkConditions(self, address):
+	def check_conditions(self, address):
 	
 		allPassed = True
 		
@@ -264,7 +265,7 @@ class ConditionChecker():
 					raise NotImplementedError("Bad operator.")
 					
 				if True or not passed:
-					print("%s condition %s" % ("Passed" if passed else "***FAILED",cond.toString(toCheck)))
+					print("%s condition %s" % ("Passed" if passed else "***FAILED",cond.pp(toCheck)))
 				
 				if not passed:
 					allPassed = False
