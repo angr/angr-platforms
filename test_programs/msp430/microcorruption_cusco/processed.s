@@ -1,0 +1,274 @@
+.global __trap_interrupt
+.global __init_stack
+.global __low_level_init
+.global __do_copy_data
+.global __do_clear_bss
+.global main
+.global __stop_progExec__
+.global __ctors_end
+.global unlock_door
+.global test_password_valid
+.global login
+.global __do_nothing
+.global INT
+.global putchar
+.global getchar
+.global getsn
+.global puts
+.global _unexpected_
+
+.text
+.org 0x10
+__trap_interrupt: ret
+.org 0x4400
+__init_stack: mov #0x4400, r1
+.org 0x4404
+__low_level_init: mov &0x015c, r5
+.org 0x4408
+and.b #-0x1, r5
+.org 0x440a
+bis #0x5a08, r5
+.org 0x440e
+__do_copy_data: clr r15
+.org 0x4410
+nop
+.org 0x4412
+tst r15
+.org 0x4414
+jz 0xe
+.org 0x4416
+mov r5, &0x015c
+.org 0x441a
+decd r15
+.org 0x441c
+mov 0x45d4(r15), 0x2400(r15)
+.org 0x4422
+jnz -0xc
+.org 0x4424
+__do_clear_bss: clr r15
+.org 0x4426
+nop
+.org 0x4428
+tst r15
+.org 0x442a
+jz 0xc
+.org 0x442c
+mov r5, &0x015c
+.org 0x4430
+dec r15
+.org 0x4432
+mov.b #0x0, 0x2400(r15)
+.org 0x4436
+jnz -0xa
+.org 0x4438
+main: call #0x4500
+.org 0x443c
+__stop_progExec__: bis #0xf0, r2
+.org 0x4440
+jmp -0x4
+.org 0x4442
+__ctors_end: br #0x45d2
+.org 0x4446
+unlock_door: push #0x7f
+.org 0x444a
+call #0x4542
+.org 0x444e
+incd r1
+.org 0x4450
+ret
+.org 0x4452
+test_password_valid: push r4
+.org 0x4454
+mov r1, r4
+.org 0x4456
+incd r4
+.org 0x4458
+decd r1
+.org 0x445a
+mov.b #0x0, -0x4(r4)
+.org 0x445e
+mov #0xfffc, r14
+.org 0x4462
+add r4, r14
+.org 0x4464
+push r14
+.org 0x4466
+push r15
+.org 0x4468
+push #0x7d
+.org 0x446c
+call #0x4542
+.org 0x4470
+mov.b -0x4(r4), r15
+.org 0x4474
+sxt r15
+.org 0x4476
+add #0x8, r1
+.org 0x4478
+pop r4
+.org 0x447a
+ret
+.org 0x447c
+.strings: .string "Enter the password to continue."
+.org 0x449c
+.string "Remember: passwords are between 8 and 16 characters."
+.org 0x44d1
+.string "Access granted."
+.org 0x44e1
+.string "That password is not correct."
+.org 0x44ff
+.string ""
+.org 0x4500
+login: add #0xfff0, r1
+.org 0x4504
+mov #0x447c , r15
+.org 0x4508
+call #0x45a6
+.org 0x450c
+mov #0x449c , r15
+.org 0x4510
+call #0x45a6
+.org 0x4514
+mov #0x30, r14
+.org 0x4518
+mov r1, r15
+.org 0x451a
+call #0x4596
+.org 0x451e
+mov r1, r15
+.org 0x4520
+call #0x4452
+.org 0x4524
+tst r15
+.org 0x4526
+jz 0xa
+.org 0x4528
+call #0x4446
+.org 0x452c
+mov #0x44d1 , r15
+.org 0x4530
+jmp 0x4
+.org 0x4532
+mov #0x44e1 , r15
+.org 0x4536
+call #0x45a6
+.org 0x453a
+add #0x10, r1
+.org 0x453e
+ret
+.org 0x4540
+__do_nothing: ret
+.org 0x4542
+INT: mov 0x2(r1), r14
+.org 0x4546
+push r2
+.org 0x4548
+mov r14, r15
+.org 0x454a
+swpb r15
+.org 0x454c
+mov r15, r2
+.org 0x454e
+bis #0x8000, r2
+.org 0x4552
+call #0x10
+.org 0x4556
+pop r2
+.org 0x4558
+ret
+.org 0x455a
+putchar: decd r1
+.org 0x455c
+push r15
+.org 0x455e
+push #0x0
+.org 0x4560
+mov r15, 0x4(r1)
+.org 0x4564
+call #0x4542
+.org 0x4568
+mov 0x4(r1), r15
+.org 0x456c
+add #0x6, r1
+.org 0x4570
+ret
+.org 0x4572
+getchar: push r4
+.org 0x4574
+mov r1, r4
+.org 0x4576
+incd r4
+.org 0x4578
+decd r1
+.org 0x457a
+mov #0xfffc, r15
+.org 0x457e
+add r4, r15
+.org 0x4580
+push r15
+.org 0x4582
+push #0x1
+.org 0x4584
+call #0x4542
+.org 0x4588
+mov.b -0x4(r4), r15
+.org 0x458c
+sxt r15
+.org 0x458e
+add #0x6, r1
+.org 0x4592
+pop r4
+.org 0x4594
+ret
+.org 0x4596
+getsn: push r14
+.org 0x4598
+push r15
+.org 0x459a
+push #0x2
+.org 0x459c
+call #0x4542
+.org 0x45a0
+add #0x6, r1
+.org 0x45a4
+ret
+.org 0x45a6
+puts: push r11
+.org 0x45a8
+mov r15, r11
+.org 0x45aa
+jmp 0xe
+.org 0x45ac
+inc r11
+.org 0x45ae
+sxt r15
+.org 0x45b0
+push r15
+.org 0x45b2
+push #0x0
+.org 0x45b4
+call #0x4542
+.org 0x45b8
+add #0x4, r1
+.org 0x45ba
+mov.b @r11, r15
+.org 0x45bc
+tst.b r15
+.org 0x45be
+jnz -0x12
+.org 0x45c0
+push #0xa
+.org 0x45c4
+push #0x0
+.org 0x45c6
+call #0x4542
+.org 0x45ca
+add #0x4, r1
+.org 0x45cc
+clr r15
+.org 0x45ce
+pop r11
+.org 0x45d0
+ret
+.org 0x45d2
+_unexpected_: reti pc

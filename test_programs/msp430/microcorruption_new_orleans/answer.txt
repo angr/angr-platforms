@@ -1,0 +1,5 @@
+The correct password is
+
+hex: 7d493c6a51373f
+
+It is simply comparing against a hardcoded string
