@@ -1,6 +1,6 @@
 import pyvex
-from arch_msp430 import ArchMSP430
-import instrs_msp430 as instrs
+from .arch_msp430 import ArchMSP430
+from . import instrs_msp430 as instrs
 from pyvex.lifting import register
 from pyvex.lifting.util import *
 
@@ -13,11 +13,3 @@ class LifterMSP430(GymratLifter):
 register(LifterMSP430, 'MSP430')
 
 
-if __name__ == '__main__':
-    arch = ArchMSP430()
-    irsb = pyvex.IRSB('\xf8\x23', 0, arch)
-    l = LifterMSP430(irsb, '\xf8\x23', 1, 1, 0)
-    print l.disassemble()
-    #irsb = l.lift()
-    print irsb.statements
-    irsb.pp()

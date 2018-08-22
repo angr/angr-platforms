@@ -254,7 +254,7 @@ def disasm(state, addr, length=None):
     b = addr
     while length is not None and b < addr + length:
         ins = decode(state, b)
-        print hex(b), ins
+        print(hex(b), ins)
         b += ins.LEN
 
         if isinstance(b, InstructionJump):

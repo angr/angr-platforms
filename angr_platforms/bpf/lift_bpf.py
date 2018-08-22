@@ -234,7 +234,9 @@ class Inst_DIV(Inst_Arithmetic):
 
     def compute_result(self, x):
         a = self.get('A', Type.int_32)
-        self.put(a / self.constant(x, Type.int_32), 'A')
+        c = self.constant(x, Type.int_32)
+        tmp_a = a // c
+        self.put(tmp_a, 'A')
 
 
 class Inst_AND(Inst_Arithmetic):

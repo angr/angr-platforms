@@ -13,7 +13,7 @@ def test_sydney():
     simgr = p.factory.simgr()
     simgr.explore(find=0x4462)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_true('47544e6b7b5f443a00' in stdin_contents.encode('hex'))
+    nose.tools.assert_true('47544e6b7b5f443a00' in stdin_contents.hex())
 
 if __name__ == '__main__':
     test_sydney()

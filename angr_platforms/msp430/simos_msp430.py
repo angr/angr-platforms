@@ -2,8 +2,8 @@ from angr.simos import SimOS, register_simos
 from angr.sim_procedure import SimProcedure
 from angr.engines.vex import SimEngineVEX
 from angr.calling_conventions import SimStackArg, SimRegArg, SimCC, register_syscall_cc, register_default_cc, SimCC
-from arch_msp430 import ArchMSP430
-from arch_msp430 import ArchMSP430
+from .arch_msp430 import ArchMSP430
+from .arch_msp430 import ArchMSP430
 
 
 # http://mspgcc.sourceforge.net/manual/x1248.html

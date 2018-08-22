@@ -15,7 +15,7 @@ def test_new_orleans():
     simgr = p.factory.simgr()
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_true('7d493c6a51373f' in stdin_contents.encode('hex'))
+    nose.tools.assert_true('7d493c6a51373f' in stdin_contents.hex())
 
 if __name__ == '__main__':
     test_new_orleans()

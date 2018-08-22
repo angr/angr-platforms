@@ -24,7 +24,7 @@ def test_idea_correct_flag():
     # the syscall number must be 0x1337
     state.memory.store(proj.arch.DATA_BASE, 0x1337, endness='Iend_LE')
     # input variables
-    for i in xrange(0, len(flag), 4):
+    for i in range(0, len(flag), 4):
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.se.BVV(ord(flag[i]), 8))
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.se.BVV(ord(flag[i+1]), 8))
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.se.BVV(ord(flag[i+2]), 8))
@@ -53,7 +53,7 @@ def test_idea_incorrect_flag():
     # the syscall number must be 0x1337
     state.memory.store(proj.arch.DATA_BASE, 0x1337, endness='Iend_LE')
     # input variables
-    for i in xrange(0, len(flag), 4):
+    for i in range(0, len(flag), 4):
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.se.BVV(ord(flag[i]), 8))
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.se.BVV(ord(flag[i+1]), 8))
         state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.se.BVV(ord(flag[i+2]), 8))

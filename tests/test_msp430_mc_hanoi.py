@@ -13,7 +13,7 @@ def test_hanoi():
     simgr = p.factory.simgr()
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_equals(stdin_contents.encode('hex'), '00000000000000000000000000000000960000000000000000000000')
+    nose.tools.assert_equals(stdin_contents.hex(), '00000000000000000000000000000000960000000000000000000000')
 
 if __name__ == '__main__':
     test_hanoi()

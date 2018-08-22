@@ -1,1 +1,3 @@
-import lift_msp430, simos_msp430, arch_msp430
+from .arch_msp430 import *
+from .lift_msp430 import *
+from .simos_msp430 import *

@@ -31,7 +31,7 @@ class BF(Blob):
 
     @staticmethod
     def is_compatible(stream):
-        bf_re = re.compile('[+\-<>.,\[\]\n]+')
+        bf_re = re.compile(b'[+\-<>.,\[\]\n]+')
         stream.seek(0)
         stuff = stream.read(0x1000)
         if bf_re.match(stuff):
