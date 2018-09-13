@@ -51,9 +51,9 @@ class CT64KBlob(cle.backends.blob.Blob):
         self.os = 'ct64k'
         self.binary_stream.seek(file_offset)
         string = self.binary_stream.read(size)
-        unistring = u''.join(chr(c) for c in struct.unpack('H'*(len(string)//2), string))
-        self.memory.add_backer(mem_addr - self.linked_base, unistring)
-        self._max_addr = max(len(unistring) + mem_addr, self._max_addr)
+        memdata = list(struct.unpack('H'*(len(string)//2), string))
+        self.memory.add_backer(mem_addr - self.linked_base, memdata)
+        self._max_addr = max(len(memdata) + mem_addr, self._max_addr)
         self._min_addr = min(mem_addr, self._min_addr)
         self.engine_preset = ct64k_engine_preset
 
