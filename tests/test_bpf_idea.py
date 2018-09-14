@@ -17,7 +17,7 @@ def test_idea_correct_flag():
     assert proj.arch.name == 'BPF'
 
     state = proj.factory.entry_state()
-    simgr = proj.factory.simgr(state)
+    simgr = proj.factory.simulation_manager(state)
 
     # Initialize the state with the correct flag
     flag = "w0w_y0u_are_Master-0F-secc0mp///>_w_<///"
@@ -46,7 +46,7 @@ def test_idea_incorrect_flag():
     assert proj.arch.name == 'BPF'
 
     state = proj.factory.entry_state()
-    simgr = proj.factory.simgr(state)
+    simgr = proj.factory.simulation_manager(state)
 
     # Initialize the state with the incorrect flag
     flag = "w0w_y0u_are_Master-0F-secc0mp///>_w_<//\\"

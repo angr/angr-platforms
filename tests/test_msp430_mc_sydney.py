@@ -10,7 +10,7 @@ def test_sydney():
     p.hook_symbol('getsn', simos_msp430.MCgetsn())
     p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())
     p.hook_symbol('puts', simos_msp430.MCputs())
-    simgr = p.factory.simgr()
+    simgr = p.factory.simulation_manager()
     simgr.explore(find=0x4462)
     stdin_contents = simgr.found[0].posix.dumps(0)
     nose.tools.assert_true('47544e6b7b5f443a00' in stdin_contents.hex())

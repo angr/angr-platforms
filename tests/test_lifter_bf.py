@@ -9,7 +9,7 @@ def test_hello():
     hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/hello.bf'))
     p = angr.Project(hellobf)
     entry = p.factory.entry_state()
-    smgr = p.factory.simgr(entry)
+    smgr = p.factory.simulation_manager(entry)
     smgr.explore()
     nose.tools.assert_equals(smgr.deadended[0].posix.dumps(1), b'Hello World!\n')
 
@@ -18,7 +18,7 @@ def test_1bytecrackme_good():
     bad_states = lambda state: b"-" in state.posix.dumps(1)
     p = angr.Project(crackme)
     entry = p.factory.entry_state(remove_options={angr.options.LAZY_SOLVES})
-    smgr = p.factory.simgr(entry)
+    smgr = p.factory.simulation_manager(entry)
     smgr.run(until=lambda lsmgr: len(lsmgr.active) == 0)
     smgr.stash(from_stash="deadended", to_stash="bad", filter_func=bad_states)
     nose.tools.assert_equals(b"\n", smgr.deadended[0].posix.dumps(0))
