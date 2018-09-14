@@ -41,7 +41,7 @@ class MCgetsn(SimProcedure):
     def run(self, ptr, maxbytes):
         self.state.posix.fd[0].read(ptr, maxbytes)
         # NOTE: The behavior of EOF (this is zero) is undefined!!!
-        return self.state.se.Unconstrained('getsn', self.state.arch.bits)
+        return self.state.solver.Unconstrained('getsn', self.state.arch.bits)
 
 
 class SimMSP430(SimOS):
