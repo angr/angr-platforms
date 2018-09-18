@@ -15,16 +15,16 @@ class BF(Blob):
     """
     is_default = True
 
-    def __init__(self, path, custom_offset=0, *args, **kwargs):
+    def __init__(self, path, offset=0, *args, **kwargs):
         """
         Loader backend for BF programs
         :param path: The file path
-        :param custom_offset: Skip this many bytes from the beginning of the file.
+        :param offset: Skip this many bytes from the beginning of the file.
         """
         super(BF, self).__init__(path, *args,
-                custom_arch=arch_from_id("bf"),
-                custom_offset=custom_offset,
-                custom_entry_point=0,
+                arch=arch_from_id("bf"),
+                offset=offset,
+                entry_point=0,
                 **kwargs)
         self.os = "bf"
         self.engine_preset = bf_engine_preset

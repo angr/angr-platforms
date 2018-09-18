@@ -9,7 +9,7 @@ from .ct64_engine import *
 l = logging.getLogger('angr.ct64k')
 
 def load_rom(rom):
-    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'custom_arch': ArchCT64K(), 'custom_base_addr': 0x1000, 'custom_entry_point': 0x1000})
+    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000})
 
 class ArchCT64K(archinfo.Arch):
     def __init__(self, endness=archinfo.Endness.BE):
