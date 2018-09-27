@@ -1,4 +1,4 @@
-from angr_platforms.msp430 import *
+from angr_platforms.msp430 import arch_msp430, lift_msp430, simos_msp430
 import angr
 import os
 import nose
