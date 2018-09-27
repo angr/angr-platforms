@@ -1,8 +1,7 @@
-import pyvex
 from .arch_msp430 import ArchMSP430
 from . import instrs_msp430 as instrs
 from pyvex.lifting import register
-from pyvex.lifting.util import *
+from pyvex.lifting.util import GymratLifter
 
 
 class LifterMSP430(GymratLifter):
@@ -11,5 +10,3 @@ class LifterMSP430(GymratLifter):
     instrs = [instrs.__dict__[x] for x in filter(lambda x: x.startswith("Instruction_"), instrs.__dict__.keys())]
 
 register(LifterMSP430, 'MSP430')
-
-
