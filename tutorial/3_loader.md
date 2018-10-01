@@ -52,12 +52,12 @@ l = logging.getLogger("cle.bf")
 __all__ = ('BF',)
 
 class BF(Blob):
-    def __init__(self, path, custom_offset=0, *args, **kwargs):
+    def __init__(self, path, offset=0, *args, **kwargs):
 
         super(BF, self).__init__(path, *args,
-                custom_arch=arch_from_id("bf"),
-                custom_offset=custom_offset,
-                custom_entry_point=0,
+                arch=arch_from_id("bf"),
+                offset=offset,
+                entry_point=0,
                 **kwargs)
 
 ```

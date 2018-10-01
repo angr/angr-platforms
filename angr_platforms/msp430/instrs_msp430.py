@@ -1,5 +1,5 @@
 import abc
-from arch_msp430 import ArchMSP430
+from .arch_msp430 import ArchMSP430
 from pyvex.lifting.util import *
 import bitstring
 from bitstring import Bits

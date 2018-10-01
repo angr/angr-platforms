@@ -17,18 +17,18 @@ def test_idea_correct_flag():
     assert proj.arch.name == 'BPF'
 
     state = proj.factory.entry_state()
-    simgr = proj.factory.simgr(state)
+    simgr = proj.factory.simulation_manager(state)
 
     # Initialize the state with the correct flag
     flag = "w0w_y0u_are_Master-0F-secc0mp///>_w_<///"
     # the syscall number must be 0x1337
     state.memory.store(proj.arch.DATA_BASE, 0x1337, endness='Iend_LE')
     # input variables
-    for i in xrange(0, len(flag), 4):
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.se.BVV(ord(flag[i]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.se.BVV(ord(flag[i+1]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.se.BVV(ord(flag[i+2]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 3, state.se.BVV(ord(flag[i+3]), 8))
+    for i in range(0, len(flag), 4):
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.solver.BVV(ord(flag[i]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.solver.BVV(ord(flag[i+1]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.solver.BVV(ord(flag[i+2]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 3, state.solver.BVV(ord(flag[i+3]), 8))
 
     # Execute until it returns
     simgr.explore(find=(MAX_INSTR_ID * 8,))
@@ -46,18 +46,18 @@ def test_idea_incorrect_flag():
     assert proj.arch.name == 'BPF'
 
     state = proj.factory.entry_state()
-    simgr = proj.factory.simgr(state)
+    simgr = proj.factory.simulation_manager(state)
 
     # Initialize the state with the incorrect flag
     flag = "w0w_y0u_are_Master-0F-secc0mp///>_w_<//\\"
     # the syscall number must be 0x1337
     state.memory.store(proj.arch.DATA_BASE, 0x1337, endness='Iend_LE')
     # input variables
-    for i in xrange(0, len(flag), 4):
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.se.BVV(ord(flag[i]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.se.BVV(ord(flag[i+1]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.se.BVV(ord(flag[i+2]), 8))
-        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 3, state.se.BVV(ord(flag[i+3]), 8))
+    for i in range(0, len(flag), 4):
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i, state.solver.BVV(ord(flag[i]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 1, state.solver.BVV(ord(flag[i+1]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 2, state.solver.BVV(ord(flag[i+2]), 8))
+        state.memory.store(proj.arch.DATA_BASE + 0x10 + i + 3, state.solver.BVV(ord(flag[i+3]), 8))
 
     # Execute until it returns
     simgr.explore(find=(MAX_INSTR_ID * 8,))

@@ -122,7 +122,7 @@ class SimEngineBF(angr.SimEngine):
                 val_at_ptr = state.memory.load(state.regs.ptr, 1)
                 # find the ].  This returns None if we don't find it (ran off the end)
                 jk = "Ijk_Boring"
-                dest = self.resolve_jump(state, state.se.eval(state.ip))
+                dest = self.resolve_jump(state, state.solver.eval(state.ip))
                 taken_state = state.copy()
                 taken_state.ip = dest
                 not_taken_state = state.copy()
@@ -140,7 +140,7 @@ class SimEngineBF(angr.SimEngine):
                 # find the [, or the beginning.  If we go there, it's over.
                 jk = "Ijk_Boring"
                 taken_state = state.copy()
-                dest = self.resolve_jump(state, state.se.eval(state.ip))
+                dest = self.resolve_jump(state, state.solver.eval(state.ip))
                 taken_state.ip = dest
                 not_taken_state = state.copy()
                 not_taken_state.ip = state.ip + 1

@@ -2,7 +2,7 @@ import archinfo
 import pyvex
 from pyvex.lifting.util import *
 from pyvex.lifting import register
-from arch_bf import ArchBF
+from .arch_bf import ArchBF
 import bitstring
 import sys
 import os
