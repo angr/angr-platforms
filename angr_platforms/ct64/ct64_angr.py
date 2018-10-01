@@ -9,7 +9,7 @@ from .ct64_engine import *
 l = logging.getLogger('angr.ct64k')
 
 def load_rom(rom):
-    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'custom_arch': ArchCT64K(), 'custom_base_addr': 0x1000, 'custom_entry_point': 0x1000})
+    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000})
 
 class ArchCT64K(archinfo.Arch):
     def __init__(self, endness=archinfo.Endness.BE):
@@ -30,11 +30,11 @@ class ArchCT64K(archinfo.Arch):
             1: 'sp',
             2: 'bp',
     }
-    for i in xrange(3, 0x10):
+    for i in range(3, 0x10):
         register_names[i] = 'sc%X' % i
-    for i in xrange(0x10, 0x40):
+    for i in range(0x10, 0x40):
         register_names[i] = 'r%X' % i
-    for i in xrange(0x40, 0x100):
+    for i in range(0x40, 0x100):
         register_names[i] = 's%X' % i
 
     registers = {n: (o, 1) for o, n in register_names.items()}
@@ -51,9 +51,9 @@ class CT64KBlob(cle.backends.blob.Blob):
         self.os = 'ct64k'
         self.binary_stream.seek(file_offset)
         string = self.binary_stream.read(size)
-        unistring = u''.join(unichr(c) for c in struct.unpack('H'*(len(string)//2), string))
-        self.memory.add_backer(mem_addr - self.linked_base, unistring)
-        self._max_addr = max(len(unistring) + mem_addr, self._max_addr)
+        memdata = list(struct.unpack('H'*(len(string)//2), string))
+        self.memory.add_backer(mem_addr - self.linked_base, memdata)
+        self._max_addr = max(len(memdata) + mem_addr, self._max_addr)
         self._min_addr = min(mem_addr, self._min_addr)
         self.engine_preset = ct64k_engine_preset
 

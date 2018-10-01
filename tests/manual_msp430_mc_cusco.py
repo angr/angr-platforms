@@ -18,6 +18,6 @@ p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())
 p.hook_symbol('puts', simos_msp430.MCputs())
 state = p.factory.entry_state()
 state.options.update(o.refs)
-simgr = p.factory.simgr(state)
+simgr = p.factory.simulation_manager(state)
 simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
 print 'That last log message means we have ip control :)'
