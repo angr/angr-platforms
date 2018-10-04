@@ -32,8 +32,6 @@ class MCgetsn(SimProcedure):
           R14 has the max number of bytes to read
 
     """
-
-    IS_SYSCALL = False
     num_args = 2
     NUM_ARGS = 2
     # pylint:disable=arguments-differ
