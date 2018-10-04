@@ -10,8 +10,6 @@ class WriteByteAtPtr(SimProcedure):
     """
     Defines what to do for the "." instruction.
     """
-
-    IS_SYSCALL = True
     NUM_ARGS = 0
     num_args = 0
     # pylint:disable=arguments-differ
@@ -26,8 +24,6 @@ class ReadByteToPtr(SimProcedure):
     """
     Defines what to do for the "," instruction
     """
-
-    IS_SYSCALL = True
     num_args = 0
     NUM_ARGS = 0
     # pylint:disable=arguments-differ
