@@ -572,7 +572,6 @@ class Instruction_RETI(Type1Instruction):
 
     def compute_result(self, src):
         # Pop the saved SR
-        import ipdb; ipdb.set_trace(context=30)
         sp = self.get(1, REGISTER_TYPE)
         sr = self.get_sr()
         sp += 2
@@ -584,10 +583,10 @@ class Instruction_RETI(Type1Instruction):
         # Jump to PC (setting the jumpkind)
         self.jump(None, newpc, jumpkind=JumpKind.Ret)
 
-    def negative(self, ret):
+    def negative(self, *args):
         pass
 
-    def zero(self, ret):
+    def zero(self, *args):
         pass
 
 ##
