@@ -799,21 +799,6 @@ class Instruction_BIS(Type3Instruction):
         return src | dst
 
 
-class Instruction_BIT(Type3Instruction):
-    # Bit Test. Just update flags.  No write-out
-    opcode = "1011"
-    name = "bit"
-
-    def compute_result(self, src, dst):
-        return src & dst
-
-    def zero(self, src, dst, ret):
-        return self.constant(0, ret.ty)
-
-    def carry(self, src, dst, ret):
-        return ret != self.constant(0, ret.ty)
-
-
 class Instruction_XOR(Type3Instruction):
     # Exclusive Or
     opcode = "1110"
@@ -845,6 +830,15 @@ class Instruction_AND(Type3Instruction):
 
     def carry(self, src, dst, ret):
         return ret != self.constant(0, ret.ty)
+
+class Instruction_BIT(Instruction_AND):
+    # Bit Test. Just update flags.  No write-out
+    opcode = "1011"
+    name = "bit"
+
+    def commit_result(self, *args):
+        pass
+
 
 ##
 ## Zero-operand Jumps
