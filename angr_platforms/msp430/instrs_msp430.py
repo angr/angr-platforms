@@ -806,6 +806,9 @@ class Instruction_BIT(Type3Instruction):
 
     def compute_result(self, src, dst):
         return src & dst
+    
+    def commit_result(self, res):
+        pass
 
     def zero(self, src, dst, ret):
         return self.constant(0, ret.ty)
