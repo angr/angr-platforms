@@ -898,12 +898,12 @@ class Instruction_JL(Type2Instruction):
     name = 'jl'
 
     def compute_result(self, dst):
-        self.jump(self.get_negative() == self.get_overflow(), dst)
+        self.jump(self.get_negative() != self.get_overflow(), dst)
 
 
 class Instruction_JMP(Type2Instruction):
     opcode = '111'
-    name = 'jl'
+    name = 'jmp'
 
     def compute_result(self, dst):
         self.jump(None, dst)
