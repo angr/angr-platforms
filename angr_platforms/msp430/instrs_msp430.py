@@ -731,7 +731,7 @@ class Instruction_SUB(Type3Instruction):
             return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
 
     def carry(self, src, dst, ret):
-        return dst > src
+        return dst >= src
 
 
 class Instruction_CMP(Instruction_SUB):
