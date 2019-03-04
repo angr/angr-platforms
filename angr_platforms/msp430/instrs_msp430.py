@@ -645,93 +645,63 @@ class Instruction_ADD(Type3Instruction):
     name = 'add'
 
     def compute_result(self, src, dst):
-        return src + dst
+        return self._compute_sum(src, dst)
 
-    def compute_flags(self, src, dst, ret):
-        # The flags for this are super ugly.
+    def _compute_sum(self, src, dst):
+        return dst + src
+
+    def carry(self, src, dst, ret):
         if self.data['b'] == '0':
             src17 = src.cast_to(Type.int_17)
             dst17 = dst.cast_to(Type.int_17)
-            ret17 = src17 + dst17
+            ret17 = self._compute_sum(src17, dst17)
             c = ret17[16]
-            o = (ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])
-            retval = ret17
         else:
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
-            ret9 = src9 + dst9
+            ret9 = self._compute_sum(src9, dst9)
             c = ret9[8]
-            o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_1)
-            retval = ret9
-        z = self.zero(src, dst, retval)
-        n = self.negative(src, dst, retval)
-        self.set_flags(z, n, c, o)
+
+        return c
+
+    def overflow(self, src, dst, ret):
+        if self.data['b'] == '0':
+            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
+        else:
+            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
 
 
-class Instruction_ADDC(Type3Instruction):
+class Instruction_ADDC(Instruction_ADD):
     # dst = src + dst + C
     opcode = '0110'
     name = 'addc'
 
-    def compute_result(self, src, dst):
-        return src + dst + self.carry()
-
-    def compute_flags(self, src, dst, retval):
-        carryin = self.get_carry()
-        if self.data['b'] == '0':
-            src17 = src.cast_to(Type.int_17)
-            dst17 = dst.cast_to(Type.int_17)
-            ci17 = carryin.cast_to(Type.int_17)
-            ret17 = src17 + dst17 + ci17
-            c = ret17[16]
-            o = ((ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])).cast_to(Type.int_16)
-            retval = ret17
-        else:  # self.data['b'] == '1':
-            src9 = src.cast_to(Type.int_9)
-            dst9 = dst.cast_to(Type.int_9)
-            ret9 = src9 + dst9
-            c = ret9[8]
-            o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_16)
-            retva= ret9
-        z = self.zero(src, dst, retval)
-        n = self.negative(src, dst, retval)
-        self.set_flags(z, n, c, o)
+    def _compute_sum(self, src, dst):
+        return dst + src + self.get_carry().cast_to(src.ty)
 
 
-class Instruction_SUBC(Type3Instruction):
-    opcode = '0111'
-    name = 'subc'
-
-    def compute_result(self, src, dst):
-        return src - dst + self.get_carry()
-
-    def overflow(self, src, dst, ret):
-        # TODO: This is probably wrong
-        if self.data['b'] == '0':
-            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
-        else:
-            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
-
-    def carry(self, src, dst, ret):
-        return dst > (src + self.get_carry())
-
-
-class Instruction_SUB(Type3Instruction):
+class Instruction_SUB(Instruction_ADD):
+    # dst = dst + ~src + 1
     opcode = '1000'
     name = "sub"
 
-    def compute_result(self, src, dst):
-        return dst - src
+    def _compute_sum(self, src, dst):
+        return dst + ~src + self.constant(1, src.ty)
 
     def overflow(self, src, dst, ret):
-        # TODO: This is probably wrong
         if self.data['b'] == '0':
-            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
+            return (dst[15] ^ src[15]) & (ret[15] ^ dst[15])
         else:
-            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
+            return (dst[7] ^ src[7]) & (ret[7] ^ dst[7])
 
-    def carry(self, src, dst, ret):
-        return dst >= src
+
+class Instruction_SUBC(Instruction_SUB):
+    # dst = dst + ~src + C
+    opcode = '0111'
+    name = 'subc'
+
+    def _compute_sum(self, src, dst):
+        return dst + ~src + self.get_carry().cast_to(src.ty)
 
 
 class Instruction_CMP(Instruction_SUB):
