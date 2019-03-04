@@ -708,14 +708,13 @@ class Instruction_SUBC(Instruction_SUB):
         return dst - src - self.constant(1, src.ty) + self.get_carry()
 
     def carry(self, src, dst, ret):
-        neg_src17 = (~src).cast_to(Type.int_17)
+        # Works for .w and .b mode
+        # Equivalent with checking the carry out of the MSB of dst + ~src + C
+        src17 = src.cast_to(Type.int_17)
         dst17 = dst.cast_to(Type.int_17)
+        one17 = self.constant(1, Type.int_17)
         cr17 = self.get_carry().cast_to(Type.int_17)
-        res17 = dst + neg_src17 + cr17
-        if self.data['b'] == '0':
-            return res17[16]
-        else:
-            return res17[8]
+        return dst17 >= src17 + one17 - cr17
 
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
