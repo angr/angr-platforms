@@ -645,9 +645,6 @@ class Instruction_ADD(Type3Instruction):
     name = 'add'
 
     def compute_result(self, src, dst):
-        return self._compute_sum(src, dst)
-
-    def _compute_sum(self, src, dst):
         return dst + src
 
     def carry(self, src, dst, ret):
@@ -666,9 +663,9 @@ class Instruction_ADD(Type3Instruction):
 
     def overflow(self, src, dst, ret):
         if self.data['b'] == '0':
-            return (ret[15] ^ dst[15]) & (ret[15] ^ src[15])
+            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
         else:
-            return (ret[7] ^ dst[7]) & (ret[7] ^ src[7])
+            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
 
 
 class Instruction_ADDC(Instruction_ADD):
@@ -676,33 +673,46 @@ class Instruction_ADDC(Instruction_ADD):
     opcode = '0110'
     name = 'addc'
 
-    def _compute_sum(self, src, dst):
+    def compute_result(self, src, dst):
         return dst + src + self.get_carry().cast_to(src.ty)
 
 
-class Instruction_SUB(Instruction_ADD):
+class Instruction_SUB(Type3Instruction):
     # dst = dst + ~src + 1
+    # or
+    # dst = dst - src
     opcode = '1000'
     name = "sub"
 
-    def _compute_sum(self, src, dst):
-        return dst + ~src + self.constant(1, src.ty)
+    def compute_result(self, src, dst):
+        return dst - src
+
+    def carry(self, src, dst, ret):
+        return dst >= src
 
     def overflow(self, src, dst, ret):
         if self.data['b'] == '0':
-            return (dst[15] ^ src[15]) & (dst[15] ^ ret[15])
+            return (dst[15] ^ src[15]) & (ret[15] ^ dst[15])
         else:
-            return (dst[7] ^ src[7]) & (dst[7] ^ ret[7])
+            return (dst[7] ^ src[7]) & (ret[7] ^ dst[7])
 
 
 class Instruction_SUBC(Instruction_SUB):
     # dst = dst + ~src + C
+    # or
+    # dst = dst - src - 1 + C
     opcode = '0111'
     name = 'subc'
 
-    def _compute_sum(self, src, dst):
-        return dst + ~src + self.get_carry().cast_to(src.ty)
+    def compute_result(self, src, dst):
+        return dst - src - self.constant(1, src.ty) + self.get_carry()
 
+    def carry(self, src, dst, ret):
+        src17 = src.cast_to(Type.int_17)
+        dst17 = dst.cast_to(Type.int_17)
+        one17 = self.constant(1, Type.int_17)
+        cr17 = self.get_carry().cast_to(Type.int_17)
+        return dst17 >= src17 + one17 - cr17
 
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
