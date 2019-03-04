@@ -708,11 +708,11 @@ class Instruction_SUBC(Instruction_SUB):
         return dst - src - self.constant(1, src.ty) + self.get_carry()
 
     def carry(self, src, dst, ret):
-        src17 = src.cast_to(Type.int_17)
+        neg_src17 = (~src).cast_to(Type.int_17)
         dst17 = dst.cast_to(Type.int_17)
-        one17 = self.constant(1, Type.int_17)
         cr17 = self.get_carry().cast_to(Type.int_17)
-        return dst17 >= src17 + one17 - cr17
+        res17 = dst + neg_src17 + cr17
+        return res17[16]
 
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
