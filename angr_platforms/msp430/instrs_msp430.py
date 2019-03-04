@@ -651,12 +651,12 @@ class Instruction_ADD(Type3Instruction):
         if self.data['b'] == '0':
             src17 = src.cast_to(Type.int_17)
             dst17 = dst.cast_to(Type.int_17)
-            ret17 = self._compute_sum(src17, dst17)
+            ret17 = self.compute_result(src17, dst17)
             c = ret17[16]
         else:
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
-            ret9 = self._compute_sum(src9, dst9)
+            ret9 = self.compute_result(src9, dst9)
             c = ret9[8]
 
         return c
