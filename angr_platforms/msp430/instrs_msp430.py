@@ -666,9 +666,9 @@ class Instruction_ADD(Type3Instruction):
 
     def overflow(self, src, dst, ret):
         if self.data['b'] == '0':
-            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
+            return (ret[15] ^ dst[15]) & (ret[15] ^ src[15])
         else:
-            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
+            return (ret[7] ^ dst[7]) & (ret[7] ^ src[7])
 
 
 class Instruction_ADDC(Instruction_ADD):
@@ -690,9 +690,9 @@ class Instruction_SUB(Instruction_ADD):
 
     def overflow(self, src, dst, ret):
         if self.data['b'] == '0':
-            return (dst[15] ^ src[15]) & (ret[15] ^ dst[15])
+            return (dst[15] ^ src[15]) & (dst[15] ^ ret[15])
         else:
-            return (dst[7] ^ src[7]) & (ret[7] ^ dst[7])
+            return (dst[7] ^ src[7]) & (dst[7] ^ ret[7])
 
 
 class Instruction_SUBC(Instruction_SUB):
@@ -868,12 +868,12 @@ class Instruction_JL(Type2Instruction):
     name = 'jl'
 
     def compute_result(self, dst):
-        self.jump(self.get_negative() == self.get_overflow(), dst)
+        self.jump(self.get_negative() != self.get_overflow(), dst)
 
 
 class Instruction_JMP(Type2Instruction):
     opcode = '111'
-    name = 'jl'
+    name = 'jmp'
 
     def compute_result(self, dst):
         self.jump(None, dst)
