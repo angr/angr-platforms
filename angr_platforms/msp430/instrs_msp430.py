@@ -712,7 +712,10 @@ class Instruction_SUBC(Instruction_SUB):
         dst17 = dst.cast_to(Type.int_17)
         cr17 = self.get_carry().cast_to(Type.int_17)
         res17 = dst + neg_src17 + cr17
-        return res17[16]
+        if self.data['b'] == '0':
+            return res17[16]
+        else:
+            return res17[8]
 
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
