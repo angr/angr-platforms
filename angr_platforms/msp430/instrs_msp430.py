@@ -1,6 +1,6 @@
 import abc
 from .arch_msp430 import ArchMSP430
-from pyvex.lifting.util import *
+from pyvex.lifting.util import Instruction, JumpKind, ParseError, Type
 import bitstring
 from bitstring import Bits
 import logging
@@ -33,29 +33,38 @@ def bits_to_signed_int(s):
     return Bits(bin=s).int
 
 class MSP430Instruction(Instruction):
+    opcode = None
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.commit_func = None
 
     # Default flag handling
     def zero(self, *args):
+        #pylint: disable=unused-argument
         retval = args[-1]
         return retval == self.constant(0, retval.ty)
 
     def negative(self, *args):
+        #pylint: disable=unused-argument
         retval = args[-1]
         return retval[15] if self.data['b'] == '0' else retval[7]
 
     def carry(self, *args):
+        #pylint: disable=unused-argument,no-self-use
         return None
 
     def overflow(self, *args):
+        #pylint: disable=unused-argument,no-self-use
         return None
 
     # Some common stuff we use around
 
     def get_sr(self):
-        return self.get(2, REGISTER_TYPE)
+        return self.get('sr', REGISTER_TYPE)
 
     def get_pc(self):
-        return self.get('pc', Type.int_16)
+        return self.get('pc', REGISTER_TYPE)
 
     def put_sr(self, val):
         return self.put(val, 2)
@@ -73,7 +82,8 @@ class MSP430Instruction(Instruction):
         return self.get_sr()[OVERFLOW_BIT_IND]
 
     def commit_result(self, res):
-        if self.commit_func:
+        #pylint: disable=not-callable
+        if self.commit_func is not None:
             self.commit_func(res)
 
     def match_instruction(self, data, bitstrm):
@@ -102,12 +112,12 @@ class MSP430Instruction(Instruction):
             if (src_mode == ArchMSP430.Mode.INDEXED_MODE and data['s'] != '0011') \
                     or (data['s'] == '0000' and src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE):
                 data['S'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
-                self.bitwidth += 16
+                self.bitwidth += 16 # pylint: disable=no-member
         if 'd' in data:
             dst_mode = int(data['a'], 2)
             if dst_mode == ArchMSP430.Mode.INDEXED_MODE:
                 data['D'] = bitstring.Bits(uint=bitstrm.read('uintle:16'), length=16).bin
-                self.bitwidth += 16
+                self.bitwidth += 16 # pylint: disable=no-member
         return data
 
     def compute_flags(self, *args):
@@ -117,8 +127,8 @@ class MSP430Instruction(Instruction):
         """
         z = self.zero(*args)
         n = self.negative(*args)
-        c = self.carry(*args)
-        o = self.overflow(*args)
+        c = self.carry(*args) # pylint: disable=assignment-from-no-return,assignment-from-none
+        o = self.overflow(*args) # pylint: disable=assignment-from-no-return,assignment-from-none
         self.set_flags(z, n, c, o)
 
     def set_flags(self, z, n, c, o):
@@ -130,7 +140,7 @@ class MSP430Instruction(Instruction):
                  (o, OVERFLOW_BIT_IND, 'V'),
                  (c, CARRY_BIT_IND, 'C')]
         sreg = self.get_sr()
-        for flag, offset, name in flags:
+        for flag, offset, _ in flags:
             if flag:
                 sreg = sreg & ~(1 << offset) | (flag.cast_to(Type.int_16) << offset).cast_to(sreg.ty)
         self.put_sr(sreg)
@@ -145,7 +155,6 @@ class MSP430Instruction(Instruction):
         """
         src = ArchMSP430.register_index[int(src_bits, 2)]
         src_mode = int(mode_bits, 2)
-        writeout = None
         # Load the immediate word
         src_imm = None
         if imm_bits:
@@ -308,6 +317,7 @@ class MSP430Instruction(Instruction):
         return val, writeout
 
     def decorate_reg(self, reg_name, reg_mode, imm):
+        # pylint: disable=no-self-use
         """
         Decorate the register argument used for disassembly
         """
@@ -397,11 +407,12 @@ class Type1Instruction(MSP430Instruction):
 
     def disassemble(self):
         self.name = self.name if self.data['b'] == '0' else self.name + ".b"
-        src = self.decorate_src(self.data['s'], self.data['A'], self.data['S'], ty)
+        src = self.decorate_src(self.data['s'], self.data['A'], self.data['S'])
         return self.addr, self.name, [src, ]
 
     @abc.abstractmethod
     def compute_result(self, src):
+        # pylint: disable=arguments-differ
         pass
 
     def fetch_operands(self):
@@ -423,6 +434,7 @@ class Type2Instruction(MSP430Instruction):
 
     @abc.abstractmethod
     def compute_result(self, offset):
+        # pylint: disable=arguments-differ
         pass
 
     def fetch_operands(self):
@@ -442,6 +454,7 @@ class Type3Instruction(MSP430Instruction):
 
     @abc.abstractmethod
     def compute_result(self, src, dst):
+        # pylint: disable=arguments-differ
         pass
 
     def fetch_operands(self):
@@ -473,7 +486,8 @@ class Instruction_RRC(Type1Instruction):
         # Write it out
         return src
 
-    def carry(self, src, retval):
+    def carry(self, src, ret):
+        # pylint: disable=arguments-differ
         return src[0]
 
 
@@ -504,6 +518,7 @@ class Instruction_RRA(Type1Instruction):
         return src
 
     def carry(self, src, ret):
+        # pylint: disable=arguments-differ
         return src[0]
 
 
@@ -533,9 +548,11 @@ class Instruction_PUSH(Type1Instruction):
 
     # No flags.
     def negative(self, src, ret):
+        # pylint: disable=arguments-differ
         pass
 
     def zero(self, src, ret):
+        # pylint: disable=arguments-differ
         pass
 
 
@@ -555,9 +572,11 @@ class Instruction_CALL(Type1Instruction):
         self.jump(None, src, jumpkind=JumpKind.Call)
 
     def negative(self, src, ret):
+        # pylint: disable=arguments-differ
         pass
 
     def zero(self, src, ret):
+        # pylint: disable=arguments-differ
         pass
 
 
@@ -633,9 +652,11 @@ class Instruction_MOV(Type3Instruction):
         return src
 
     def negative(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         pass
 
     def zero(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         pass
 
 
@@ -645,92 +666,79 @@ class Instruction_ADD(Type3Instruction):
     name = 'add'
 
     def compute_result(self, src, dst):
-        return src + dst
+        return dst + src
 
-    def compute_flags(self, src, dst, ret):
-        # The flags for this are super ugly.
+    def carry(self, src, dst, ret):
         if self.data['b'] == '0':
             src17 = src.cast_to(Type.int_17)
             dst17 = dst.cast_to(Type.int_17)
-            ret17 = src17 + dst17
+            ret17 = self.compute_result(src17, dst17)
             c = ret17[16]
-            o = (ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])
-            retval = ret17
         else:
             src9 = src.cast_to(Type.int_9)
             dst9 = dst.cast_to(Type.int_9)
-            ret9 = src9 + dst9
+            ret9 = self.compute_result(src9, dst9)
             c = ret9[8]
-            o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_1)
-            retval = ret9
-        z = self.zero(src, dst, retval)
-        n = self.negative(src, dst, retval)
-        self.set_flags(z, n, c, o)
+
+        return c
+
+    def overflow(self, src, dst, ret):
+        # pylint: disable=arguments-differ
+        if self.data['b'] == '0':
+            return (ret[15] ^ src[15]) & (ret[15] ^ dst[15])
+        else:
+            return (ret[7] ^ src[7]) & (ret[7] ^ dst[7])
 
 
-class Instruction_ADDC(Type3Instruction):
+class Instruction_ADDC(Instruction_ADD):
     # dst = src + dst + C
     opcode = '0110'
     name = 'addc'
 
     def compute_result(self, src, dst):
-        return src + dst + self.carry()
-
-    def compute_flags(self, src, dst, retval):
-        carryin = self.get_carry()
-        if self.data['b'] == '0':
-            src17 = src.cast_to(Type.int_17)
-            dst17 = dst.cast_to(Type.int_17)
-            ci17 = carryin.cast_to(Type.int_17)
-            ret17 = src17 + dst17 + ci17
-            c = ret17[16]
-            o = ((ret17[15] ^ src17[15]) & (ret17[15] ^ dst17[15])).cast_to(Type.int_16)
-            retval = ret17
-        else:  # self.data['b'] == '1':
-            src9 = src.cast_to(Type.int_9)
-            dst9 = dst.cast_to(Type.int_9)
-            ret9 = src9 + dst9
-            c = ret9[8]
-            o = ((ret9[7] ^ src9[7]) & (ret9[7] ^ dst9[7])).cast_to(Type.int_16)
-            retva= ret9
-        z = self.zero(src, dst, retval)
-        n = self.negative(src, dst, retval)
-        self.set_flags(z, n, c, o)
-
-
-class Instruction_SUBC(Type3Instruction):
-    opcode = '0111'
-    name = 'subc'
-
-    def compute_result(self, src, dst):
-        return src - dst + self.get_carry()
-
-    def overflow(self, src, dst, ret):
-        if self.data['b'] == '0':
-            return (ret[15] ^ dst[15]) & (src[15] ^ dst[15])
-        else:
-            return (ret[7] ^ dst[7]) & (src[7] ^ dst[7])
-
-    def carry(self, src, dst, ret):
-        return dst > (src + self.get_carry())
+        return dst + src + self.get_carry().cast_to(src.ty)
 
 
 class Instruction_SUB(Type3Instruction):
+    # dst = dst + ~src + 1
+    # or
+    # dst = dst - src
     opcode = '1000'
     name = "sub"
 
     def compute_result(self, src, dst):
         return dst - src
 
+    def carry(self, src, dst, ret):
+        # pylint: disable=arguments-differ
+        return dst >= src
+
     def overflow(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         if self.data['b'] == '0':
-            return (ret[15] ^ dst[15]) & (src[15] ^ dst[15])
+            return (dst[15] ^ src[15]) & (ret[15] ^ dst[15])
         else:
-            return (ret[7] ^ dst[7]) & (src[7] ^ dst[7])
+            return (dst[7] ^ src[7]) & (ret[7] ^ dst[7])
+
+
+class Instruction_SUBC(Instruction_SUB):
+    # dst = dst + ~src + C
+    # or
+    # dst = dst - src - 1 + C
+    opcode = '0111'
+    name = 'subc'
+
+    def compute_result(self, src, dst):
+        return dst - src - self.constant(1, src.ty) + self.get_carry()
 
     def carry(self, src, dst, ret):
-        return dst > src
-
+        # Works for .w and .b mode
+        # Equivalent with checking the carry out of the MSB of dst + ~src + C
+        src17 = src.cast_to(Type.int_17)
+        dst17 = dst.cast_to(Type.int_17)
+        one17 = self.constant(1, Type.int_17)
+        cr17 = self.get_carry().cast_to(Type.int_17)
+        return dst17 >= src17 + one17 - cr17
 
 class Instruction_CMP(Instruction_SUB):
     opcode = '1001'
@@ -760,16 +768,18 @@ class Instruction_DADD(Type3Instruction):
             carry = r / 10
             r %= 10
             rets += r
-        self.carry = carry #Carry computed in-line. save it.
+        self._carry = carry #Carry computed in-line. save it.
         # Smash the digits back together
         for r, x in zip(rets, range(0, bits, 4)):
-                ret | (r << x).cast_to(Type.int_16)
+                ret |= (r << x).cast_to(Type.int_16)
         return ret
 
     def carry(self, src, dst, ret):
-        return self.carry
+        # pylint: disable=arguments-differ
+        return self._carry
 
     def overflow(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         return None # WTF: Docs say this is actually undefined!?
 
 
@@ -782,9 +792,11 @@ class Instruction_BIC(Type3Instruction):
         return ~src & dst
 
     def negative(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         pass
 
     def zero(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         pass
 
 
@@ -806,9 +818,11 @@ class Instruction_XOR(Type3Instruction):
         return src ^ dst
 
     def carry(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         return ret != self.constant(0, ret.ty)
 
     def overflow(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         if self.data['b'] == '1':
             return src[7] & dst[7]
         else:
@@ -824,10 +838,13 @@ class Instruction_AND(Type3Instruction):
         return src & dst
 
     def overflow(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         return self.constant(0, ret.ty)
 
     def carry(self, src, dst, ret):
+        # pylint: disable=arguments-differ
         return ret != self.constant(0, ret.ty)
+
 
 class Instruction_BIT(Instruction_AND):
     # Bit Test. Just update flags.  No write-out
