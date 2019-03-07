@@ -33,8 +33,11 @@ def bits_to_signed_int(s):
     return Bits(bin=s).int
 
 class MSP430Instruction(Instruction):
-    commit_func = None
     opcode = None
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.commit_func = None
 
     # Default flag handling
     def zero(self, *args):
@@ -137,7 +140,7 @@ class MSP430Instruction(Instruction):
                  (o, OVERFLOW_BIT_IND, 'V'),
                  (c, CARRY_BIT_IND, 'C')]
         sreg = self.get_sr()
-        for flag, offset, _name in flags:
+        for flag, offset, _ in flags:
             if flag:
                 sreg = sreg & ~(1 << offset) | (flag.cast_to(Type.int_16) << offset).cast_to(sreg.ty)
         self.put_sr(sreg)
