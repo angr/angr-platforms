@@ -1,6 +1,11 @@
+
+import logging
+
+import archinfo
 import angr
 import claripy
-import logging
+import pyvex
+
 
 l = logging.getLogger('angr.engines.SinEngineBF')
 
@@ -43,6 +48,24 @@ class SimEngineBF(angr.SimEngine):
             return state.scratch.jump_table[addr]
         except KeyError:
             raise ValueError("There is no entry in the jump table at address %d" % addr)
+
+    def lift(self, addr=None, clemory=None, insn_bytes=None, size=None, arch=None, **kwargs):
+
+        if addr is None:
+            raise ValueError("addr must be specified.")
+
+        if insn_bytes is None:
+            if clemory is None:
+                raise ValueError("clemory must be specified if insn_bytes is None.")
+            insn_bytes = clemory.load(addr, size)
+        else:
+            size = len(insn_bytes)
+
+        if arch is None:
+            arch = archinfo.arch_from_id('bf')
+
+        irsb = pyvex.lift(insn_bytes, addr, arch, max_bytes=size)
+        return irsb
 
     def _process(self, state, successors, *args, **kwargs):
         """
