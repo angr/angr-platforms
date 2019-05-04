@@ -40,8 +40,8 @@ log = logging.getLogger("LifterBF")
 # By the spec, cells are 8 bits, and do all the usual wrapping stuff.
 PTR_TYPE = Type.int_64
 CELL_TYPE = Type.int_8
-PTR_REG = ArchBF().registers['ptr'][0]
-INOUT_REG = ArchBF().registers['inout'][0]
+PTR_REG = 'ptr'
+INOUT_REG = 'inout'
 
 
 class Instruction_NOP(Instruction):
