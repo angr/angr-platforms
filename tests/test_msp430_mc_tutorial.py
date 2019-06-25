@@ -13,7 +13,8 @@ def test_tutorial():
     simgr = p.factory.simulation_manager(save_unconstrained=True)
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_true('ffffffffffffffff00' in stdin_contents.hex())
+    nose.tools.assert_not_in(b'\0', stdin_contents[:8])
+    nose.tools.assert_equal(stdin_contents[8], 0)
 
 if __name__ == '__main__':
     test_tutorial()
