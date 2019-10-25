@@ -1,18 +1,13 @@
-
 import logging
-
-import archinfo
 import angr
 import claripy
-import pyvex
+
+l = logging.getLogger(__name__)
 
 
-l = logging.getLogger('angr.engines.SinEngineBF')
-
-
-class SimEngineBF(angr.SimEngine):
+class BFMixin(angr.engines.SuccessorsMixin):
     """
-    This is a SimEngine for executing BrainFuck.  Oh yeah, you're not hallucinating.
+    This is a SimEngine mixin for executing BrainFuck.  Oh yeah, you're not hallucinating.
     """
 
     def _build_jump_table(self, state):
@@ -49,25 +44,25 @@ class SimEngineBF(angr.SimEngine):
         except KeyError:
             raise ValueError("There is no entry in the jump table at address %d" % addr)
 
-    def lift(self, addr=None, clemory=None, insn_bytes=None, size=None, arch=None, **kwargs):
+    #def lift(self, addr=None, clemory=None, insn_bytes=None, size=None, arch=None, **kwargs):
 
-        if addr is None:
-            raise ValueError("addr must be specified.")
+    #    if addr is None:
+    #        raise ValueError("addr must be specified.")
 
-        if insn_bytes is None:
-            if clemory is None:
-                raise ValueError("clemory must be specified if insn_bytes is None.")
-            insn_bytes = clemory.load(addr, size)
-        else:
-            size = len(insn_bytes)
+    #    if insn_bytes is None:
+    #        if clemory is None:
+    #            raise ValueError("clemory must be specified if insn_bytes is None.")
+    #        insn_bytes = clemory.load(addr, size)
+    #    else:
+    #        size = len(insn_bytes)
 
-        if arch is None:
-            arch = archinfo.arch_from_id('bf')
+    #    if arch is None:
+    #        arch = archinfo.arch_from_id('bf')
 
-        irsb = pyvex.lift(insn_bytes, addr, arch, max_bytes=size)
-        return irsb
+    #    irsb = pyvex.lift(insn_bytes, addr, arch, max_bytes=size)
+    #    return irsb
 
-    def _process(self, state, successors, *args, **kwargs):
+    def process_successors(self, successors, **kwargs):
         """
         This function executes one "basic block" of BrainFuck.
 
@@ -81,8 +76,6 @@ class SimEngineBF(angr.SimEngine):
             2) Input and Output.  We're modeling I/O as a system call, so this ends the block.
             3) ip points somewhere outside the program's memory.  In Brainfuck, this is the simple halting case.
 
-        :param state:
-        :type state: SimState
         :param successors: The SimSuccessors for this block.  In other words, where the program can go from here, and
         under what circumstances
         :type successors: angr.SimSuccessors
@@ -90,6 +83,7 @@ class SimEngineBF(angr.SimEngine):
         :param kwargs:
         :return:
         """
+        state = self.state
         my_block = state.ip  # The start address of this basic block.  We'll need this later
         while True:
             # Run through instructions, until we hit a branch.
@@ -183,23 +177,11 @@ class SimEngineBF(angr.SimEngine):
         successors.artifacts['irsb_size'] = state.ip - my_block
         successors.artifacts['irsb'] = None
         successors.artifacts['irsb_direct_next'] = True
-        return successors
-
-    def _check(self, state, *args, **kwargs):
-        """
-        Check if this engine can be used for execution on the current state. A callback `check_failure` is called upon
-        failed checks. Note that the execution can still fail even if check() returns True.
-
-        :param SimState state: The state with which to execute.
-        :param args:                   Positional arguments that will be passed to process().
-        :param kwargs:                 Keyword arguments that will be passed to process().
-        :return:                       True if the state can be handled by the current engine, False otherwise.
-        """
-        return True
 
 
-# Engine registration
-bf_engine_preset = angr.engines.basic_preset.copy()
-bf_engine_preset.add_default_plugin('bf', SimEngineBF)
-bf_engine_preset.default_engine = 'bf'
-bf_engine_preset.order = 'bf',
+class UberEngineWithBF(angr.engines.UberEngine, BFMixin):
+    """
+    This is a class that "mixes" together the standard symbolic execution stack and the brainfuck interpreter.
+    Giving it to angr will do everything we want.
+    """
+    pass
