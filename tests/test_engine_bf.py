@@ -1,13 +1,14 @@
-#!/usr/bin/env python
-import logging
-import nose
-import os
-from angr_platforms.bf import *
 import angr
+import logging
+import os
+import nose
+
+import angr_platforms.bf
+from angr_platforms.bf.engine_bf import UberEngineWithBF
 
 def test_hello():
     hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/hello.bf'))
-    p = angr.Project(hellobf)
+    p = angr.Project(hellobf, engine=UberEngineWithBF)
     entry = p.factory.entry_state()
     smgr = p.factory.simulation_manager(entry)
     smgr.explore()

@@ -1,9 +1,9 @@
 import angr
-from angr_platforms.bf import arch_bf, load_bf, lift_bf, simos_bf
 import logging
 import os
-import sys
 import nose
+
+import angr_platforms.bf
 
 def test_hello():
     hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/hello.bf'))
@@ -24,7 +24,6 @@ def test_1bytecrackme_good():
     nose.tools.assert_equals(b"\n", smgr.deadended[0].posix.dumps(0))
 
 if __name__ == '__main__':
-    import logging
     logging.getLogger('pyvex').setLevel(logging.DEBUG)
     logging.basicConfig()
     test_hello()
