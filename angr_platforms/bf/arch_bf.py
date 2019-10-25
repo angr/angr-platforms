@@ -6,7 +6,7 @@ class ArchBF(Arch):
 
     memory_endness = Endness.LE
     bits = 64
-    vex_arch = "BF"
+    vex_arch = None
     name = "BF"
     instruction_alignment = 1
 
