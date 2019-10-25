@@ -1,15 +1,16 @@
 import angr
+import claripy
 import cle
 import archinfo
 import logging
 import struct
 
-from .ct64_engine import *
+from .ct64_engine import UberEngineWithCT64K
 
 l = logging.getLogger('angr.ct64k')
 
 def load_rom(rom):
-    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000})
+    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000}, engine=UberEngineWithCT64K)
 
 class ArchCT64K(archinfo.Arch):
     def __init__(self, endness=archinfo.Endness.BE):
@@ -55,7 +56,6 @@ class CT64KBlob(cle.backends.blob.Blob):
         self.memory.add_backer(mem_addr - self.linked_base, memdata)
         self._max_addr = max(len(memdata) + mem_addr, self._max_addr)
         self._min_addr = min(mem_addr, self._min_addr)
-        self.engine_preset = ct64k_engine_preset
 
 class SimCT64K(angr.SimOS):
     def __init__(self, project):
