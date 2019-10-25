@@ -1,16 +1,20 @@
 import angr
 import claripy
 
-class SimEngineCT64K(angr.SimEngine):
-    def _check(self, state, *args, **kwargs):
-        return state.arch.name == 'CT64K'
+class CT64KMixin(angr.engines.SuccessorsMixin):
+    def process_successors(self, successors, **kwargs):
+        state = self.state
+        if state.arch.name != 'CT64K':
+            return super().process_successors(successors, **kwargs)
 
-    def _process(self, state, successors, *args, **kwargs):
         ins = decode(state, successors.addr)
         ins.execute(state, successors)
 
         successors.processed = True
         successors.description = str(ins)
+
+class UberEngineWithCT64K(angr.engines.UberEngine, CT64KMixin):
+    pass
 
 # pylint: disable=abstract-method
 class Instruction(object):
@@ -261,10 +265,3 @@ def disasm(state, addr, length=None):
             break
         elif isinstance(b, Instruction2) and claripy.is_true(b.rm == 0):
             break
-
-
-# Engine registration
-ct64k_engine_preset = angr.engines.basic_preset.copy()
-ct64k_engine_preset.add_default_plugin('ct64k', SimEngineCT64K)
-ct64k_engine_preset.default_engine = 'ct64k'
-ct64k_engine_preset.order = 'ct64k',
