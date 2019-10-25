@@ -3,8 +3,6 @@ from archinfo import arch_from_id
 import re
 import logging
 
-from .engine_bf import bf_engine_preset
-
 l = logging.getLogger("cle.blob")
 
 __all__ = ('BF',)
@@ -27,7 +25,6 @@ class BF(Blob):
                 entry_point=0,
                 **kwargs)
         self.os = "bf"
-        self.engine_preset = bf_engine_preset
 
     @staticmethod
     def is_compatible(stream):

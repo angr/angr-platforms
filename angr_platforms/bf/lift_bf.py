@@ -248,9 +248,9 @@ if __name__ == '__main__':
     logging.basicConfig()
 
     irsb_ = pyvex.IRSB(None, 0, arch=archinfo.arch_from_id('bf'))
-    test1 = '<>+-[].,'
-    test2 = '<>+-[].,'
-    lifter = LifterBF(irsb_, test1,len(test1) , len(test1), 0, None)
+    test1 = b'<>+-[].,'
+    test2 = b'<>+-[].,'
+    lifter = LifterBF(irsb_, test1, len(test1) , len(test1), 0, None)
     lifter.lift()
     lifter.irsb.pp()
 
