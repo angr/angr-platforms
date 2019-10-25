@@ -1,7 +1,4 @@
-
 from angr.simos import SimUserland, register_simos
-from angr.sim_procedure import SimProcedure
-from angr.engines.vex import SimEngineVEX
 from angr.calling_conventions import SimStackArg, SimRegArg, SimCC, register_syscall_cc, register_default_cc, SimCC
 
 from .arch_bpf import ArchBPF
@@ -23,15 +20,8 @@ class SimBPF(SimUserland):
     def __init__(self, *args, **kwargs):
         super(SimBPF, self).__init__(*args, name="BPF", **kwargs)
 
-    def configure_project(self):
-        super(SimBPF, self).configure_project()
-
     def state_blank(self, data_region_size=0x8000, **kwargs): # pylint:disable=arguments-differ
         state = super(SimBPF, self).state_blank(**kwargs)  # pylint:disable=invalid-name
-        return state
-
-    def state_entry(self, **kwargs):
-        state = super(SimBPF, self).state_entry(**kwargs)
         return state
 
 

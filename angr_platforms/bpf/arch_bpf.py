@@ -14,7 +14,7 @@ class ArchBPF(Arch):
         super(ArchBPF, self).__init__('Iend_LE')
 
     bits = 32
-    vex_arch = None
+    vex_arch = "BPF"
     name = "BPF"
     instruction_endness = 'Iend_BE'
     memory_endness = 'Iend_LE'
