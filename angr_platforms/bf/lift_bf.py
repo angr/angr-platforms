@@ -129,18 +129,24 @@ class Instruction_DEC(Instruction):
 
 
 class BracketInstruction(Instruction):
+    jump_table = {}
+    
     def calculate_jump(self, relevant_instructions):
         bracket_stack = [self]
+        if self.addr in self.jump_table:
+            return self.jump_table[self.addr]
         for instr in relevant_instructions:
             if isinstance(instr, self.__class__):
                 bracket_stack.append(instr)
             elif isinstance(instr, self.closing):
                 bracket_stack.pop()
                 if len(bracket_stack) == 0:
-                    return instr.addr
+                    self.jump_table[self.addr] = instr.addr + 1
+                    self.jump_table[instr.addr] = self.addr + 1
+                    return instr.addr + 1
         if len(bracket_stack) > 0:
             raise Exception('Missing matching %s for %s at address %d' % (self.closing.name, self.name, self.addr))
-
+            
 class Instruction_SKZ(BracketInstruction):
     bin_format = bin(ord("["))[2:].zfill(8)
     name = 'skz'
@@ -162,7 +168,7 @@ class Instruction_SKZ(BracketInstruction):
         # and make the other take us to the next instruction.  Therefore, we invert the comparison.
         # Go to the next instruction if *ptr != 0
         next_instr = self.constant(self.addr + 1, PTR_TYPE)
-        self.jump(val != 0, next_instr)
+        self.jump(val == 0, next_instr)
         # And go to the next ] if *ptr == 0
         self.jump(None, self.jump_addr)
 
@@ -183,7 +189,7 @@ class Instruction_SKNZ(BracketInstruction):
         ptr = self.get(PTR_REG, PTR_TYPE)
         val = self.load(ptr, CELL_TYPE)
         next_instr = self.constant(self.addr + 1, PTR_TYPE)
-        self.jump(val == 0, next_instr)
+        self.jump(val != 0, next_instr)
         self.jump(None, self.jump_addr) # TODO will this break when stuff is split across blocks?
 
 Instruction_SKZ.closing = Instruction_SKNZ
