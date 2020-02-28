@@ -50,8 +50,8 @@ class ArchCT64K(archinfo.Arch):
 class CT64KBlob(cle.backends.blob.Blob):
     def _load(self, file_offset, mem_addr, size):
         self.os = 'ct64k'
-        self.binary_stream.seek(file_offset)
-        string = self.binary_stream.read(size)
+        self._binary_stream.seek(file_offset)
+        string = self._binary_stream.read(size)
         memdata = list(struct.unpack('H'*(len(string)//2), string))
         self.memory.add_backer(mem_addr - self.linked_base, memdata)
         self._max_addr = max(len(memdata) + mem_addr, self._max_addr)

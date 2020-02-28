@@ -35,19 +35,4 @@ class BF(Blob):
             return True
         return False
 
-"""
-    def _load(self, offset, size=None):
-        """"""
-        Load a segment into memory.
-        """"""
-
-        self.binary_stream.seek(offset)
-        if size is None:
-            string = self.binary_stream.read()
-        else:
-            string = self.binary_stream.read(size)
-        self.memory.add_backer(0, string)
-        self._max_addr = len(string)
-"""
-
 register_backend("bf", BF)
