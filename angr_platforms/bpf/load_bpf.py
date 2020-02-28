@@ -10,13 +10,13 @@ l = logging.getLogger("load_Bpf")
 class BPF(Blob):
     is_default = False
 
-    def __init__(self, path, offset=0, *args, **kwargs):
+    def __init__(self, *args, offset=0, **kwargs):
         """
         Loader backend for BF programs
         :param path: The file path
         :param offset: Skip this many bytes from the beginning of the file.
         """
-        super(BPF, self).__init__(path, *args,
+        super(BPF, self).__init__(*args,
                                   arch=arch_from_id("bpf"),
                                   offset=offset,
                                   entry_point=0,
