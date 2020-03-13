@@ -808,6 +808,14 @@ class Instruction_BIS(Type3Instruction):
     def compute_result(self, src, dst):
         return src | dst
 
+    def negative(self, src, dst, ret):
+        # pylint: disable=arguments-differ
+        pass
+
+    def zero(self, src, dst, ret):
+        # pylint: disable=arguments-differ
+        pass
+
 
 class Instruction_XOR(Type3Instruction):
     # Exclusive Or
