@@ -7,7 +7,7 @@ from .arch_riscv import ArchRISCV
 
 class SimCCRISCV(SimCC):
     ARG_REGS = [ 'a0', 'a1', 'a2', 'a3', 'a4', 'a5','a6', 'a7']
-    FP_ARG_REGS = []    # TODO: ???
+    FP_ARG_REGS = []    # expand in case the floating point extension is added
     STACK_ALIGNMENT = 16
     RETURN_ADDR = SimStackArg(4, 4)
     RETURN_VAL = SimRegArg('ra', 4)
@@ -29,7 +29,6 @@ class SimRISCV(SimOS):
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ
         state = super(SimRISCV, self).state_blank(**kwargs)  # pylint:disable=invalid-name
-        # PTR starts halfway through memory
         return state
 
     def state_entry(self, **kwargs):
