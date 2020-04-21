@@ -1,6 +1,5 @@
 from archinfo.arch import register_arch, Arch, Register
 from archinfo.tls import TLSArchInfo
-from capstone import CS_ARCH_RISCV, CS_MODE_RISCV32
 
 #copied from arch msp430
 class ArchRISCV(Arch):
@@ -14,8 +13,6 @@ class ArchRISCV(Arch):
 
     bits = 32
     name = "RISCV"
-    cs_arch = CS_ARCH_RISCV
-    cs_mode = CS_MODE_RISCV32 
     instruction_endness = "Iend_LE" 
     max_inst_bytes = 4
     instruction_alignment = 4
