@@ -12,29 +12,6 @@ class SimCCRISCV(SimCC):
     RETURN_VAL = SimRegArg('ra', 4)
     ARCH = ArchRISCV
 
-class SimRISCV(SimOS):
-    # Syscalls are for lamers
-    SYSCALL_TABLE = {}
-
-
-    def __init__(self, *args, **kwargs):
-        super(SimRISCV, self).__init__(*args, name='RISCV', **kwargs)
-
-    def configure_project(self):
-        super(SimRISCV, self).configure_project()
-
-        #self._load_syscalls(SimMSP430.SYSCALL_TABLE, "bf")
-
-    def state_blank(self, data_region_size=0x8000, **kwargs):
-        # pylint:disable=arguments-differ
-        state = super(SimRISCV, self).state_blank(**kwargs)  # pylint:disable=invalid-name
-        return state
-
-    def state_entry(self, **kwargs):
-        state = super(SimRISCV, self).state_entry(**kwargs)
-        return state
-
-
 class SimRISCVSyscall(SimCC):
     ARG_REGS = [ ]
     #RETURN_VAL = ""
@@ -49,6 +26,5 @@ class SimRISCVSyscall(SimCC):
     def syscall_num(state):
         return state.regs.inout
 
-register_simos('UNIX - System V', SimRISCV)
 register_syscall_cc('RISCV', 'default', SimRISCVSyscall)
 register_default_cc('RISCV', SimCCRISCV)
