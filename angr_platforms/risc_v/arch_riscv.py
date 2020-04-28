@@ -1,13 +1,11 @@
 try:
     import capstone as _capstone
+    if _capstone.__version__ < '5.0':
+        raise ImportError('Only capstone verison >= 5.0 support RISC-V')
 except ImportError:
     _capstone = None
 
-from .arch import Arch, register_arch, Endness, Register
-from .archerror import ArchError
-from .tls import TLSArchInfo
-
-from archinfo.arch import register_arch, Arch, Register
+from archinfo.arch import register_arch, Arch, Endness, Register
 from archinfo.tls import TLSArchInfo
 
 # copied from arch msp430
@@ -52,13 +50,9 @@ class ArchRISCV(Arch):
     sizeof = {'short': 16, 'int': 32, 'long': 32, 'long long': 64}
 
     if _capstone:
-        try:
-            cs_arch = _capstone.CS_ARCH_RISCV
-            cs_mode = _capstone.CS_MODE_RISCV32
-        except AttributeError:
-            raise ArchError(
-                'Arch %s does not support disassembly with capstone version < 5.0.0' % name
-            )
+        cs_arch = _capstone.CS_ARCH_RISCV
+        cs_mode = _capstone.CS_MODE_RISCV32
+
 
     # TODO: Currently keystone, unicorn DON'T support RISC-V
     # if _keystone:
