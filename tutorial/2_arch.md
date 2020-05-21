@@ -47,49 +47,44 @@ To create a new arch, you simply make a subclass of `archinfo.Arch`, and define 
 
 Now, let's lay down some code.
 
-First, the boring stuff:
+First, some simple metadata:
 
 ```python
 from archinfo.arch import Arch
 from archinfo import register_arch
 
 class ArchBF(Arch):
-    def __init__(self, endness="Iend_LE"):
-        super(ArchBF, self).__init__('Iend_LE')
+    bits = 64
+    vex_arch = None
+    name = "BF"
 ```
-We'll call this arch little endian, since we have to say something, and in this case it doesn't matter.
-
-Next, some simple metadata:
-```python
-        self.bits = 64
-        self.vex_arch = None
-        self.name = "BF"
-```
-
 Names are usually all-caps.  As I mentioned above, the bit-width here corresponds to the address space and register widths, and we don't have one defined, so I picked 64.
 VEX doesn't support this arch, so `vex_arch` is None.
+
 
 Now here's the register file:
 
 ```python
-        self.registers = {}
-        self.registers["ip"] = (0, 1)
-        self.registers["ptr"] = (1, 1)
-        self.registers["inout"] = (2, 1)
-        self.registers["ip_at_syscall"] = (3, 1)
+    register_list = [
+        Register(name="ip", size=8, vex_offset=0), alias_names=('pc',),
+        Register(name="ptr", size=8, vex_offset=8),
+        Register(name="inout", size=1, vex_offset=16),
+        Register(name="ip_at_syscall", size=8, vex_offset=24),
+    ]
 ```
 I mentioned the 'inout' register, which is our syscall number when picking input vs output.
 However, we have another fake register `ip_at_syscall`, which is used by angr to track syscall-related return behavior.  Don't worry about it, just put it here.
+As you can see, you can also assign aliases, like `pc` for `ip`.
 
-You can also assign aliases, like `pc` for `ip`.
+
 ```python
-        self.register_names = {}
-        self.register_names[self.registers['ip'][0]] = 'pc'
-        self.register_names[self.registers['ip'][1]] = 'ip'
-        self.ip_offset = self.registers["ip"][0]
+    def __init__(self, endness="Iend_LE"):
+        super(ArchBF, self).__init__('Iend_LE')
+        ip_offset = self.registers["ip"][0]
 ```
+Finally we add the initializer. We'll call this arch little endian, since we have to say something, and in this case it doesn't matter.
+Various kinds of reasoning need to know where the ip is rather explicitly.  We set that here too.
 
-Various kinds of reasoning need to where the ip is rather explicitly.  We set that here too.
 
 Finally, we need to tell archinfo about our new arch:
 
