@@ -130,7 +130,7 @@ class Instruction_DEC(Instruction):
 
 class BracketInstruction(Instruction):
     jump_table = {}
-    
+
     def calculate_jump(self, relevant_instructions):
         bracket_stack = [self]
         if self.addr in self.jump_table:
@@ -146,7 +146,7 @@ class BracketInstruction(Instruction):
                     return instr.addr + 1
         if len(bracket_stack) > 0:
             raise Exception('Missing matching %s for %s at address %d' % (self.closing.name, self.name, self.addr))
-            
+
 class Instruction_SKZ(BracketInstruction):
     bin_format = bin(ord("["))[2:].zfill(8)
     name = 'skz'
@@ -253,14 +253,12 @@ if __name__ == '__main__':
     logging.getLogger('pyvex').setLevel(logging.DEBUG)
     logging.basicConfig()
 
-    irsb_ = pyvex.IRSB(None, 0, arch=archinfo.arch_from_id('bf'))
     test1 = b'<>+-[].,'
     test2 = b'<>+-[].,'
-    lifter = LifterBF(irsb_, test1, len(test1) , len(test1), 0, None)
-    lifter.lift()
+    lifter = LifterBF(arch=archinfo.arch_from_id('bf'), addr=0)
+    lifter._lift(data=test1)
     lifter.irsb.pp()
 
-    lifter = LifterBF(ArchBF(), 0)
-    lifter._lift(data=test2, bytes_offset=0, max_bytes=len(test2), opt_level=0, traceflags=None)
-    lifter.lift()
+    lifter = LifterBF(arch=ArchBF(), addr=0)
+    lifter._lift(data=test2)
     lifter.irsb.pp()
