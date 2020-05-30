@@ -136,7 +136,7 @@ class ArchSPARC(Arch):
     got_section_name = ".got"
     ld_linux_name = None
     byte_width = 8
-    elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0)
+    elf_tls = TLSArchInfo(2, 56, [8], [4], [0], 0, 0)  #I'm not sure how to determine the value of this formula
 
 register_arch([r'sparc|sparc32|sparcv8'], 32, 'Iend_BE', ArchSPARC)
 
