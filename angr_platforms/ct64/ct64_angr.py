@@ -78,9 +78,9 @@ class SimCT64K(angr.SimOS):
         state.register_plugin('registers', state.memory)
         state.memory.id = 'reg'
 
-        state.registers.store(0, addr)
-        state.registers.store(1, state.arch.initial_sp)
-        state.registers.store(2, state.arch.initial_sp)
+        state.registers.store(0, addr, size=1)
+        state.registers.store(1, state.arch.initial_sp, size=1)
+        state.registers.store(2, state.arch.initial_sp, size=1)
 
         state.inspect.b('reg_read', action=self.hard_checker_rd, when=angr.BP_AFTER)
         state.inspect.b('reg_write', action=self.hard_checker_wr, when=angr.BP_AFTER)
