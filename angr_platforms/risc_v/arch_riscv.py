@@ -95,7 +95,7 @@ class ArchRISCV(Arch):
                  vex_offset=0, default_value=(0, False, 0)),
         Register(name='x1', size=4, alias_names=('ra', 'lr',),
                  general_purpose=True, vex_offset=4),
-        Register(name='x2', size=4, alias_names=('sp', 'bp'),
+        Register(name='x2', size=4, alias_names=('sp', 'bp', ),
                  general_purpose=True,
                  default_value=(Arch.initial_sp, True, 'global'),
                  vex_offset=8),
@@ -158,6 +158,7 @@ class ArchRISCV(Arch):
         Register(name='x31', size=4, alias_names=('t6',),
                  general_purpose=True, vex_offset=124),
         Register(name='ip', alias_names={'pc', }, size=4, vex_offset=128),
+        Register(name='ip_at_syscall', alias_names={}, size=4, vex_offset=132)
     ]
 
 

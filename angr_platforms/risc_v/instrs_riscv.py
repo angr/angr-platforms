@@ -2,6 +2,7 @@ import abc
 from pyvex.lifting.util import Instruction, JumpKind, ParseError, Type
 import bitstring
 from bitstring import Bits, BitArray
+from .simos_riscv import SimRISCVSyscall
 import logging
 l = logging.getLogger(__name__)
 
@@ -1400,4 +1401,19 @@ class Instruction_CSRRCI(I_Instruction):
     opcode = '1110011'
     func3 = '111'
     name = 'CSRRCI'
+
+class Instruction_ECALL(I_Instruction):
+    opcode = '1110011'
+    func3 = '000'
+    name = 'ecall'
+
+    def compute_result(self, data, bitstream):
+        return_addr = self.addr + self.constant(4, Type.int_32)
+        sp_addr = self.get('sp', Type.int_32)
+        self.put(self.constant(0xfffffffc, Type.int_32), 'sp')
+        self.jump(None, self.constant(0x80000180, Type.int_32), JumpKind.Syscall)
+        self.put(sp_addr, 'sp')
+        return return_addr
+
+
 
