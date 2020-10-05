@@ -1,149 +1,171 @@
-from archinfo import Arch, Endness
+from archinfo.arch import register_arch, Arch, Endness, Register
+from archinfo.tls import TLSArchInfo
 
 class ArchAVR(Arch):
-    def __init__(self, endness="Iend_LE"):
-        super(ArchAVR, self).__init__(endness)
 
-        self.bits = 32
-        self.call_sp_fix = 3
-        self.instruction_alignment = 2
-        self.vex_arch = None
-        self.name = "AVR"
-        self.instruction_endness = Endness.LE
+    def __init__(self, endness=Endness.LE):
+        super().__init__(endness)
+    
+    name = "AVR"
+    bits = 32 # TODO: word is 16 bits
+    max_inst_bytes = 4
+    ip_offset = 0x80000000
+    sp_offset = 0x5d
+    call_pushes_ret = True
+    instruction_endness = Endness.LE
+    sizeof = {"long" : 24}
+    # FIXME: something in angr assumes that sizeof(long) == sizeof(return address on stack)
+    initial_sp = 0x7fff
+    call_sp_fix = 3
+    instruction_alignment = 2
+    nop_instruction = b'\x00\x00'
+    flash_offset = 1 << 31
+    ioreg_offset = 0x20
 
-        # Things I did not want to include but were necessary unfortunately :-(
-        # self.cs_mode = capstone.CS_MODE_LITTLE_ENDIAN if endness == 'Iend_LE' else capstone.CS_MODE_BIG_ENDIAN
-        # END
+    elf_tls = TLSArchInfo(1, 8, [], [0], [], 0, 0) # TODO ?
+    register_list = [
+        Register(name="R0", size=1, vex_offset=0),
+        Register(name="R1", size=1, vex_offset=1),
+        Register(name="R2", size=1, vex_offset=2),
+        Register(name="R3", size=1, vex_offset=3),
+        Register(name="R4", size=1, vex_offset=4),
+        Register(name="R5", size=1, vex_offset=5),
+        Register(name="R6", size=1, vex_offset=6),
+        Register(name="R7", size=1, vex_offset=7),
+        Register(name="R8", size=1, vex_offset=8),
+        Register(name="R9", size=1, vex_offset=9),
+        Register(name="R10", size=1, vex_offset=10),
+        Register(name="R11", size=1, vex_offset=11),
+        Register(name="R12", size=1, vex_offset=12),
+        Register(name="R13", size=1, vex_offset=13),
+        Register(name="R14", size=1, vex_offset=14),
+        Register(name="R15", size=1, vex_offset=15),
+        Register(name="R16", size=1, vex_offset=16),
+        Register(name="R17", size=1, vex_offset=17),
+        Register(name="R18", size=1, vex_offset=18),
+        Register(name="R19", size=1, vex_offset=19),
+        Register(name="R20", size=1, vex_offset=20),
+        Register(name="R21", size=1, vex_offset=21),
+        Register(name="R22", size=1, vex_offset=22),
+        Register(name="R23", size=1, vex_offset=23),
+        Register(name="R24", size=1, vex_offset=24),
+        Register(name="R25", size=1, vex_offset=25),
+        Register(name="R26", size=1, vex_offset=26),
+        Register(name="R27", size=1, vex_offset=27),
+        Register(name="R28", size=1, vex_offset=28),
+        Register(name="R29", size=1, vex_offset=29),
+        Register(name="R30", size=1, vex_offset=30),
+        Register(name="R31", size=1, vex_offset=31),
 
-        # IO Registers are mapped into the register file starting at 0x20
-        # Any instruction that references an IO register by numer should just add this.
-        self.ioreg_offset = 0x20
+        Register(name="R1_R0", size=2, vex_offset=0),
+        Register(name="R3_R2", size=2, vex_offset=2),
+        Register(name="R5_R4", size=2, vex_offset=4),
+        Register(name="R7_R6", size=2, vex_offset=6),
+        Register(name="R9_R8", size=2, vex_offset=8),
+        Register(name="R11_R10", size=2, vex_offset=10),
+        Register(name="R13_R12", size=2, vex_offset=12),
+        Register(name="R15_R14", size=2, vex_offset=14),
+        Register(name="R17_R16", size=2, vex_offset=16),
+        Register(name="R19_R18", size=2, vex_offset=18),
+        Register(name="R21_R20", size=2, vex_offset=20),
+        Register(name="R23_R22", size=2, vex_offset=22),
+        Register(name="R25_R24", size=2, vex_offset=24),
+        Register(name="R27_R26", size=2, vex_offset=26),
+        Register(name="R29_R28", size=2, vex_offset=28),
+        Register(name="R31_R30", size=2, vex_offset=30),
 
-        # Instructions and data are in different memory in AVR
-        # The program code segment will be mapped in the higher part of the address space.
-        # Instructions that access program memory like lpm need to be aware of this.
-        self.flash_offset = 1 << 31
+        Register(name="W", size=2, subregisters=[("WL", 0, 1), ("WH", 1, 1)], vex_offset=24),
+        Register(name="X", size=2, subregisters=[("XL", 0, 1), ("XH", 1, 1)], vex_offset=26),
+        Register(name="Y", size=2, subregisters=[("YL", 0, 1), ("YH", 1, 1)], vex_offset=28),
+        Register(name="Z", size=2, subregisters=[("ZL", 0, 1), ("ZH", 1, 1)], vex_offset=30),
 
-        self.registers = {}
-        self.registers.update({"r%d" % i            : (i, 1) for i in range(0, 32)})
-        self.registers.update({"R%d_R%d" % (i+1, i) : (i, 2) for i in range(0, 32, 2)})
+        Register(name="EEDR", size=1, vex_offset=0x40),
+        Register(name="EEARL", size=1, vex_offset=0x41),
+        Register(name="EEARH", size=1, vex_offset=0x42),
+        Register(name="GTCCR", size=1, vex_offset=0x43),
+        Register(name="TCCR0A", size=1, vex_offset=0x44),
+        Register(name="TCCR0B", size=1, vex_offset=0x45),
+        Register(name="TCNT0", size=1, vex_offset=0x46),
+        Register(name="OCR0A", size=1, vex_offset=0x47),
+        Register(name="OCR0B", size=1, vex_offset=0x48),
+        Register(name="IO_0x29", size=1, vex_offset=0x49),
+        Register(name="GPIOR1", size=1, vex_offset=0x4a),
+        Register(name="GPIOR2", size=1, vex_offset=0x4b),
+        Register(name="SPCR", size=1, vex_offset=0x4c),
+        Register(name="SPSR", size=1, vex_offset=0x4d),
+        Register(name="SPDR", size=1, vex_offset=0x4e),
+        Register(name="IO_0x2f", size=1, vex_offset=0x4f),
+        Register(name="ACSR", size=1, vex_offset=0x50),
+        Register(name="IO_0x31", size=1, vex_offset=0x51),
+        Register(name="IO_0x32", size=1, vex_offset=0x52),
+        Register(name="SMCR", size=1, vex_offset=0x53),
+        Register(name="MCUSR", size=1, vex_offset=0x54),
+        Register(name="MCUCR", size=1, vex_offset=0x55),
+        Register(name="IO_0x36", size=1, vex_offset=0x56),
+        Register(name="SPMCSR", size=1, vex_offset=0x57),
+        Register(name="RAMPD", size=1, vex_offset=0x58),
+        Register(name="RAMPX", size=1, vex_offset=0x59),
+        Register(name="RAMPY", size=1, vex_offset=0x5a),
+        Register(name="RAMPZ", size=1, vex_offset=0x5b),
+        Register(name="EIND", size=1, vex_offset=0x5c),
 
-        self.registers["W"] =       (24, 2)
-        self.registers["X"] =       (26, 2)
-        self.registers["Y"] =       (28, 2)
-        self.registers["Z"] =       (30, 2)
+        Register(name="SP", size=2, vex_offset=0x5d),
+        Register(name="sp", size=2, vex_offset=0x5d),
+        Register(name="SPL", size=1, vex_offset=0x5d),
+        Register(name="SPH", size=1, vex_offset=0x5e),
 
-        self.registers["WL"] =      (24, 1)
-        self.registers["WH"] =      (25, 1)
-        self.registers["XL"] =      (26, 1)
-        self.registers["XH"] =      (27, 1)
-        self.registers["YL"] =      (28, 1)
-        self.registers["YH"] =      (29, 1)
-        self.registers["ZL"] =      (30, 1)
-        self.registers["ZH"] =      (31, 1)
+        Register(name="SREG", size=1, vex_offset=0x5f),
 
-        self.registers["EEDR"] =    (0x40, 1)
-        self.registers["EEARL"] =   (0x41, 1)
-        self.registers["EEARH"] =   (0x42, 1)
-        self.registers["GTCCR"] =   (0x43, 1)
-        self.registers["TCCR0A"] =  (0x44, 1)
-        self.registers["TCCR0B"] =  (0x45, 1)
-        self.registers["TCNT0"] =   (0x46, 1)
-        self.registers["OCR0A"] =   (0x47, 1)
-        self.registers["OCR0B"] =   (0x48, 1)
-        self.registers["IO_0x29"] = (0x49, 1)
-        self.registers["GPIOR1"] =  (0x4a, 1)
-        self.registers["GPIOR2"] =  (0x4b, 1)
-        self.registers["SPCR"] =    (0x4c, 1)
-        self.registers["SPSR"] =    (0x4d, 1)
-        self.registers["SPDR"] =    (0x4e, 1)
-        self.registers["IO_0x2f"] = (0x4f, 1)
-        self.registers["ACSR"] =    (0x50, 1)
-        self.registers["IO_0x31"] = (0x51, 1)
-        self.registers["IO_0x32"] = (0x52, 1)
-        self.registers["SMCR"] =    (0x53, 1)
-        self.registers["MCUSR"] =   (0x54, 1)
-        self.registers["MCUCR"] =   (0x55, 1)
-        self.registers["IO_0x36"] = (0x56, 1)
-        self.registers["SPMCSR"] =  (0x57, 1)
-        self.registers["RAMPD"] =   (0x58, 1)
-        self.registers["RAMPX"] =   (0x59, 1)
-        self.registers["RAMPY"] =   (0x5a, 1)
-        self.registers["RAMPZ"] =   (0x5b, 1)
-        self.registers["EIND"] =    (0x5c, 1)
+        Register(name="WDTCSR", size=1, vex_offset=0x60),
+        Register(name="CLKPR", size=1, vex_offset=0x61),
+        Register(name="PRR", size=1, vex_offset=0x64),
+        Register(name="OSCCAL", size=1, vex_offset=0x66),
+        Register(name="PCICR", size=1, vex_offset=0x68),
+        Register(name="EICRA", size=1, vex_offset=0x69),
+        Register(name="PCMSK0", size=1, vex_offset=0x6b),
+        Register(name="PCMSK2", size=1, vex_offset=0x6d),
+        Register(name="PCMSK1", size=1, vex_offset=0x6c),
+        Register(name="TIMSK0", size=1, vex_offset=0x6e),
+        Register(name="TIMSK1", size=1, vex_offset=0x6f),
+        Register(name="TIMSK2", size=1, vex_offset=0x70),
+        Register(name="ADCL", size=1, vex_offset=0x78),
+        Register(name="ADCH", size=1, vex_offset=0x79),
+        Register(name="ADCSRA", size=1, vex_offset=0x7a),
+        Register(name="ADCSRB", size=1, vex_offset=0x7b),
+        Register(name="ADMUX", size=1, vex_offset=0x7c),
+        Register(name="DIDR0", size=1, vex_offset=0x7e),
+        Register(name="DIDR1", size=1, vex_offset=0x7f),
+        Register(name="TCCR1A", size=1, vex_offset=0x80),
+        Register(name="TCCR1B", size=1, vex_offset=0x81),
+        Register(name="TCCR1C", size=1, vex_offset=0x82),
+        Register(name="TCNT1H", size=1, vex_offset=0x85),
+        Register(name="TCNT1L", size=1, vex_offset=0x84),
+        Register(name="ICR1H", size=1, vex_offset=0x87),
+        Register(name="ICR1L", size=1, vex_offset=0x86),
+        Register(name="OCR1AH", size=1, vex_offset=0x89),
+        Register(name="OCR1AL", size=1, vex_offset=0x88),
+        Register(name="OCR1BH", size=1, vex_offset=0x8b),
+        Register(name="OCR1BL", size=1, vex_offset=0x8a),
+        Register(name="TCCR2A", size=1, vex_offset=0xb0),
+        Register(name="TCCR2B", size=1, vex_offset=0xb1),
+        Register(name="TCNT2", size=1, vex_offset=0xb2),
+        Register(name="OCR2A", size=1, vex_offset=0xb3),
+        Register(name="OCR2B", size=1, vex_offset=0xb4),
+        Register(name="ASSR", size=1, vex_offset=0xb6),
+        Register(name="TWBR", size=1, vex_offset=0xb8),
+        Register(name="TWSR", size=1, vex_offset=0xb9),
+        Register(name="TWAR", size=1, vex_offset=0xba),
+        Register(name="TWDR", size=1, vex_offset=0xbb),
+        Register(name="TWCR", size=1, vex_offset=0xbc),
+        Register(name="TWAMR", size=1, vex_offset=0xbd),
+        Register(name="UCSR0A", size=1, vex_offset=0xc0),
+        Register(name="UCSR0B", size=1, vex_offset=0xc1),
+        Register(name="UCSR0C", size=1, vex_offset=0xc2),
+        Register(name="UBRR0H", size=1, vex_offset=0xc5),
+        Register(name="UBRR0L", size=1, vex_offset=0xc4),
+        Register(name="UDR0", size=1, vex_offset=0xc6),
 
-        self.registers["SP"] =      (0x5d, 2)
-        self.registers["sp"] =      (0x5d, 2)
-        self.registers["SPL"] =     (0x5d, 1)
-        self.registers["SPH"] =     (0x5e, 1)
+        Register(name="ip", size=4, alias_names=('pc'), vex_offset=0x80000000),
+    ]
 
-        self.registers["SREG"] =    (0x5f, 1)
-
-        self.registers["WDTCSR"] =  (0x60, 1)
-        self.registers["CLKPR"] =   (0x61, 1)
-        self.registers["PRR"] =     (0x64, 1)
-        self.registers["OSCCAL"] =  (0x66, 1)
-        self.registers["PCICR"] =   (0x68, 1)
-        self.registers["EICRA"] =   (0x69, 1)
-        self.registers["PCMSK0"] =  (0x6b, 1)
-        self.registers["PCMSK2"] =  (0x6d, 1)
-        self.registers["PCMSK1"] =  (0x6c, 1)
-        self.registers["TIMSK0"] =  (0x6e, 1)
-        self.registers["TIMSK1"] =  (0x6f, 1)
-        self.registers["TIMSK2"] =  (0x70, 1)
-        self.registers["ADCL"] =    (0x78, 1)
-        self.registers["ADCH"] =    (0x79, 1)
-        self.registers["ADCSRA"] =  (0x7a, 1)
-        self.registers["ADCSRB"] =  (0x7b, 1)
-        self.registers["ADMUX"] =   (0x7c, 1)
-        self.registers["DIDR0"] =   (0x7e, 1)
-        self.registers["DIDR1"] =   (0x7f, 1)
-        self.registers["TCCR1A"] =  (0x80, 1)
-        self.registers["TCCR1B"] =  (0x81, 1)
-        self.registers["TCCR1C"] =  (0x82, 1)
-        self.registers["TCNT1H"] =  (0x85, 1)
-        self.registers["TCNT1L"] =  (0x84, 1)
-        self.registers["ICR1H"] =   (0x87, 1)
-        self.registers["ICR1L"] =   (0x86, 1)
-        self.registers["OCR1AH"] =  (0x89, 1)
-        self.registers["OCR1AL"] =  (0x88, 1)
-        self.registers["OCR1BH"] =  (0x8b, 1)
-        self.registers["OCR1BL"] =  (0x8a, 1)
-        self.registers["TCCR2A"] =  (0xb0, 1)
-        self.registers["TCCR2B"] =  (0xb1, 1)
-        self.registers["TCNT2"] =   (0xb2, 1)
-        self.registers["OCR2A"] =   (0xb3, 1)
-        self.registers["OCR2B"] =   (0xb4, 1)
-        self.registers["ASSR"] =    (0xb6, 1)
-        self.registers["TWBR"] =    (0xb8, 1)
-        self.registers["TWSR"] =    (0xb9, 1)
-        self.registers["TWAR"] =    (0xba, 1)
-        self.registers["TWDR"] =    (0xbb, 1)
-        self.registers["TWCR"] =    (0xbc, 1)
-        self.registers["TWAMR"] =   (0xbd, 1)
-        self.registers["UCSR0A"] =  (0xc0, 1)
-        self.registers["UCSR0B"] =  (0xc1, 1)
-        self.registers["UCSR0C"] =  (0xc2, 1)
-        self.registers["UBRR0H"] =  (0xc5, 1)
-        self.registers["UBRR0L"] =  (0xc4, 1)
-        self.registers["UDR0"] =    (0xc6, 1)
-
-        self.registers["pc"] =      (0x80000000, 4)
-        self.registers["ip"] =      (0x80000000, 4)
-
-        self.register_names = {}
-        self.register_names.update({i: "r%d" % i for i in range(0, 32)})
-        self.register_names.update({i[0]: name for name, i in self.registers.iteritems() if i > self.ioreg_offset})
-        self.register_names[self.registers['pc'][0]] = 'pc'
-        self.register_names[self.registers["SREG"][0]] = "SREG"
-
-        self.register_size_names = {}
-        self.register_size_names.update({self.registers["R%d_R%d" % (i+1, i)] : "R%d_R%d" % (i+1, i) for i in range(0, 32, 2)})
-
-
-        self.ip_offset = self.registers["pc"][0]
-        self.sp_offset = self.registers["sp"][0]
-        self.initial_sp = 0x7fff
-        self.call_pushes_ret = True
-        # FIXME: something in angr assumes that sizeof(long) == sizeof(return address on stack)
-        self.sizeof["long"] = 24
+register_arch([r'em_avr'], 32, 'Iend_LE', ArchAVR)

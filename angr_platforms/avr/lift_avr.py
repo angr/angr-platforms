@@ -1,7 +1,7 @@
 import struct
-from arch_avr import ArchAVR
-from pyvex.lift.util import *
-from pyvex.lift import register
+from .arch_avr import ArchAVR
+from pyvex.lifting.util import *
+from pyvex.lifting import register
 from pyvex.expr import int_type_for_size
 import bitstring
 import sys
@@ -9,7 +9,6 @@ import os
 import re
 import pyvex
 import archinfo
-from arch_avr import ArchAVR
 
 # This is a lifter for Atmel AVR 8-bit microcontrollers.
 # (most commonly known to the public as "that Arduino thing")
@@ -62,6 +61,13 @@ def compute_overflow_sub(src, dst, res):
 class AVRInstruction(Instruction):
     # TODO: allow changing this based on arch, support pc overflow
     pc_type = Type.int_24
+
+    def lift(self, irsb_c, past_instructions, future_instructions):
+        self.apply_context(past_instructions, future_instructions)
+        super().lift(irsb_c, past_instructions, future_instructions)
+
+    def apply_context(self, past, future):
+        pass
 
     def get_reg(self, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
@@ -605,7 +611,7 @@ class Instruction_EOR(TwoRegAVRInstruction):
         return res[7]
 
 class Instruction_INC(NoFlags, OneRegAVRInstruction):
-    opcode = '1011'
+    opcode = '0011'
     name = 'inc'
 
     def compute_result(self, src):
@@ -858,7 +864,7 @@ class Instruction_SUBI(RegImmAVRInstruction):
         return compute_overflow_sub(imm, dst, res)
 
 class Instruction_SUB(TwoRegAVRInstruction):
-    opcode = "00110"
+    opcode = "000110"
     name = "sub"
 
     def compute_result(self, src, dst):
@@ -969,8 +975,8 @@ class LoadStoreInstruction(NoFlags, AVRInstruction):
         # special mode: pre-decrement
         if self.data["s"] and self.data["q"] == 2:
             addr -= 1
-            self.put((addr >> 16).cast_to(Int.int_8), segment_reg)
-            self.put(addr.cast_to(Int.int_16), index_reg)
+            self.put((addr >> 16).cast_to(Type.int_8), segment_reg)
+            self.put(addr.cast_to(Type.int_16), index_reg)
 
         # special mode: post-increment
         if self.data["s"] and self.data["q"] == 1:
@@ -1387,8 +1393,7 @@ class Instruction_RETI(NoFlags, AVRInstruction):
         sp = self.get_reg("SP")
         self.put_reg(sp + self.arch.call_sp_fix, 'SP')
         dst = self.load_data(sp, int_type_for_size(self.arch.call_sp_fix * 8))
-        # Set GIE
-        self.set_flag(MSPFlagIndex.GIE, 1)
+        self.set_flag(AVRFlagIndex.I_Interrupt, 1)
         self.absolute_jump(None, dst, jumpkind=JumpKind.Ret)
 
 class Instruction_RJMP(NoFlags, AVRInstruction):
@@ -1551,6 +1556,8 @@ class LifterAVR(GymratLifter):
         # TODO: DES
         Instruction_EICALL,
         Instruction_EIJMP,
+        Instruction_ICALL,
+        Instruction_IJMP,
         Instruction_ELPM,
         Instruction_ELPMd,
         Instruction_ELPMplus,
@@ -1599,6 +1606,7 @@ class LifterAVR(GymratLifter):
         #SBR Virtual; See OR
         Instruction_SBRC,
         Instruction_SBRS,
+        Instruction_CPSE,
         # Note: The following instructions will lift to BSET
         #SEC
         #SEH
@@ -1632,27 +1640,22 @@ if __name__ == '__main__':
         b'\x00\x00',  # NOP
         b'\x23\x01',  # MOVW
         b'\x46\x02',  # MULS
-        b"\x01\x1c"   # adc r0, r1
-        b'\x1f\xbe',  # out 0x3d, r1
-        b"\x01\xf8", # bld r0, 1
-        b"\x0e\x94\x00\x00", # call 0x0
-
     ]
-    print "Decoder test:"
+    print("Decoder test:")
     for num, test in enumerate(tests):
-        print num
-        l = LifterAVR(ArchAVR(), 0)
-        l._lift(test, 0, max_inst=1)
+        print(num)
+        lifter = LifterAVR(ArchAVR(), 0)
+        lifter._lift(data=test)
 
-    print "Lifter test:"
-    for test2 in tests:
-        l = LifterAVR(ArchAVR(), 0)
-        l._lift(test2, bytes_offset=0, max_bytes=len(test2), max_inst=len(test2)/2)
-        l.irsb.pp()
+    print("Lifter test:")
+    for test in tests:
+        lifter = LifterAVR(ArchAVR(), 0)
+        lifter._lift(data=test)
+        lifter.irsb.pp()
 
-    print "Full tests:"
-    fulltest = "".join(tests)
-    l = LifterAVR(ArchAVR(), 0)
-    l._lift(fulltest, bytes_offset=0, max_bytes=len(fulltest), max_inst=len(fulltest) / 2)
-    l.irsb.pp()
-    pyvex.IRSB(fulltest, 0x0, arch=ArchAVR()).pp()
+    print("Full tests:")
+    fulltest = b"".join(tests)
+    lifter = LifterAVR(ArchAVR(), 0)
+    lifter._lift(data=fulltest)
+    lifter.irsb.pp()
+    
