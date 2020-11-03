@@ -5,7 +5,7 @@ class ArchAVR(Arch):
 
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
-    
+
     name = "AVR"
     bits = 32
     max_inst_bytes = 4

@@ -1,14 +1,13 @@
-import struct
-from .arch_avr import ArchAVR
-from pyvex.lifting.util import *
-from pyvex.lifting import register
-from pyvex.expr import int_type_for_size
-import bitstring
-import sys
-import os
+#pylint: disable=wildcard-import, unused-wildcard-import, unused-argument, arguments-differ
+import logging
 import re
-import pyvex
-import archinfo
+
+import bitstring
+from pyvex.expr import int_type_for_size
+from pyvex.lifting import register
+from pyvex.lifting.util import *
+
+from .arch_avr import ArchAVR
 
 # This is a lifter for Atmel AVR 8-bit microcontrollers.
 # (most commonly known to the public as "that Arduino thing")
@@ -69,21 +68,23 @@ class AVRInstruction(Instruction):
     def apply_context(self, past, future):
         pass
 
+    def compute_result(self, *args):
+        pass
+
     def get_reg(self, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
             if len(name) != 5:
                 # The ISA has special restrictions on what instructions use which
                 # regs.  5-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible registers.  See get_reg_16_31")
-            else:
-                return self.get(int(name, 2), REG_TYPE)
+            return self.get(int(name, 2), REG_TYPE)
         else:
             try:
                 reg, width = self.arch.registers[name]
                 ty = REG_TYPE if width == 1 else DOUBLEREG_TYPE
                 return self.get(reg, ty)
-            except KeyError:
-                raise ValueError("Invalid register for name: " + name)
+            except KeyError as e:
+                raise ValueError("Invalid register for name: " + name) from e
 
     def put_reg(self, value, name):
         if isinstance(name, str) and re.match('^[01]+$', name):
@@ -91,16 +92,15 @@ class AVRInstruction(Instruction):
                 # The ISA has special restrictions on what instructions use which
                 # regs.  5-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible registers.  See get_reg_16_31")
-            else:
-                self.put(value, int(name, 2))
-                return
+            self.put(value, int(name, 2))
+            return
         else:
             try:
                 reg, _ = self.arch.registers[name]
                 self.put(value, reg)
                 return
-            except KeyError:
-                raise ValueError("Invalid register for put: " + name)
+            except KeyError as e:
+                raise ValueError("Invalid register for put: " + name) from e
 
     def get_reg_pair(self, name_num):
         if isinstance(name_num, str) and re.match('^[01]+$', name_num):
@@ -108,15 +108,14 @@ class AVRInstruction(Instruction):
                 # The ISA has special restrictions on what instructions use which
                 # regs.  5-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible double registers.")
-            else:
-                num = int(name_num, 2)
+            num = int(name_num, 2)
         else:
             num = name_num
         try:
             offset = self.arch.registers['R%d_R%d' % (2 * num + 1, 2 * num)][0]
             return self.get(offset, DOUBLEREG_TYPE)
-        except KeyError:
-            raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num))
+        except KeyError as e:
+            raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num)) from e
 
     def put_reg_pair(self, value, name_num):
         if isinstance(name_num, str) and re.match('^[01]+$', name_num):
@@ -124,29 +123,28 @@ class AVRInstruction(Instruction):
                 # The ISA has special restrictions on what instructions use which
                 # regs.  5-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible double registers.")
-            else:
-                name_num = int(name_num, 2)
+            name_num = int(name_num, 2)
         if isinstance(name_num, int):
             num = name_num
 
             try:
                 offset = self.arch.registers['R%d_R%d' % (2 * num + 1, 2 * num)][0]
                 return self.put(value, offset)
-            except KeyError:
-                raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num))
+            except KeyError as e:
+                raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num)) from e
         else:
             try:
                 offset = self.arch.registers[name_num][0]
                 return self.put(value, offset)
-            except KeyError:
-                raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num))
+            except KeyError as e:
+                raise ValueError("Invalid reg pair: " + 'R%d_R%d' % (2 * num + 1, 2 * num)) from e
 
     def _get_ioreg_register(self, reg_offset, ty):
         # we need special handling for the stack pointer
         # angr expects the stack pointer to point to the last stack entry,
         # while the AVR stack pointer must point to the next free entry (one byte below the last stack entry)
         #
-        # luckily, the only way that a program can observe the stack pointer is through IO registers, 
+        # luckily, the only way that a program can observe the stack pointer is through IO registers,
         # so we can let the SP in the register file point to the last stack entry and translate it
         # during IO register access.
         spl = self.arch.registers["SPL"][0]
@@ -170,15 +168,14 @@ class AVRInstruction(Instruction):
                 # The ISA has special restrictions on what instructions use which
                 # regs.  6-bit IO regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible IO registers.")
-            else:
-                return self._get_ioreg_register(self.arch.ioreg_offset + int(name, 2), REG_TYPE)
+            return self._get_ioreg_register(self.arch.ioreg_offset + int(name, 2), REG_TYPE)
         else:
             try:
                 reg, width = self.arch.registers[name]
                 ty = REG_TYPE if width == 1 else DOUBLEREG_TYPE
                 return self._get_ioreg_register(reg, ty)
-            except KeyError:
-                raise ValueError("Invalid register for name: " + name)
+            except KeyError as e:
+                raise ValueError("Invalid register for name: " + name) from e
 
     def _put_ioreg_register(self, value, reg_offset):
         spl = self.arch.registers["SPL"][0]
@@ -205,16 +202,15 @@ class AVRInstruction(Instruction):
                 # The ISA has special restrictions on what instructions use which
                 # regs.  6-bit regs are any reg.  Otherwise you must specify
                 raise ValueError("Must correctly constrain possible IO registers. ")
-            else:
-                self._put_ioreg_register(value, self.arch.ioreg_offset + int(name, 2))
-                return
+            self._put_ioreg_register(value, self.arch.ioreg_offset + int(name, 2))
+            return
         else:
             try:
                 reg, _ = self.arch.registers[name]
                 self._put_ioreg_register(value, reg)
                 return
-            except KeyError:
-                raise ValueError("Invalid register for put: " + name)
+            except KeyError as e:
+                raise ValueError("Invalid register for put: " + name) from e
 
     # AVR has different address spaces for flash (program memory) and ram (data memory).
     # The program memory is mapped at arch.flash_offset. All program addresses are translated during lifting.
@@ -235,7 +231,7 @@ class AVRInstruction(Instruction):
     #################################
 
     def get_flag(self, idx):
-        assert idx >= 0 and idx < 8
+        assert 0 <= idx < 8
         flag_reg_tmp = self.get_reg('SREG')
         return flag_reg_tmp[idx]
 
@@ -250,18 +246,21 @@ class AVRInstruction(Instruction):
 
     # Default flag behavior
 
+    # pylint: disable=no-self-use
     def interrupt_enable(self, *args):
         return None
 
+    # pylint: disable=no-self-use
     def transfer(self, *args):
         return None
 
+    # pylint: disable=no-self-use
     def half_carry(self, *args):
         return None
 
     def signed(self, *args):
-        v = self.overflow(*args)
-        n = self.negative(*args)
+        v = self.overflow(*args)  # pylint: disable=assignment-from-none
+        n = self.negative(*args)  # pylint: disable=assignment-from-none
         if n is not None and v is not None:
             return n ^ v
         else:
@@ -276,8 +275,7 @@ class AVRInstruction(Instruction):
     def zero(self, *args):
         if not args:
             raise Exception(repr(self))
-        else:
-            return args[-1] == 0
+        return args[-1] == 0
 
     def carry(self, *args):
         return None
@@ -305,19 +303,20 @@ class AVRInstruction(Instruction):
 
     def match_instruction(self, data, bitstrm):
         if hasattr(self, 'opcode'):
-            if data['o'] != self.opcode:
-                raise ParseError("Mismatched opcode, expected %s, got %s" % (self.opcode, data['o']))
+            if data['o'] != self.opcode:  # pylint: disable=no-member
+                raise ParseError("Mismatched opcode, expected %s, got %s" % (self.opcode, data['o']))  # pylint: disable=no-member
         else:
             if 'o' in data:
-                raise Exception("Instruction " + self.name + " should probably have an opcode")
+                raise Exception("Instruction " + self.name + " should probably have an opcode")  # pylint: disable=no-member
+
     def compute_flags(self, *args):
-        i = self.interrupt_enable(*args)
-        t = self.transfer(*args)
-        h = self.half_carry(*args)
+        i = self.interrupt_enable(*args)  # pylint: disable=assignment-from-none
+        t = self.transfer(*args)  # pylint: disable=assignment-from-none
+        h = self.half_carry(*args)  # pylint: disable=assignment-from-none
         s = self.signed(*args)
-        v = self.overflow(*args)
+        v = self.overflow(*args)  # pylint: disable=assignment-from-none
         z = self.zero(*args)
-        c = self.carry(*args)
+        c = self.carry(*args)  # pylint: disable=assignment-from-none
         self.set_flags(i, t, h, s, v, z, c)
 
 
@@ -634,11 +633,11 @@ class Instruction_LSR(OneRegAVRInstruction):
     def carry(self, src, res):
         return src[0]
 
-    def negative(self, *args):
+    def negative(self, src, res):
         return 0
 
-    def overflow(self, *args):
-        return self.negative(*args) ^ self.carry(*args)
+    def overflow(self, src, res):
+        return self.negative(src, res) ^ self.carry(src, res)
 
 class Instruction_MOV(NoFlags, TwoRegAVRInstruction):
     opcode = '001011'
@@ -777,8 +776,8 @@ class Instruction_ROR(OneRegAVRInstruction):
     def negative(self, src, res):
         return res[7]
 
-    def overflow(self, *args):
-        return self.negative(*args) ^ self.carry(*args)
+    def overflow(self, src, res):
+        return self.negative(src, res) ^ self.carry(src, res)
 
 class Instruction_SBC(TwoRegAVRInstruction):
     opcode = '000010'
@@ -926,8 +925,8 @@ class Instruction_LAGeneric(NoFlags, AVRInstruction):
     def fetch_operands(self):
         z = self.get(self.arch.registers["Z"][0], DOUBLEREG_TYPE).cast_to(Type.int_32)
         rampz = self.get(self.arch.registers["RAMPZ"][0], REG_TYPE).cast_to(Type.int_32)
-        self._target = (rampz << 16) + z
-        self._val = self.load_data(self._target, Type.int_8)
+        self._target = (rampz << 16) + z #pylint:disable=attribute-defined-outside-init
+        self._val = self.load_data(self._target, Type.int_8) #pylint:disable=attribute-defined-outside-init
         dst = self.get_reg(self.data["d"])
         return self._val, dst
 
@@ -960,7 +959,7 @@ class Instruction_LAT(Instruction_LAGeneric):
 class LoadStoreInstruction(NoFlags, AVRInstruction):
     def process_address_operand(self):
         """This function computes the address for the load or store instruction,
-        taking care of the correct segment register (RAMPX/Y/Z). 
+        taking care of the correct segment register (RAMPX/Y/Z).
         It also applies any specified post-increment/pre-decrement.
         """
 
@@ -1032,7 +1031,7 @@ class Instruction_STGeneric(LoadStoreInstruction):
 
     def compute_result(self, addr, val):
         self.store_data(val, addr)
-    
+
 class Instruction_STx(Instruction_STGeneric):
     bin_format = '1001001rrrrr11qq'
 
@@ -1409,7 +1408,7 @@ class Instruction_RJMP(NoFlags, AVRInstruction):
 
 class SkipInstruction(NoFlags, AVRInstruction):
     def apply_context(self, past, future):
-        self.next_size = future[0].bytewidth
+        self.next_size = future[0].bytewidth #pylint:disable=attribute-defined-outside-init
 
     def fetch_operands(self):
         return (self.get_reg(self.data["r"]), int(self.data["b"], 2))
@@ -1456,7 +1455,7 @@ class Instruction_CBI(NoFlags, AVRInstruction):
         idx = int(self.data['b'], 2)
         return ior, idx
 
-    def compute_result(self, ior):
+    def compute_result(self, ior, idx):
         ior[idx] = 0
         return ior
 
@@ -1630,10 +1629,11 @@ class LifterAVR(GymratLifter):
         Instruction_XCH,
         }
 
+
 register(LifterAVR, "AVR")
 
-if __name__ == '__main__':
-    import logging
+
+def main():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
     tests = [
@@ -1658,4 +1658,7 @@ if __name__ == '__main__':
     lifter = LifterAVR(ArchAVR(), 0)
     lifter._lift(data=fulltest)
     lifter.irsb.pp()
-    
+
+
+if __name__ == "__main__":
+    main()
