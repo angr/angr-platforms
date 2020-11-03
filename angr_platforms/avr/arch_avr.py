@@ -7,7 +7,7 @@ class ArchAVR(Arch):
         super().__init__(endness)
     
     name = "AVR"
-    bits = 32 # TODO: word is 16 bits
+    bits = 32
     max_inst_bytes = 4
     ip_offset = 0x80000000
     sp_offset = 0x5d
