@@ -1,4 +1,4 @@
-# pylint: disable=W0613,R0201
+# pylint: disable=W0613,R0201,W0221,W0223
 from .instruction_patterns import I_Instruction
 from pyvex.lifting.util import Type, ParseError, JumpKind
 

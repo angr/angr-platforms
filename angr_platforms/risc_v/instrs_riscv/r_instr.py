@@ -1,4 +1,4 @@
-# pylint: disable=W0613,R0201
+# pylint: disable=W0613,R0201,W0221
 from pyvex.lifting.util import Type
 from .instruction_patterns import R_Instruction
 

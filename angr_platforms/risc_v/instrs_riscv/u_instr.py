@@ -1,4 +1,4 @@
-
+# pylint: disable=W0221
 from .instruction_patterns import U_Instruction
 from pyvex.lifting.util import Type
 

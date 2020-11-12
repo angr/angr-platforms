@@ -1,3 +1,4 @@
+# pylint: disable=W0221,W0223
 from pyvex.lifting.util import Type, Instruction
 from bitstring import BitArray
 
@@ -74,7 +75,7 @@ class I_Instruction(RISCV_Instruction):
         self.bin_format = "iiiiiiiIIIIIsssss{0}ddddd{1}".format(self.func3, self.opcode)
         super().__init__(bitstrm, arch, addr)
 
-    '''In the shift instruction extend this function to also check the last 7 bits of the immediate'''
+    #'''In the shift instruction extend this function to also check the last 7 bits of the immediate'''
 
     def match_instruction(self, data, bitstream):
         if hasattr(self, "extra_constraints"):
@@ -131,7 +132,7 @@ class S_Instruction(RISCV_Instruction):
             self.extra_constraints(data, bitstream)
         return True
 
-    '''This is the address + offset'''
+    #'''This is the address + offset'''
 
     def get_addr(self):
         addr = self.get(int(self.data['s'], 2), Type.int_32)
@@ -139,13 +140,13 @@ class S_Instruction(RISCV_Instruction):
         offset = BitArray(bin='{0}{1}'.format(self.data['I'], self.data['i'])).int
         return addr + offset
 
-    '''Value is returned as int32 caller must cast it to store half words or bytes'''
+    #'''Value is returned as int32 caller must cast it to store half words or bytes'''
 
     def get_val(self):
         return self.get(int(self.data['S'], 2), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_val(),
+        return (self.get_val(),)
 
     def commit_result(self, result):
         self.store(result, self.get_addr())
@@ -182,7 +183,7 @@ class B_Instruction(RISCV_Instruction):
     def get_src2(self):
         return self.get(int(self.data['S'], 2), Type.int_32)
 
-    ''' The offset for B instructions is as follows inst[31]inst[7]inst[30:25]inst[11:8] just had to be carefull with the endianness'''
+    #''' The offset for B instructions is as follows inst[31]inst[7]inst[30:25]inst[11:8] just had to be carefull with the endianness'''
 
     def get_offset(self):
         begin = self.data['i'][0:4]
@@ -259,9 +260,7 @@ class J_Instruction(RISCV_Instruction):
     def get_dst(self):
         return int(self.data['d'], 2)
 
-    ''''
-    Some weird way to parse the immediate according to risc-v isa
-    '''
+    #Some weird way to parse the immediate according to risc-v isa
 
     def get_imm(self):
         i = self.data['i']
@@ -270,7 +269,7 @@ class J_Instruction(RISCV_Instruction):
         return BitArray(bin=imm).int
 
     def fetch_operands(self):
-        return self.get_imm(),
+        return (self.get_imm(),)
 
     def commit_result(self, result):
         self.put(result, self.get_dst())
@@ -341,7 +340,7 @@ class CI_Instruction(RISCV_Instruction):
         return int(self.data['s'], 2)
 
     def fetch_operands(self):
-        return self.get(self.get_dst(), Type.int_32),
+        return (self.get(self.get_dst(), Type.int_32),)
 
 
 class CIW_Instruction(RISCV_Instruction):
@@ -369,7 +368,7 @@ class CIW_Instruction(RISCV_Instruction):
         return True
 
     def fetch_operands(self):
-        return int(self.data['d'], 2) + 8,
+        return (int(self.data['d'], 2) + 8,)
 
 
 class CL_Instruction(RISCV_Instruction):
@@ -472,7 +471,7 @@ class CB_Instruction(RISCV_Instruction):
         return True
 
     def fetch_operands(self):
-        return self.get(int(self.data['s'], 2) + 8, Type.int_32),
+        return (self.get(int(self.data['s'], 2) + 8, Type.int_32),)
 
 
 class CJ_Instruction(RISCV_Instruction):
@@ -503,6 +502,4 @@ class CJ_Instruction(RISCV_Instruction):
         i = self.data['j']
         parsed = "{0}{1}{2}{3}{4}{5}{6}{7}0".format(i[0], i[4], i[2:4], i[6], i[5], i[10], i[1], i[7:10])
         val = self.constant(BitArray(bin=parsed).int, Type.int_32)
-        return val.signed,
-
-
+        return (val.signed,)
