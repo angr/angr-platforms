@@ -8,8 +8,8 @@ class SimCCRISCV(SimCC):
     ARG_REGS = [ 'a0', 'a1', 'a2', 'a3', 'a4', 'a5']
     FP_ARG_REGS = []    # expand in case the floating point extension is added
     STACK_ALIGNMENT = 16
-    RETURN_ADDR = SimStackArg(4, 4)
-    RETURN_VAL = SimRegArg('ra', 4)
+    RETURN_ADDR = SimRegArg('ra', 4)
+    RETURN_VAL = SimRegArg('a0', 4)
     ARCH = ArchRISCV
 
 class SimRISCVSyscall(SimCC):
