@@ -1,4 +1,4 @@
-
+# pylint: disable=W0613,R0201
 from .instruction_patterns import CI_Instruction
 from pyvex.lifting.util import Type, ParseError
 from bitstring import BitArray
@@ -101,5 +101,3 @@ class Instruction_CSLLI(CI_Instruction):
         imm = self.constant(BitArray(bin=data).uint, Type.int_8)
         res = (src1 << imm) & self.constant(0xffffffff, Type.int_32)
         self.put(res, self.get_dst())
-
-

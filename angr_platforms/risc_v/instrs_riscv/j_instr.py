@@ -11,4 +11,3 @@ class Instruction_JAL(J_Instruction):
         addr = self.addr+imm
         self.jump(None, self.constant(addr, Type.int_32))
         return return_addr
-

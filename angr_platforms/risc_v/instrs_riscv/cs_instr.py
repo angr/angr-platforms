@@ -1,4 +1,4 @@
-
+# pylint: disable=W0613,R0201
 from .instruction_patterns import CS_Instruction
 from pyvex.lifting.util import Type, ParseError
 from bitstring import BitArray
@@ -69,4 +69,3 @@ class Instruction_CXOR(CS_Instruction):
 
     def compute_result(self, src1, src2):
         return src1 ^ src2
-

@@ -1,3 +1,4 @@
+# pylint: disable=R0201
 from .instruction_patterns import S_Instruction
 from pyvex.lifting.util import Type
 
@@ -24,4 +25,3 @@ class Instruction_SW(S_Instruction):
 
     def compute_result(self, val):
         return val
-

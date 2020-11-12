@@ -1,3 +1,4 @@
+# pylint: disable=W0221
 from .instruction_patterns import B_Instruction
 
 class Instruction_BEQ(B_Instruction):
@@ -17,7 +18,6 @@ class Instruction_BNE(B_Instruction):
     def compute_result(self, src1, src2, imm):
         addr = self.addr + imm
         self.jump(src1 != src2, addr)
-        return None
 
 class Instruction_BLT(B_Instruction):
     func3='100'
@@ -58,4 +58,3 @@ class Instruction_BGEU(B_Instruction):
         src2.is_signed = False
         addr = self.addr + imm
         self.jump(src1 >= src2, addr)
-

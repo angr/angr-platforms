@@ -1,4 +1,4 @@
-
+# pylint: disable=W0613,R0201
 from .instruction_patterns import CB_Instruction
 from pyvex.lifting.util import Type, ParseError
 from bitstring import BitArray
@@ -82,4 +82,3 @@ class Instruction_CSRAI(CB_Instruction):
         result = (~((~src1) >> shftamnt)) & self.constant(0xffffffff, Type.int_32)
         dst = int(self.data['s'], 2) + 8
         self.put(result, dst)
-

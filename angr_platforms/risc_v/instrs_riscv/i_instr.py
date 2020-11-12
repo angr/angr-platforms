@@ -1,4 +1,4 @@
-
+# pylint: disable=W0613,R0201
 from .instruction_patterns import I_Instruction
 from pyvex.lifting.util import Type, ParseError, JumpKind
 
@@ -214,6 +214,3 @@ class Instruction_ECALL(I_Instruction):
         self.jump(None, self.constant(0x80000180, Type.int_32), JumpKind.Syscall)
         self.put(sp_addr, 'sp')
         return return_addr
-
-
-

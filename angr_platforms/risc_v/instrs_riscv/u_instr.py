@@ -15,4 +15,3 @@ class Instruction_AUIPC(U_Instruction):
 
     def compute_result(self, _ , imm):
         return self.addr + (imm << self.constant(12, Type.int_8))
-

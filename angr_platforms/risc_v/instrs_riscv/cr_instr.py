@@ -1,4 +1,4 @@
-
+# pylint: disable=W0613,R0201
 from .instruction_patterns import CR_Instruction
 from pyvex.lifting.util import Type, ParseError
 
@@ -82,4 +82,3 @@ class Instruction_EB(CR_Instruction):
         return data
 
 # no idea what EBreak does so not modelling it for the moment
-

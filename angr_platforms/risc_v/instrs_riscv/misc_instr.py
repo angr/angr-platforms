@@ -1,3 +1,4 @@
+# pylint: disable=W0613,R0201,W0221, W0223
 from .instruction_patterns import RISCV_Instruction, CL_Instruction, CIW_Instruction
 from pyvex.lifting.util import Type, Instruction, ParseError
 from bitstring import BitArray
@@ -32,7 +33,7 @@ class Instruction_CSWSP(RISCV_Instruction):
         return self.get(int(self.data['s'], 2), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_src1(),
+        return (self.get_src1(),)
 
     def get_imm(self):
         val = "{0}{1}00".format(self.data['i'][4:6], self.data['i'][0:4])
@@ -79,4 +80,3 @@ class Instruction_NOP(Instruction):
 
     def match_instruction(self, data, bitstream):
         return True
-

@@ -1,3 +1,4 @@
+# pylint: disable=W0613,R0201
 from pyvex.lifting.util import Type
 from .instruction_patterns import R_Instruction
 
@@ -152,7 +153,6 @@ class Instruction_MULHU(R_Instruction):
         src2.is_signed = False
         return (src1*src2) >> self.constant(32, Type.int_8)
 
-'''Dvision disabled due to exceeding recusion depth'''
 class Instruction_DIV(R_Instruction):
     func3='100'
     func7='0000001'
@@ -164,7 +164,6 @@ class Instruction_DIV(R_Instruction):
         src2 = src2.signed
         return src1//src2
 
-'''Division disabled due to exceeding recusrion dpeth'''
 class Instruction_DIVU(R_Instruction):
     func3='101'
     func7='0000001'
@@ -195,4 +194,3 @@ class Instruction_REMU(R_Instruction):
         src1.is_signed = False
         src2.is_signed = False
         return src1 % src2
-
