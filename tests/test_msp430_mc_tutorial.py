@@ -6,6 +6,7 @@ import nose
 
 def test_tutorial():
     thebin = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/msp430/microcorruption_tutorial/out.elf'))
+    # disabling auto_load_libs doesn't affect the execution time.
     p = angr.Project(thebin, load_options={'rebase_granularity': 8})
     p.hook_symbol('getsn', simos_msp430.MCgetsn())
     p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())

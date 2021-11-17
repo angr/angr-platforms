@@ -6,7 +6,7 @@ import os
 def test_hanoi():
     the_bin = str(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               '../test_programs/msp430/microcorruption_hanoi/out.elf'))
-    p = angr.Project(the_bin, load_options={'rebase_granularity': 8})
+    p = angr.Project(the_bin, load_options={'rebase_granularity': 8}, auto_load_libs=False)
     p.hook_symbol('getsn', simos_msp430.MCgetsn())
     p.hook_symbol('__stop_progExec__', simos_msp430.MCstopexec())
     p.hook_symbol('puts', simos_msp430.MCputs())

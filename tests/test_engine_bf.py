@@ -12,6 +12,7 @@ def test_hello():
     pyvex.lifting.lifters['BF'] = []
     try:
         hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/hello.bf'))
+        # auto_load_libs can't be disabled as it increases the execution time of the testcase.
         p = angr.Project(hellobf, engine=UberEngineWithBF)
         entry = p.factory.entry_state()
         smgr = p.factory.simulation_manager(entry)
@@ -26,6 +27,7 @@ def test_1bytecrackme_good():
     try:
         crackme = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/1bytecrackme-good.bf'))
         bad_states = lambda state: b"-" in state.posix.dumps(1)
+        # auto_load_libs can't be disabled as it increases the execution time of the testcase.
         p = angr.Project(crackme, engine=UberEngineWithBF)
         p.arch.vex_arch = None  # force test with engine
         entry = p.factory.entry_state(remove_options={angr.options.LAZY_SOLVES})

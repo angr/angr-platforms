@@ -12,7 +12,7 @@ TEST_PROGRAMS_BASE = str(os.path.join(os.path.dirname(os.path.realpath(__file__)
 def test_idea_correct_flag():
 
     idea_bpf = os.path.join(TEST_PROGRAMS_BASE, 'idea.bpf')
-    proj = angr.Project(idea_bpf, main_opts={'backend': 'bpf'})
+    proj = angr.Project(idea_bpf, main_opts={'backend': 'bpf'}, auto_load_libs=False)
 
     assert proj.arch.name == 'BPF'
 
@@ -41,7 +41,7 @@ def test_idea_correct_flag():
 def test_idea_incorrect_flag():
 
     idea_bpf = os.path.join(TEST_PROGRAMS_BASE, 'idea.bpf')
-    proj = angr.Project(idea_bpf, main_opts={'backend': 'bpf'})
+    proj = angr.Project(idea_bpf, main_opts={'backend': 'bpf'}, auto_load_libs=False)
 
     assert proj.arch.name == 'BPF'
 
