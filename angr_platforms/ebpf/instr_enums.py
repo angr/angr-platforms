@@ -20,11 +20,23 @@ where left of colon is the meaning what it is and on the right is the number of 
 `op` has the following form:
 
 +----------------+--------+--------------------+
-|   instruction class     |   3 bits           |
+|  5 instruction class    |   3 bits           |
 |     specific bits       | instruction class  |
 +----------------+--------+--------------------+
 (MSB)                                      (LSB)
 
+Three LSB bits store instruction class which is one of:
+
+  eBPF classes:
+
+  BPF_LD    0x00
+  BPF_LDX   0x01
+  BPF_ST    0x02
+  BPF_STX   0x03
+  BPF_ALU   0x04
+  BPF_JMP   0x05
+  BPF_JMP32 0x06
+  BPF_ALU64 0x07
 """
 
 INSTRUCTION_CLASS_BITS = 7
@@ -61,19 +73,6 @@ field is divided into three parts:
 | operation code | source | instruction class  |
 +----------------+--------+--------------------+
 (MSB)                                      (LSB)
-
-Three LSB bits store instruction class which is one of:
-
-  eBPF classes:
-
-  BPF_LD    0x00
-  BPF_LDX   0x01
-  BPF_ST    0x02
-  BPF_STX   0x03
-  BPF_ALU   0x04
-  BPF_JMP   0x05
-  BPF_JMP32 0x06
-  BPF_ALU64 0x07
 
 When BPF_CLASS(code) == BPF_ALU or BPF_JMP, 4th bit encodes source operand ...
 
