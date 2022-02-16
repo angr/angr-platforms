@@ -7,7 +7,7 @@ import bitstring
 
 from ebpf.instr_enums import \
     InstrClass, OpcodeSrc, AluOrAlu64Operation, JmpOperation, Jmp32Operation, OpcodeMode, OperandSize
-from pyvex.lifting.util import Instruction, ParseError, Type, JumpKind
+from pyvex.lifting.util import Instruction, ParseError, Type, JumpKind, VexValue
 
 import logging
 
@@ -310,7 +310,7 @@ class Instruction_BpfLSH(Alu64Instruction):
             assert False
 
     def compute_result(self, src, dst):
-        return dst >> src
+        return dst << src
 
 
 class Instruction_BpfRSH(Alu64TwoOperandInstruction):
@@ -318,7 +318,7 @@ class Instruction_BpfRSH(Alu64TwoOperandInstruction):
     _operation = AluOrAlu64Operation.BPF_RSH
 
     def compute_result(self, src, dst):
-        return dst << src  # FIXME
+        return dst >> src
 
 
 class Instruction_BpfNEG(Alu64OneOperandInstruction):
@@ -375,7 +375,7 @@ class Instruction_BpfARSH(Alu64Instruction):
             assert False
 
     def compute_result(self, src, dst):
-        return dst << src  # FIXME
+        return dst >> src
 
 
 class Instruction_BpfEND(Alu64OneOperandInstruction):
@@ -383,7 +383,7 @@ class Instruction_BpfEND(Alu64OneOperandInstruction):
     _operation = AluOrAlu64Operation.BPF_END
 
     def compute_result(self, src, dst):
-        return  # implement me
+        return
 
 
 class Instruction_BpfJmpExit(JmpInstruction):
@@ -469,7 +469,7 @@ class Instruction_JSGT(JmpInstructionTwoOperands):
     _operation = JmpOperation.BPF_JSGT
 
     def _condition(self, op, dst):
-        return dst > op  # FIXME: should be signed comparison
+        return dst.signed > op
 
 
 class Instruction_JSGE(JmpInstructionTwoOperands):
@@ -477,7 +477,7 @@ class Instruction_JSGE(JmpInstructionTwoOperands):
     _operation = JmpOperation.BPF_JSGE
 
     def _condition(self, op, dst):
-        return dst >= op  # FIXME: should be signed comparison
+        return dst.signed >= op
 
 
 class Instruction_JLT(JmpInstructionTwoOperands):
