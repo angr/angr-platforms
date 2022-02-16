@@ -296,9 +296,18 @@ class Instruction_BpfAnd(Alu64TwoOperandInstruction):
         return dst & src
 
 
-class Instruction_BpfLSH(Alu64TwoOperandInstruction):
+class Instruction_BpfLSH(Alu64Instruction):
     name = 'bpf_lsh'
     _operation = AluOrAlu64Operation.BPF_LSH
+
+    def fetch_operands(self):
+        dst_reg = self.get(self.dst_reg, REGISTER_TYPE)
+        if self._operation_src == OpcodeSrc.IMM:
+            return self.constant(self.imm, Type.int_8), dst_reg
+        elif self._operation_src == OpcodeSrc.SRC_REG:
+            return self.get(self.src_reg, Type.int_8), dst_reg
+        else:
+            assert False
 
     def compute_result(self, src, dst):
         return dst >> src  # FIXME
@@ -352,9 +361,18 @@ class Instruction_BpfMov(Alu64Instruction):
         return src
 
 
-class Instruction_BpfARSH(Alu64TwoOperandInstruction):
+class Instruction_BpfARSH(Alu64Instruction):
     name = 'bpf_arsh'
     _operation = AluOrAlu64Operation.BPF_ARSH
+
+    def fetch_operands(self):
+        dst_reg = self.get(self.dst_reg, REGISTER_TYPE)
+        if self._operation_src == OpcodeSrc.IMM:
+            return self.constant(self.imm, Type.int_8), dst_reg
+        elif self._operation_src == OpcodeSrc.SRC_REG:
+            return self.get(self.src_reg, Type.int_8), dst_reg
+        else:
+            assert False
 
     def compute_result(self, src, dst):
         return dst << src  # FIXME
