@@ -407,9 +407,9 @@ class Instruction_JA(JmpInstruction):
 class JmpInstructionTwoOperands(JmpInstruction, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _condition(self, op, dst):
-        '''
+        """
         returns jump condition
-        '''
+        """
 
     def fetch_operands(self):
         if self._operation_src == OpcodeSrc.SRC_REG:
