@@ -285,7 +285,7 @@ class Instruction_BpfOr(Alu64TwoOperandInstruction):
     _operation = AluOrAlu64Operation.BPF_OR
 
     def compute_result(self, src, dst):
-        return dst << src
+        return dst | src
 
 
 class Instruction_BpfAnd(Alu64TwoOperandInstruction):
