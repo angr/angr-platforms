@@ -306,7 +306,7 @@ class Instruction_BpfLSH(Alu64TwoOperandInstruction):
 
 class Instruction_BpfRSH(Alu64TwoOperandInstruction):
     name = 'bpf_rsh'
-    _operation = AluOrAlu64Operation.BPF_SUB
+    _operation = AluOrAlu64Operation.BPF_RSH
 
     def compute_result(self, src, dst):
         return dst << src  # FIXME
