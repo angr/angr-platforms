@@ -310,7 +310,7 @@ class Instruction_BpfLSH(Alu64Instruction):
             assert False
 
     def compute_result(self, src, dst):
-        return dst >> src  # FIXME
+        return dst >> src
 
 
 class Instruction_BpfRSH(Alu64TwoOperandInstruction):
@@ -501,7 +501,7 @@ class Instruction_JSLT(JmpInstructionTwoOperands):
     _operation = JmpOperation.BPF_JSLT
 
     def _condition(self, op, dst):
-        return dst < op  # FIXME should be signed
+        return dst.signed < op
 
 
 class Instruction_JSLE(JmpInstructionTwoOperands):
@@ -509,7 +509,7 @@ class Instruction_JSLE(JmpInstructionTwoOperands):
     _operation = JmpOperation.BPF_JSLE
 
     def _condition(self, op, dst):
-        return dst <= op  # FIXME: should be signed
+        return dst.signed <= op
 
 
 class Instruction_CALL(JmpInstruction):
