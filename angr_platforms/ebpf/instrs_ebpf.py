@@ -374,8 +374,8 @@ class Instruction_BpfARSH(Alu64Instruction):
         else:
             assert False
 
-    def compute_result(self, src, dst):
-        return dst >> src
+    def compute_result(self, src: 'VexValue', dst: 'VexValue'):
+        return dst.sar(src)
 
 
 class Instruction_BpfEND(Alu64OneOperandInstruction):
