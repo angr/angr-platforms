@@ -1,4 +1,4 @@
-from ebpf import instrs_ebpf as instrs
+from . import instrs_ebpf as instrs
 from pyvex.lifting import register
 from pyvex.lifting.util import GymratLifter
 

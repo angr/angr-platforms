@@ -4,7 +4,7 @@ from angr.calling_conventions import register_default_cc, SimRegArg, SimStackArg
 from angr.simos import SimOS, register_simos
 from angr.sim_procedure import SimProcedure
 
-from ebpf import ArchEbpf
+from . import ArchEbpf
 
 
 class ExitProcedureCC(SimCC):

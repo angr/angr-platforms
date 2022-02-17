@@ -5,7 +5,7 @@ Collections of eBPF instructions
 import abc
 import bitstring
 
-from ebpf.instr_enums import \
+from .instr_enums import \
     InstrClass, OpcodeSrc, AluOrAlu64Operation, JmpOperation, Jmp32Operation, OpcodeMode, OperandSize
 from pyvex.lifting.util import Instruction, ParseError, Type, JumpKind, VexValue
 
