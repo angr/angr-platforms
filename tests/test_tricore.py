@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
+""" test_tricore.py
+A module for testing tricore lifter.
+"""
+# pylint: disable=wildcard-import
+# pylint: disable=unused-wildcard-import
+
 import os
 import nose
 import angr
-import pyvex
 import claripy
 from angr_platforms.tricore import *
+
+# pylint: disable=missing-function-docstring
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
 
 TEST_PROGRAMS_BASE = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'test_programs', 'tricore'))
 
@@ -13,7 +22,7 @@ def test_lifter():
     print("Lifting (ABS format) ldmst 1000, e2")
     inst = b'e5020005'
     lifter = LifterTRICORE(ArchTRICORE(), 0)
-    lifter._lift(data=inst)
+    lifter._lift(data=inst)  # pylint: disable=protected-access
     lifter.irsb.pp()
     assert lifter.irsb.arch.name == 'TRICORE'
     nose.tools.assert_equal(lifter.irsb.stmts_used, 14)
@@ -22,7 +31,7 @@ def test_lifter():
     print("Lifting (ABSB format) st.t 0x1000, 1, 0")
     inst = b'D5010001'
     lifter = LifterTRICORE(ArchTRICORE(), 0)
-    lifter._lift(data=inst)
+    lifter._lift(data=inst)  # pylint: disable=protected-access
     lifter.irsb.pp()
     assert lifter.irsb.arch.name == 'TRICORE'
     nose.tools.assert_equal(lifter.irsb.stmts_used, 21)
@@ -51,7 +60,7 @@ def test_angr_find_v1():
     sm.explore(find=0xa1000498)
 
     nose.tools.assert_equal(len(sm.found), 1)
-    
+
     print("password: ", sm.found[0].solver.eval(password, cast_to=bytes))
 
 
@@ -75,7 +84,7 @@ def test_angr_find_v2():
     sm.explore(find=0xa100049a)
 
     nose.tools.assert_equal(len(sm.found), 1)
-    
+
     print("password: ", sm.found[0].solver.eval(password, cast_to=bytes))
 
 

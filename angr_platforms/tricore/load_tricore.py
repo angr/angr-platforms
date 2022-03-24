@@ -6,6 +6,8 @@ import logging
 from cle.backends import Blob, register_backend
 from archinfo import arch_from_id
 
+# pylint: disable=super-with-arguments
+
 l = logging.getLogger("cle.tc")
 __all__ = ('TRICORE',)
 
