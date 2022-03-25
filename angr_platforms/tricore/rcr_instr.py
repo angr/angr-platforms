@@ -2,13 +2,10 @@
 """ rcr_instr.py
 Implementation of RCR format instructions.
 """
-# pylint: disable=wildcard-import
-# pylint: disable=unused-wildcard-import
-
 import sys
 from pyvex.lifting.util import Type, Instruction
 import bitstring
-from .rtl import *
+from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
 # pylint: disable=consider-using-f-string

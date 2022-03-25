@@ -73,7 +73,7 @@ class ArchTRICORE(Arch):
     ]
 
     def __init__(self, endness=Endness.LE):
-        super(ArchTRICORE, self).__init__(endness)  # pylint: disable=super-with-arguments
+        super().__init__(endness)
 
 
 register_arch([r'tc|tricore'], 32, 'Iend_LE', ArchTRICORE)

@@ -2,14 +2,11 @@
 """ test_tricore.py
 A module for testing tricore lifter.
 """
-# pylint: disable=wildcard-import
-# pylint: disable=unused-wildcard-import
-
 import os
 import nose
 import angr
 import claripy
-from angr_platforms.tricore import *
+from angr_platforms.tricore import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=invalid-name

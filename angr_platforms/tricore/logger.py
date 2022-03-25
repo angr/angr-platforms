@@ -1,12 +1,11 @@
 """ logger.py
-This module is used for logging the lifting instruction.
+This module is used for logging details of the lifting instruction.
 """
 import os
 from datetime import datetime
 import logging
 
 # pylint: disable=consider-using-f-string
-# pylint: disable=logging-format-interpolation
 
 ENABLE_LOGGING = False  # True/False to enable/disable logging
 LOGFILES_PATH = "{0}/logs/".format(os.path.expanduser("~"))
@@ -34,7 +33,7 @@ def log_this(name, data, addr):
         pyvexlog.debug("-"*100)
         pyvexlog.debug(name)
         pyvexlog.debug(data)
-        pyvexlog.debug("addr: {0}".format(addr))
+        pyvexlog.debug("addr: %s", addr)
 
 def log_val(val):
     """ Log any value. """
