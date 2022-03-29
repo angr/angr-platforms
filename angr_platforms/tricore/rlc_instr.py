@@ -7,11 +7,6 @@ import bitstring
 from .rtl import set_usb
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=unused-variable
 
 class RLC_ADDI_Inst(Instruction):
     """ Add Immediate instruction.
@@ -56,7 +51,9 @@ class RLC_ADDI_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const16()
 
-    def compute_result(self, d_a, const16):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const16 = args[1]
         result = d_a + const16
 
         # set flags
@@ -114,7 +111,9 @@ class RLC_ADDIH(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const16()
 
-    def compute_result(self, d_a, const16):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const16 = args[1]
         return d_a + (const16 << 16)
 
     def commit_result(self, res):
@@ -160,7 +159,9 @@ class RLC_ADDIH_A(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_const16()
 
-    def compute_result(self, a_a, const16):
+    def compute_result(self, *args):
+        a_a = args[0]
+        const16 = args[1]
         return a_a + (const16 << 16)
 
     def commit_result(self, res):
@@ -206,12 +207,14 @@ class RLC_MFCR(Instruction):
     def fetch_operands(self):
         return [self.get_const16()]
 
-    def compute_result(self, const16):
+    def compute_result(self, *args):
+        const16 = args[0]
         result = ""
         if const16 == 0xfe04:
             result = self.get_psw()
         else:
             print("Unknown offset '{0}' for MFCR.".format(const16))
+
         return result
 
     def commit_result(self, res):
@@ -252,7 +255,8 @@ class RLC_MOV(Instruction):
     def fetch_operands(self):
         return [self.get_const16()]
 
-    def compute_result(self, const16):
+    def compute_result(self, *args):
+        const16 = args[0]
         return const16
 
     def commit_result(self, res):
@@ -293,7 +297,8 @@ class RLC_MOV_U(Instruction):
     def fetch_operands(self):
         return [self.get_const16()]
 
-    def compute_result(self, const16):
+    def compute_result(self, *args):
+        const16 = args[0]
         return const16
 
     def commit_result(self, res):
@@ -334,7 +339,8 @@ class RLC_MOVH(Instruction):
     def fetch_operands(self):
         return [self.get_const16()]
 
-    def compute_result(self, const16):
+    def compute_result(self, *args):
+        const16 = args[0]
         return const16 << 16
 
     def commit_result(self, res):
@@ -375,7 +381,8 @@ class RLC_MOVH_A(Instruction):
     def fetch_operands(self):
         return [self.get_const16()]
 
-    def compute_result(self, const16):
+    def compute_result(self, *args):
+        const16 = args[0]
         return const16 << 16
 
     def commit_result(self, res):
@@ -421,7 +428,10 @@ class RLC_MTCR(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a, const16):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const16 = args[1]
+
         # set flags
         c = 0
         v = 0

@@ -5,10 +5,6 @@ Implementation of SBC format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SBC_JEQ_Inst(Instruction):
     """ Jump if Equal instruction.
@@ -43,7 +39,11 @@ class SBC_JEQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_const4(), self.get_disp4()
 
-    def compute_result(self, d_15, pc, const4, disp4):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp4 = args[3]
         cond = d_15 == const4
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -81,7 +81,11 @@ class SBC_JNE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_const4(), self.get_disp4()
 
-    def compute_result(self, d_15, pc, const4, disp4):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp4 = args[3]
         cond = d_15.signed != const4
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)

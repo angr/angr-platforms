@@ -5,10 +5,6 @@ Implementation of SYS format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SYS_DEBUG_Inst(Instruction):
     """ Debug instruction.
@@ -27,7 +23,7 @@ class SYS_DEBUG_Inst(Instruction):
         log_this(self.name, data, hex(self.addr))
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         # if DBGSR.DE == 0, execute NOP.
         pass
 
@@ -48,7 +44,7 @@ class SYS_ISYNC_Inst(Instruction):
         log_this(self.name, data, hex(self.addr))
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         # complete all previous instructions
         pass
 
@@ -68,7 +64,7 @@ class SYS_NOP_Inst(Instruction):
         log_this(self.name, data, hex(self.addr))
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         pass
 
 class SYS_RSTV_Inst(Instruction):
@@ -90,7 +86,7 @@ class SYS_RSTV_Inst(Instruction):
     def get_psw(self):
         return self.get("psw", Type.int_32)
 
-    def compute_result(self):
+    def compute_result(self, *args):
         psw_val = self.get_psw()
         psw_val = (psw_val >> 31) << 31
         self.put(psw_val, "psw")

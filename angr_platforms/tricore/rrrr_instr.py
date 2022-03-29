@@ -6,10 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import extend_to_32_bits, sign_extend_3
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RRRR_DEXTR_Inst(Instruction):
     """ Insert Bit Field instruction.
@@ -48,7 +44,10 @@ class RRRR_DEXTR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         pos = d_d & 0x1f
         pos = pos.cast_to(Type.int_8)
         mask = ((1 << pos)-1).cast_to(Type.int_32)
@@ -96,7 +95,10 @@ class RRRR_EXTR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d_1(), self.get_d_d_2()
 
-    def compute_result(self, d_a, d_d_1, d_d_2):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d_1 = args[1]
+        d_d_2 = args[2]
         pos = (d_d_1 & 0x1f).cast_to(Type.int_8)    # E[d] & 0x1f
         width = (d_d_2 & 0x1f).cast_to(Type.int_8)  # E[d+1] & 0x1f
 
@@ -150,7 +152,10 @@ class RRRR_EXTR_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d_1(), self.get_d_d_2()
 
-    def compute_result(self, d_a, d_d_1, d_d_2):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d_1 = args[1]
+        d_d_2 = args[2]
         pos = (d_d_1 & 0x1f).cast_to(Type.int_8)    # E[d] & 0x1f
         width = (d_d_2 & 0x1f).cast_to(Type.int_8)  # E[d+1] & 0x1f
 
@@ -200,7 +205,9 @@ class RRRR_INSERT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         # E[d]
         pos = self.get("d{0}".format(self.data['d']), Type.int_8)
         width = self.get("d{0}".format(self.data['d']+1), Type.int_8)

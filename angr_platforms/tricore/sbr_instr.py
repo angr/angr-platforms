@@ -5,10 +5,6 @@ Implementation of SBR format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SBR_JEQ_Inst(Instruction):
     """ Jump if Equal instruction.
@@ -43,7 +39,11 @@ class SBR_JEQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_15, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp4 = args[3]
         cond = d_15 == d_b
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -78,7 +78,10 @@ class SBR_JGEZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b >= 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -113,7 +116,10 @@ class SBR_JGTZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b > 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -134,8 +140,8 @@ class SBR_JLEZ_Inst(Instruction):
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
-        a = data['a'][-1:]+data['a'][:-1]  # flip the bits order
-        data = {"disp4": int(a, 2) << 1,   # move to left
+        a = data['a'][-1:]+data['a'][:-1]  # flip bits order
+        data = {"disp4": int(a, 2) << 1,
                 "b": int(data['b'], 2)}
 
         log_this(self.name, data, hex(self.addr))
@@ -154,7 +160,10 @@ class SBR_JLEZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b <= 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -175,7 +184,7 @@ class SBR_JLTZ_Inst(Instruction):
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
-        a = data['a'][-1:]+data['a'][:-1]  # flip the bits order
+        a = data['a'][-1:]+data['a'][:-1]  # flip bits order
         data = {"disp4": int(a, 2) << 1,
                 "b": int(data['b'], 2)}
 
@@ -195,7 +204,10 @@ class SBR_JLTZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b < 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -233,7 +245,11 @@ class SBR_JNE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_15, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp4 = args[3]
         cond = d_15 != d_b
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -268,7 +284,10 @@ class SBR_JNZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b != 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -303,7 +322,10 @@ class SBR_JNZ_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, a_b, pc, disp4):
+    def compute_result(self, *args):
+        a_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = a_b != 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -338,7 +360,10 @@ class SBR_JZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, d_b, pc, disp4):
+    def compute_result(self, *args):
+        d_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = d_b == 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -373,7 +398,10 @@ class SBR_JZ_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, a_b, pc, disp4):
+    def compute_result(self, *args):
+        a_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = a_b == 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -408,7 +436,10 @@ class SBR_LOOP_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_pc(), self.get_disp4()
 
-    def compute_result(self, a_b, pc, disp4):
+    def compute_result(self, *args):
+        a_b = args[0]
+        pc = args[1]
+        disp4 = args[2]
         cond = a_b.signed != 0
         dest = pc + ((((1<<27)-1)<<5) | (disp4<<1))
         self.put(a_b - 1, "a{0}".format(self.data['b']))

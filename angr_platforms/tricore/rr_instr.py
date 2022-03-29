@@ -6,13 +6,6 @@ from pyvex.lifting.util import Type, Instruction, JumpKind
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=arguments-differ
-# pylint: disable=invalid-name
-# pylint: disable=too-many-locals
-# pylint: disable=line-too-long
-# pylint: disable=too-many-lines
 
 class RR_ABS_Inst(Instruction):
     """ Absolute Value instruction.
@@ -47,7 +40,8 @@ class RR_ABS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b()
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         result = get_abs_val(d_b, 32)
 
         # set flags
@@ -100,7 +94,8 @@ class RR_ABS_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b()
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         result_byte3 = get_abs_val(((d_b & (0xff << 24)) >> 24), 8) << 24
         result_byte2 = get_abs_val(((d_b & (0xff << 16)) >> 16), 8) << 16
         result_byte1 = get_abs_val(((d_b & (0xff << 8)) >> 8), 8)   << 8
@@ -167,7 +162,8 @@ class RR_ABS_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b()
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         result_hw1 = get_abs_val(((d_b & (0xffff << 16)) >> 16), 16) << 16
         result_hw0 = get_abs_val((d_b & 0xffff), 16)
         result = result_hw1 | result_hw0
@@ -232,7 +228,9 @@ class RR_ABSDIF_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         condition = extend_to_32_bits(d_a > d_b)
         result = ((d_a - d_b) & condition) | ((d_b - d_a) & ~condition)
 
@@ -290,7 +288,9 @@ class RR_ABSDIF_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_byte3 = extend_to_8_bits(((d_a & (0xff << 24)) >> 24) > ((d_b & (0xff << 24)) >> 24))
         cond_byte2 = extend_to_8_bits(((d_a & (0xff << 16)) >> 16) > ((d_b & (0xff << 16)) >> 16))
         cond_byte1 = extend_to_8_bits(((d_a & (0xff << 8))  >> 8)  > ((d_b & (0xff << 8))  >> 8))
@@ -377,7 +377,9 @@ class RR_ABSDIF_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_hw1 = extend_to_16_bits(((d_a & (0xffff << 16)) >> 16) > ((d_b & (0xffff << 16)) >> 16))
         cond_hw0 = extend_to_16_bits((d_a & 0xffff) > (d_b & 0xffff))
 
@@ -447,7 +449,9 @@ class RR_ABSDIFS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         condition = extend_to_32_bits(d_a > d_b)
         result = ssov(((d_a - d_b) & condition) | ((d_b - d_a) & ~condition), 32)
 
@@ -503,7 +507,9 @@ class RR_ABSDIFS_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_hw1 = extend_to_16_bits(((d_a & (0xffff << 16)) >> 16) > ((d_b & (0xffff << 16)) >> 16))
         cond_hw0 = extend_to_16_bits((d_a & 0xffff) > (d_b & 0xffff))
 
@@ -569,7 +575,8 @@ class RR_ABSS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b()
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         result = ssov(get_abs_val(d_b, 32), 32)
 
         # set flags
@@ -620,7 +627,8 @@ class RR_ABSS_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b()
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         result_hw1 = get_abs_val(((d_b & (0xffff << 16)) >> 16), 16)
         result_hw0 = get_abs_val((d_b & 0xffff), 16)
         result = (ssov(result_hw1, 16) << 16) | ssov(result_hw0, 16)
@@ -682,7 +690,9 @@ class RR_ADD_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a + d_b
 
     def commit_result(self, res):
@@ -739,7 +749,9 @@ class RR_ADD_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         return a_a + a_b
 
     def commit_result(self, res):
@@ -782,7 +794,9 @@ class RR_ADD_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_byte3 = (((d_a & (0xff << 24)) >> 24) + ((d_b & (0xff << 24)) >> 24)) & 0xff
         result_byte2 = (((d_a & (0xff << 16)) >> 16) + ((d_b & (0xff << 16)) >> 16)) & 0xff
         result_byte1 = (((d_a & (0xff << 8)) >> 8) + ((d_b & (0xff << 8)) >> 8)) & 0xff
@@ -852,7 +866,9 @@ class RR_ADD_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_hw1 = (((d_a & (0xffff << 16)) >> 16) + ((d_b & (0xffff << 16)) >> 16)) & 0xffff
         result_hw0 = ((((d_a & 0xffff) + (d_b & 0xffff)))) & 0xffff
         result = (result_hw1 << 16) | result_hw0
@@ -915,7 +931,10 @@ class RR_ADDC_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_psw()
 
-    def compute_result(self, d_a, d_b, psw):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        psw = args[2]
         return d_a + d_b + psw[31]
 
     def commit_result(self, res):
@@ -980,10 +999,9 @@ class RR_ADDS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
-        """ return a 32-bit value: result[:32].
-            set V, AV flags.
-        """
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = ssov(d_a + d_b, 32)
 
         # set flags
@@ -1038,7 +1056,9 @@ class RR_ADDS_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_hw1 = (((d_a & (0xffff << 16)) >> 16) + ((d_b & (0xffff << 16)) >> 16)) & 0xffff
         result_hw0 = ((d_a & 0xffff) + (d_b & 0xffff)) & 0xffff
         result = (ssov(result_hw1, 16) << 16) | ssov(result_hw0, 16)
@@ -1101,7 +1121,9 @@ class RR_ADDS_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_hw1 = (((d_a & (0xffff << 16)) >> 16) + ((d_b & (0xffff << 16)) >> 16))
         result_hw0 = ((d_a & 0xffff) + (d_b & 0xffff))
         result = (suov(result_hw1, 16) << 16) | suov(result_hw0, 16)
@@ -1164,7 +1186,9 @@ class RR_ADDS_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = suov(d_a + d_b, 32)
 
         # set flags
@@ -1217,7 +1241,9 @@ class RR_ADDSC_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         return a_b + (d_a << self.data['n'])
 
     def commit_result(self, res):
@@ -1257,7 +1283,9 @@ class RR_ADDSC_AT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         return (a_b + (d_a >> 3)) & 0xfffffffc
 
     def commit_result(self, res):
@@ -1300,7 +1328,9 @@ class RR_ADDX_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a + d_b
 
         # set flags
@@ -1351,7 +1381,9 @@ class RR_AND_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[0]
         return d_a & d_b
 
     def commit_result(self, res):
@@ -1395,7 +1427,10 @@ class RR_AND_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] & (d_a == d_b)         # D[c][0] AND D[a] == D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -1440,7 +1475,10 @@ class RR_AND_GE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] & (d_a >= d_b)         # D[c][0] AND D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -1485,8 +1523,10 @@ class RR_AND_GE_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
-        """ Unsigned """
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] and (d_a >= d_b)        # D[c][0] AND D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit     # D[c][31:1] | bit
         return result
@@ -1531,7 +1571,10 @@ class RR_AND_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] & (d_a < d_b)          # D[c][0] AND D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -1576,7 +1619,10 @@ class RR_AND_LT_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] & (d_a < d_b)          # D[c][0] AND D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -1621,7 +1667,10 @@ class RR_AND_NE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] & (d_a != d_b)         # D[c][0] AND D[a] != D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -1662,7 +1711,9 @@ class RR_ANDN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a & ~d_b
 
     def commit_result(self, res):
@@ -1701,7 +1752,9 @@ class RR_BMERGE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_c_31_24 = (((d_a >> 15) & 0x1) << 7) | \
                     (((d_b >> 15) & 0x1) << 6) | \
                     (((d_a >> 14) & 0x1) << 5) | \
@@ -1770,7 +1823,9 @@ class RR_BSPLIT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         e_c_63_48 = 0
         e_c_47_40 = (((d_a >> 31) & 0x1) << 7) | \
                     (((d_a >> 29) & 0x1) << 6) | \
@@ -1833,7 +1888,9 @@ class RR_CALLI_Inst(Instruction):
     def fetch_operands(self):
         return self.get_pc(), self.get_a_a()
 
-    def compute_result(self, pc, a_a):
+    def compute_result(self, *args):
+        pc = args[0]
+        a_a = args[1]
         MASK_FCX_FCXS = 0x000f0000
         MASK_FCX_FCXO = 0x0000ffff
         fcx = self.get("fcx", Type.int_32)
@@ -1917,7 +1974,8 @@ class RR_CLO_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         return clo32(d_a)
 
     def commit_result(self, res):
@@ -1952,7 +2010,8 @@ class RR_CLO_H_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         result_hw1 = ((d_a & (0xffff << 16)) >> 16)
         result_hw0 = (d_a & 0xffff)
         result = (clo16(result_hw1) << 16) | clo16(result_hw0)
@@ -1990,7 +2049,8 @@ class RR_CLS_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         return cls(d_a, 31)
 
     def commit_result(self, res):
@@ -2025,7 +2085,8 @@ class RR_CLS_H_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         result_hw1 = ((d_a & (0xffff << 16)) >> 16)
         result_hw0 = (d_a & 0xffff)
         result = (cls(result_hw1, 15) << 16) | cls(result_hw0, 15)
@@ -2063,7 +2124,8 @@ class RR_CLZ_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         return clz32(d_a)
 
     def commit_result(self, res):
@@ -2098,7 +2160,8 @@ class RR_CLZ_H_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         result_hw1 = ((d_a & (0xffff << 16)) >> 16)
         result_hw0 = (d_a & 0xffff)
         result = (clz16(result_hw1) << 16) | clz16(result_hw0)
@@ -2135,7 +2198,8 @@ class RR_DVINIT_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a_extended()]
 
-    def compute_result(self, d_a_extended):
+    def compute_result(self, *args):
+        d_a_extended = args[0]
         # E[c] = D[c+1] | D[c]
         self.put(d_a_extended & 0xffffffff, "d{0}".format(self.data['c']))
         self.put(d_a_extended >> 32, "d{0}".format(self.data['c']+1))
@@ -2177,7 +2241,9 @@ class RR_DVINIT_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         quotient_sign = (d_a[31] != d_b[31])
         abs_sig_dividend = get_abs_val(d_a, 32) >> 7
         abs_base_dividend = get_abs_val(d_a, 32) & 0x7f
@@ -2200,7 +2266,9 @@ class RR_DVINIT_B_Inst(Instruction):
         # set flags: V_1.3.0
         c = 0
         cond_overflow = (quotient_sign & (abs_divisor != 0))  # quotient_sign AND abs_divisor
-        v = (((abs_sig_dividend == abs_divisor) & (abs_base_dividend >= abs_divisor)) | (abs_sig_dividend > abs_divisor)) & cond_overflow
+        v = (((abs_sig_dividend == abs_divisor) &
+              (abs_base_dividend >= abs_divisor)) | \
+              (abs_sig_dividend > abs_divisor)) & cond_overflow
         v |= (abs_sig_dividend >= abs_divisor) & (cond_overflow^1)  # ELSE
         av = 0
         psw = self.get_psw()
@@ -2246,7 +2314,9 @@ class RR_DVINIT_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         # E[c] = D[c+1] | D[c]
         result_1 = d_a << 24
         self.put(result_1, "d{0}".format(self.data['c']))
@@ -2302,7 +2372,9 @@ class RR_DVINIT_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         quotient_sign = (d_a[31] != d_b[31])
         abs_sig_dividend = get_abs_val(d_a, 32) >> 15
         abs_base_dividend = get_abs_val(d_a, 32) & 0x7fff
@@ -2325,7 +2397,9 @@ class RR_DVINIT_H_Inst(Instruction):
         # set flags: V_1.3.0
         c = 0
         cond_overflow = (quotient_sign & (abs_divisor != 0))  # quotient_sign AND abs_divisor
-        v = (((abs_sig_dividend == abs_divisor) & (abs_base_dividend >= abs_divisor)) | (abs_sig_dividend > abs_divisor)) & cond_overflow
+        v = (((abs_sig_dividend == abs_divisor) &
+              (abs_base_dividend >= abs_divisor)) | \
+              (abs_sig_dividend > abs_divisor)) & cond_overflow
         v |= (abs_sig_dividend >= abs_divisor) & (cond_overflow^1)  # ELSE
         av = 0
         psw = self.get_psw()
@@ -2371,7 +2445,9 @@ class RR_DVINIT_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         # E[c] = D[c+1] | D[c]
         result_1 = d_a << 16
         result_2 = d_a >> 16
@@ -2421,7 +2497,8 @@ class RR_DVINIT_U_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         # E[c] = D[c+1] | D[c]
         self.put(d_a, "d{0}".format(self.data['c']))
         zero = self.constant(0, Type.int_32)
@@ -2460,7 +2537,9 @@ class RR_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a == d_b
 
     def commit_result(self, res):
@@ -2499,9 +2578,10 @@ class RR_EQ_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
-        result = (a_a == a_b)
-        return result
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
+        return a_a == a_b
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -2539,7 +2619,9 @@ class RR_EQ_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) == (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) == (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) == (d_b & (0xff << 16)))
@@ -2587,7 +2669,9 @@ class RR_EQ_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) == (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff << 16)) == (d_b & (0xffff << 16)))
         result = (0xffff << 16) & (cond_2 << 16) | \
@@ -2630,7 +2714,9 @@ class RR_EQ_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond = extend_to_32_bits(d_a == d_b)
         result = 0xffffffff & cond
         return result
@@ -2671,7 +2757,9 @@ class RR_EQANY_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = ((d_a & 0xff) == (d_b & 0xff))
         cond_2 = ((d_a & (0xff <<  8)) == (d_b & (0xff <<  8)))
         cond_3 = ((d_a & (0xff << 16)) == (d_b & (0xff << 16)))
@@ -2715,7 +2803,9 @@ class RR_EQANY_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = ((d_a & 0xffff) == (d_b & 0xffff))
         cond_2 = ((d_a & (0xffff << 16)) == (d_b & (0xffff << 16)))
         result = cond_2 or cond_1
@@ -2753,7 +2843,8 @@ class RR_EQZ_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_a()]
 
-    def compute_result(self, a_a):
+    def compute_result(self, *args):
+        a_a = args[0]
         return a_a == 0
 
     def commit_result(self, res):
@@ -2792,7 +2883,9 @@ class RR_GE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return (d_a.signed >= d_b).cast_to(Type.int_32)
 
     def commit_result(self, res):
@@ -2831,7 +2924,9 @@ class RR_GE_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a >= d_b  # Unsigned comparison
 
     def commit_result(self, res):
@@ -2870,9 +2965,10 @@ class RR_GE_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
-        result = (a_a >= a_b)  # Unsigned
-        return result
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
+        return a_a >= a_b  # Unsigned
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -2900,7 +2996,8 @@ class RR_JI_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_a()]
 
-    def compute_result(self, a_a):
+    def compute_result(self, *args):
+        a_a = args[0]
         dest = (a_a >> 1) << 1
         self.jump(None, dest)
 
@@ -2930,7 +3027,9 @@ class RR_JLI_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_pc()
 
-    def compute_result(self, a_a, pc):
+    def compute_result(self, *args):
+        a_a = args[0]
+        pc = args[1]
         ret_addr = pc + 4
         self.put(ret_addr, "a11")
 
@@ -2970,7 +3069,9 @@ class RR_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return (d_a.signed < d_b).cast_to(Type.int_32)
 
     def commit_result(self, res):
@@ -3009,7 +3110,9 @@ class RR_LT_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a < d_b  # unsigned comparison
 
     def commit_result(self, res):
@@ -3048,7 +3151,9 @@ class RR_LT_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         return a_a < a_b  # Unsigned comparison
 
     def commit_result(self, res):
@@ -3087,7 +3192,9 @@ class RR_LT_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) < (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) < (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) < (d_b & (0xff << 16)))
@@ -3135,7 +3242,9 @@ class RR_LT_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) < (d_b & 0xff))  # Unsigned
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) < (d_b & (0xff <<  8)))  # Unsigned
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) < (d_b & (0xff << 16)))  # Unsigned
@@ -3183,7 +3292,9 @@ class RR_LT_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) < (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff << 16)) < (d_b & (0xffff << 16)))
         result = (0xffff << 16) & (cond_2 << 16) | \
@@ -3227,7 +3338,9 @@ class RR_LT_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) < (d_b & 0xffff)) # Unsigned
         cond_2 = extend_to_16_bits((d_a & (0xffff << 16)) < (d_b & (0xffff << 16)))  # Unsigned
         result = (0xffff << 16) & (cond_2 << 16) | \
@@ -3271,7 +3384,9 @@ class RR_LT_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond = extend_to_32_bits(d_a < d_b)
         result = 0xffffffff & cond
         return result
@@ -3312,7 +3427,9 @@ class RR_LT_WU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond = extend_to_32_bits(d_a < d_b)  # Unsigned
         result = 0xffffffff & cond
         return result
@@ -3353,7 +3470,9 @@ class RR_MAX_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         condition = extend_to_32_bits(d_a > d_b)
         result = (d_a & condition) | (d_b & ~condition)
         return result
@@ -3394,7 +3513,9 @@ class RR_MAX_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[0]
         condition = d_a > d_b
         return self.ite(condition, d_a, d_b)
 
@@ -3438,7 +3559,9 @@ class RR_MAX_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) > (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) > (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) > (d_b & (0xff << 16)))
@@ -3486,7 +3609,9 @@ class RR_MAX_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) > (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) > (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) > (d_b & (0xff << 16)))
@@ -3534,7 +3659,9 @@ class RR_MAX_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) > (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff <<  16)) > (d_b & (0xffff <<  16)))
         result = ((d_a & 0xffff0000 & (cond_2 << 16)) | (d_b & 0xffff0000 & (~cond_2 << 16))) |\
@@ -3578,7 +3705,9 @@ class RR_MAX_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) > (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff <<  16)) > (d_b & (0xffff <<  16)))
         result = ((d_a & 0xffff0000 & (cond_2 << 16)) | (d_b & 0xffff0000 & (~cond_2 << 16))) |\
@@ -3622,7 +3751,9 @@ class RR_MIN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         condition = extend_to_32_bits(d_a < d_b)
         result = (d_a & condition) | (d_b & ~condition)
         return result
@@ -3663,7 +3794,9 @@ class RR_MIN_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         condition = d_a < d_b
         return self.ite(condition, d_a, d_b)
 
@@ -3707,7 +3840,9 @@ class RR_MIN_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) < (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) < (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) < (d_b & (0xff << 16)))
@@ -3755,7 +3890,9 @@ class RR_MIN_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_8_bits((d_a & 0xff) < (d_b & 0xff))
         cond_2 = extend_to_8_bits((d_a & (0xff <<  8)) < (d_b & (0xff <<  8)))
         cond_3 = extend_to_8_bits((d_a & (0xff << 16)) < (d_b & (0xff << 16)))
@@ -3803,7 +3940,9 @@ class RR_MIN_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) < (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff <<  16)) < (d_b & (0xffff <<  16)))
         result = ((d_a & 0xffff0000 & (cond_2 << 16)) | (d_b & 0xffff0000 & (~cond_2 << 16))) |\
@@ -3847,7 +3986,9 @@ class RR_MIN_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         cond_1 = extend_to_16_bits((d_a & 0xffff) < (d_b & 0xffff))
         cond_2 = extend_to_16_bits((d_a & (0xffff <<  16)) < (d_b & (0xffff <<  16)))
         result = ((d_a & 0xffff0000 & (cond_2 << 16)) | (d_b & 0xffff0000 & (~cond_2 << 16))) |\
@@ -3888,7 +4029,8 @@ class RR_MOV_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_b()]
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         return d_b
 
     def commit_result(self, res):
@@ -3924,7 +4066,8 @@ class RR_MOV_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_b()]
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         return d_b
 
     def commit_result(self, res):
@@ -3960,7 +4103,8 @@ class RR_MOV_AA_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         return a_b
 
     def commit_result(self, res):
@@ -3996,7 +4140,8 @@ class RR_MOV_D_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         return a_b
 
     def commit_result(self, res):
@@ -4035,7 +4180,9 @@ class RR_NAND_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return ~(d_a & d_b)
 
     def commit_result(self, res):
@@ -4074,7 +4221,9 @@ class RR_NE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return (d_a != d_b).cast_to(Type.int_32)
 
     def commit_result(self, res):
@@ -4113,7 +4262,9 @@ class RR_NE_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         return (a_a != a_b).cast_to(Type.int_32)
 
     def commit_result(self, res):
@@ -4148,7 +4299,8 @@ class RR_NEZ_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_a()]
 
-    def compute_result(self, a_a):
+    def compute_result(self, *args):
+        a_a = args[0]
         return a_a != 0
 
     def commit_result(self, res):
@@ -4187,7 +4339,9 @@ class RR_NOR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, s1, s2):
+    def compute_result(self, *args):
+        s1 = args[0]
+        s2 = args[1]
         return ~(s1 | s2)
 
     def commit_result(self, res):
@@ -4226,7 +4380,9 @@ class RR_OR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a | d_b
 
     def commit_result(self, res):
@@ -4270,7 +4426,10 @@ class RR_OR_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a == d_b)
         result = ((d_c >> 1) << 1) | bit
         return result
@@ -4315,7 +4474,10 @@ class RR_OR_GE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a >= d_b)         # D[c][0] OR D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -4360,7 +4522,10 @@ class RR_OR_GE_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a >= d_b)         # D[c][0] OR D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -4405,7 +4570,10 @@ class RR_OR_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a < d_b)           # D[c][0] OR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit     # D[c][31:1] | bit
         return result
@@ -4450,7 +4618,10 @@ class RR_OR_LT_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a < d_b)          # D[c][0] OR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -4495,7 +4666,10 @@ class RR_OR_NE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] | (d_a != d_b)         # D[c][0] OR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -4536,7 +4710,9 @@ class RR_ORN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a | ~d_b
 
     def commit_result(self, res):
@@ -4569,7 +4745,9 @@ class RR_PARITY_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_c_31_24 = (((d_a >> 31) & 0x1) ^ ((d_b >> 30) & 0x1) ^ \
                      ((d_a >> 29) & 0x1) ^ ((d_b >> 28) & 0x1) ^ \
                      ((d_a >> 27) & 0x1) ^ ((d_b >> 26) & 0x1) ^ \
@@ -4617,7 +4795,8 @@ class RR_SAT_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a()
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         pos_cond = extend_to_32_bits(d_a > 0xffff)
         result = (0xffff & pos_cond) | d_a & (pos_cond^0xffffffff)
         return result
@@ -4658,7 +4837,9 @@ class RR_SH_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         sha = d_b.cast_to(Type.int_6).cast_to(Type.int_32, signed=True)
         condition = sha.signed >= 0
         result = self.ite(condition,
@@ -4709,7 +4890,10 @@ class RR_SH_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a == d_b)
 
     def commit_result(self, res):
@@ -4751,7 +4935,10 @@ class RR_SH_GE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a >= d_b)
 
     def commit_result(self, res):
@@ -4793,7 +4980,10 @@ class RR_SH_GE_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a >= d_b)  # Unsigned
 
     def commit_result(self, res):
@@ -4835,7 +5025,10 @@ class RR_SH_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a < d_b)
 
     def commit_result(self, res):
@@ -4877,7 +5070,10 @@ class RR_SH_LT_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a < d_b)  # Unsigned
 
     def commit_result(self, res):
@@ -4916,7 +5112,9 @@ class RR_SH_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         sha = d_b & 0x1f  # D[b][4:0]
         cond_sha_pos = extend_to_16_bits(sha & 0x10 == 0)  # if SHA is positive
 
@@ -4929,7 +5127,7 @@ class RR_SH_H_Inst(Instruction):
         result_hw_2_pos = (d_a_hw_2 << sha.cast_to(Type.int_8)) & cond_sha_pos
 
         # if SHA is negative
-        cond_sha_neg = cond_sha_pos ^ 0xffff  # convert the condition, but avoid to appear as negative in python
+        cond_sha_neg = cond_sha_pos ^ 0xffff
         shift_count = twos_comp(sha, 5) & (cond_sha_neg != 0)    # if sha<0
         shift_count = get_abs_val(shift_count, 5)
 
@@ -4985,7 +5183,10 @@ class RR_SH_NE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         return (d_c << 1) | (d_a != d_b)
 
     def commit_result(self, res):
@@ -5027,7 +5228,9 @@ class RR_SHA_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         sha = d_b.cast_to(Type.int_6).cast_to(Type.int_32, signed=True)
         cond_pos = extend_to_32_bits(sha.signed >= 0)
         cond_bit = extend_to_32_bits(d_a[31] == 1)
@@ -5084,7 +5287,9 @@ class RR_SHA_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         sha = d_b & 0x1f  # D[b][4:0]
         cond_sha_pos = extend_to_16_bits(sha & 0x10 == 0)  # if SHA is positive
 
@@ -5097,7 +5302,7 @@ class RR_SHA_H_Inst(Instruction):
         result_hw_2_pos = (d_a_hw_2 << sha.cast_to(Type.int_8)) & cond_sha_pos
 
         # if SHA is negative
-        cond_sha_neg = cond_sha_pos ^ 0xffff  # convert the condition, but avoid to appear as negative in python
+        cond_sha_neg = cond_sha_pos ^ 0xffff
         shift_count = twos_comp(sha, 5) & (cond_sha_neg != 0)    # if sha<0
         shift_count = get_abs_val(shift_count, 5)
 
@@ -5153,7 +5358,9 @@ class RR_SHAS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         sha = d_b & 0x1f  # D[b][0:5]
         cond_1 = extend_to_32_bits(sha >= 0)  #
         cond_2 = extend_to_32_bits(sha < 0)   # not work correctly for negative numbers
@@ -5202,7 +5409,9 @@ class RR_SUB_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a - d_b
 
     def commit_result(self, res):
@@ -5259,7 +5468,9 @@ class RR_SUB_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         return a_a - a_b
 
     def commit_result(self, res):
@@ -5302,7 +5513,9 @@ class RR_SUB_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_byte_0 = ((d_a & 0xff) - (d_b & 0xff)) & 0xff
         result_byte_1 = (((d_a >>  8) & 0xff) - ((d_b >>  8) & 0xff)) & 0xff
         result_byte_2 = (((d_a >> 16) & 0xff) - ((d_b >> 16) & 0xff)) & 0xff
@@ -5362,7 +5575,9 @@ class RR_SUB_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_hw_0 = ((d_a & 0xffff) - (d_b & 0xffff)) & 0xffff
         result_hw_1 = (((d_a >>  16) & 0xffff) - ((d_b >>  16) & 0xffff)) & 0xffff
         result = (result_hw_1 << 16)  | result_hw_0
@@ -5419,7 +5634,9 @@ class RR_SUBC_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         psw = self.get_psw()
         psw_c = psw >> 31  # get carry bit
         result = d_a - d_b + psw_c - 1  # result[31:0]
@@ -5483,7 +5700,9 @@ class RR_SUBS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = ssov32(d_a - d_b, self.max_pos, self.max_neg)
 
         # set flags
@@ -5538,7 +5757,9 @@ class RR_SUBS_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = suov32_sub(d_a - d_b)
 
         # set flags
@@ -5593,7 +5814,9 @@ class RR_SUBS_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result_hw_0 = (d_a & 0xffff) - (d_b & 0xffff)
         result_hw_1 = ((d_a >> 16) & 0xffff) - ((d_b >> 16) & 0xffff)
         result = (ssov16(result_hw_1) << 16) | ssov16(result_hw_0)
@@ -5650,7 +5873,9 @@ class RR_SUBS_HU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         # get each Half-words of registers
         d_a_hw_0 = d_a & 0xffff
         d_a_hw_1 = (d_a >> 16) & 0xffff
@@ -5735,7 +5960,9 @@ class RR_SUBX_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a - d_b
 
         # set flags
@@ -5786,7 +6013,9 @@ class RR_XNOR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return ~(d_a ^ d_b)
 
     def commit_result(self, res):
@@ -5825,7 +6054,9 @@ class RR_XOR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a ^ d_b
 
     def commit_result(self, res):
@@ -5869,7 +6100,10 @@ class RR_XOR_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a == d_b)
         result = ((d_c >> 1) << 1) | bit
         return result
@@ -5914,7 +6148,10 @@ class RR_XOR_GE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a >= d_b)         # D[c][0] XOR D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -5960,7 +6197,10 @@ class RR_XOR_GE_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a >= d_b)         # D[c][0] AND D[a] >= D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -6006,7 +6246,10 @@ class RR_XOR_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a < d_b)          # D[c][0] XOR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -6052,7 +6295,10 @@ class RR_XOR_LT_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a < d_b)          # D[c][0] XOR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
@@ -6097,7 +6343,10 @@ class RR_XOR_NE_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         bit = d_c[0] ^ (d_a != d_b)         # D[c][0] XOR D[a] < D[b]
         result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result

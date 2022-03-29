@@ -5,10 +5,6 @@ Implementation of SSRO format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SSRO_ST_A_Inst(Instruction):
     """ Store Word from Address Register instruction.
@@ -40,7 +36,10 @@ class SSRO_ST_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_15(), self.get_offset()
 
-    def compute_result(self, a_a, a_15, offset):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_15 = args[1]
+        offset = args[2]
         addr = a_15 + (offset << 2)
         self.store(a_a, addr)
 
@@ -74,7 +73,10 @@ class SSRO_ST_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_15(), self.get_offset()
 
-    def compute_result(self, d_a, a_15, offset):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_15 = args[1]
+        offset = args[2]
         val = d_a & 0xff
         addr = a_15 + offset
         self.store(val, addr)
@@ -109,7 +111,10 @@ class SSRO_ST_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_15(), self.get_offset()
 
-    def compute_result(self, d_a, a_15, offset):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_15 = args[1]
+        offset = args[2]
         val = d_a & 0xffff
         addr = a_15 + (offset << 1)
         self.store(val, addr)
@@ -144,6 +149,9 @@ class SSRO_ST_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_15(), self.get_offset()
 
-    def compute_result(self, d_a, a_15, offset):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_15 = args[1]
+        offset = args[2]
         addr = a_15 + (offset << 2)
         self.store(d_a, addr)

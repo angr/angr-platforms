@@ -8,13 +8,6 @@ import bitstring
 from .rtl import sign_extend_2
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=no-else-return
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
-# pylint: disable=too-many-statements
 
 class ABS_LD_85_Instructions(Instruction):
     """ ABS_LD_85_Instructions:
@@ -96,7 +89,10 @@ class ABS_LD_85_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_a(), self.get_off18(), self.get_op2()
 
-    def compute_result(self, a, off18, op2):
+    def compute_result(self, *args):
+        a = args[0]
+        off18 = args[1]
+        op2 = args[2]
         result = ""
         if op2 == 0x0:  # LD.W
             ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(off18 & 0x3fff)[2:].zfill(14))
@@ -119,8 +115,6 @@ class ABS_LD_85_Instructions(Instruction):
             result = self.load(addr, Type.int_32)
 
         elif op2 == 0x3:  # LD.DA
-            #TODO: unable to compile a sample code with tool chain. Invalid register specification.
-            #      May be because of specification version.
             ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(off18 & 0x3fff)[2:].zfill(14))
             ea = int(ea, 2)
             addr = self.constant(ea, Type.int_32)
@@ -196,7 +190,7 @@ class ABS_LD_05_Instructions(Instruction):
     def get_dst_reg(self):
         return "d{0}".format(self.data['a'])
 
-    def compute_result(self):
+    def compute_result(self, *args):
         result = ""
         if self.data['op2'] == 0x0:  # LD.B
             addr = self.constant(self.data['off18'], Type.int_32)
@@ -204,21 +198,24 @@ class ABS_LD_05_Instructions(Instruction):
 
         elif self.data['op2'] == 0x1:  # LD.BU
             off18 = self.data['off18']
-            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                               bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
             ea = int(ea, 2)
             addr = self.constant(ea, Type.int_32)
             result = self.load(addr, Type.int_8)
 
         elif self.data['op2'] == 0x2:  # LD.H
             off18 = self.data['off18']
-            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                               bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
             ea = int(ea, 2)
             addr = self.constant(ea, Type.int_32)
             result = sign_extend_2(self.load(addr, Type.int_16), 16)
 
         elif self.data['op2'] == 0x3:  # LD.HU
             off18 = self.data['off18']
-            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                               bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
             ea = int(ea, 2)
             addr = self.constant(ea, Type.int_32)
             result = self.load(addr, Type.int_16)
@@ -270,11 +267,12 @@ class ABS_LD_45_Instructions(Instruction):
     def get_dst_reg(self):
         return "d{0}".format(self.data['a'])
 
-    def compute_result(self):
+    def compute_result(self, *args):
         result = ""
         if self.data['op2'] == 0x0:  # LD.Q
             off18 = self.data['off18']
-            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+            ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                               bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
             ea = int(ea, 2)
             addr = self.constant(ea, Type.int_32)
             result = self.load(addr, Type.int_16).cast_to(Type.int_32) << 16
@@ -341,9 +339,10 @@ class ABS_15_Instructions(Instruction):
 
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         off18 = self.data['off18']
-        ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+        ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                           bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
         addr = self.constant(int(ea, 2), Type.int_32)
         if self.data['op2'] == 0x0:  # STLCX
             self.store(self.get("pcxi", Type.int_32), addr)
@@ -460,9 +459,10 @@ class ABS_E5_Instructions(Instruction):
 
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         off18 = self.data['off18']
-        ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
+        ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4),
+                                           bin(self.data['off18'] & 0x3fff)[2:].zfill(14))
         addr = self.constant(int(ea, 2), Type.int_32)
         if self.data['op2'] == 0x0:  # SWAP.W
             tmp = self.load(addr, Type.int_32)
@@ -472,7 +472,8 @@ class ABS_E5_Instructions(Instruction):
         elif self.data['op2'] == 0x1:  # LDMST
             self.store(
                 (self.load(addr, Type.int_32) & ~self.get("d{0}".format(self.data['a']+1), Type.int_32)) |
-                (self.get("d{0}".format(self.data['a']), Type.int_32) & self.get("d{0}".format(self.data['a']+1), Type.int_32))
+                (self.get("d{0}".format(self.data['a']), Type.int_32) &
+                 self.get("d{0}".format(self.data['a']+1), Type.int_32))
                 , addr)
 
 class ABS_LEA_Instruction(Instruction):
@@ -522,7 +523,8 @@ class ABS_LEA_Instruction(Instruction):
     def fetch_operands(self):
         return [self.get_off18()]
 
-    def compute_result(self, off18):
+    def compute_result(self, *args):
+        off18 = args[0]
         result = ""
         if self.data['op2'] == 0x0:
             ea = "{0}00000000000000{1}".format(bin(off18 >> 14)[2:].zfill(4), bin(off18 & 0x3fff)[2:].zfill(14))
@@ -602,21 +604,13 @@ class ABS_ST_A5_Instructions(Instruction):
         addr = self.constant(ea, Type.int_32)
         return addr
 
-    def get_op2(self):
-        return self.data['op2']
-
-    def get_a(self):
-        return self.data['a']
-
-    def fetch_operands(self):
-        return self.get_a(), self.get_op2()
-
-    def compute_result(self, a, op2):
+    def compute_result(self, *args):
+        a = self.data['a']
         result = ""
-        if op2 == 0x0:  # ST.W
+        if self.data['op2'] == 0x0:  # ST.W
             result = self.get("d{0}".format(a), Type.int_32)
 
-        elif op2 == 0x1:  # ST.D
+        elif self.data['op2'] == 0x1:  # ST.D
             result_0 = self.get("d{0}".format(a), Type.int_32)
             result_1 = self.get("d{0}".format(a+1), Type.int_32)
             dest_addr = self.get_dst_addr()
@@ -624,12 +618,10 @@ class ABS_ST_A5_Instructions(Instruction):
             self.store(result_0, dest_addr)
             self.store(result_1, dest_addr+4)
 
-        elif op2 == 0x2:  # ST.A
+        elif self.data['op2'] == 0x2:  # ST.A
             result = self.get("a{0}".format(a), Type.int_32)
 
-        elif op2 == 0x3:  # ST.DA
-            #TODO: unable to compile a sample code with tool chain. Invalid register specification.
-            #      May be because of specification version.
+        elif self.data['op2'] == 0x3:  # ST.DA
             result_0 = self.get("a{0}".format(a), Type.int_32)
             result_1 = self.get("a{0}".format(a+1), Type.int_32)
             dest_addr = self.get_dst_addr()
@@ -695,21 +687,13 @@ class ABS_ST_25_Instructions(Instruction):
         addr = self.constant(ea, Type.int_32)
         return addr
 
-    def get_op2(self):
-        return self.data['op2']
-
-    def get_a(self):
-        return self.data['a']
-
-    def fetch_operands(self):
-        return self.get_a(), self.get_op2()
-
-    def compute_result(self, a, op2):
+    def compute_result(self, *args):
         result = ""
-        if op2 == 0x0:  # ST.B
+        a = self.data['a']
+        if self.data['op2'] == 0x0:  # ST.B
             result = self.get("d{0}".format(a), Type.int_8).cast_to(Type.int_32)
 
-        elif op2 == 0x2:  # ST.H
+        elif self.data['op2'] == 0x2:  # ST.H
             result = self.get("d{0}".format(a), Type.int_16).cast_to(Type.int_32)
 
         return result
@@ -763,19 +747,10 @@ class ABS_ST_65_Instructions(Instruction):
         addr = self.constant(ea, Type.int_32)
         return addr
 
-    def get_op2(self):
-        return self.data['op2']
-
-    def get_a(self):
-        return self.data['a']
-
-    def fetch_operands(self):
-        return self.get_a(), self.get_op2()
-
-    def compute_result(self, a, op2):
+    def compute_result(self, *args):
         result = ""
-        if op2 == 0x0:  # ST.Q
-            result = self.get("d{0}".format(a), Type.int_32) >> 16
+        if self.data['op2'] == 0x0:  # ST.Q
+            result = self.get("d{0}".format(self.data['a']), Type.int_32) >> 16
 
         return result
 

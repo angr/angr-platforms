@@ -6,10 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SRR_ADD_12_Inst(Instruction):
     """ Add instruction.
@@ -44,7 +40,9 @@ class SRR_ADD_12_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_15(), self.get_d_b()]
 
-    def compute_result(self, d_15, d_b):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        d_b = args[1]
         result = d_15 + d_b
 
         c = 0
@@ -95,7 +93,9 @@ class SRR_ADD_1A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a + d_b
 
         c = 0
@@ -145,7 +145,9 @@ class SRR_ADD_42_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a + d_b
 
         c = 0
@@ -192,7 +194,9 @@ class SRR_ADD_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_a(), self.get_a_b()]
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         return a_a + a_b
 
     def commit_result(self, res):
@@ -239,7 +243,9 @@ class SRR_ADDS_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = ssov32(d_a + d_b, self.max_pos, self.max_neg)
 
         c = 0
@@ -286,7 +292,9 @@ class SRR_AND_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a & d_b
 
     def commit_result(self, res):
@@ -325,10 +333,12 @@ class SRR_CMOV_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b(), self.get_d_15()]
 
-    def compute_result(self, d_a, d_b, d_15):
-        condition = (d_15 != 0)
-        result = self.irsb_c.ite(condition.rdt, d_b.rdt, d_a.rdt)
-        return result
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_15 = args[2]
+        condition = d_15 != 0
+        return self.irsb_c.ite(condition.rdt, d_b.rdt, d_a.rdt)
 
     def put(self, val, reg):
         offset = self._lookup_register(self.irsb_c.irsb.arch, reg)
@@ -370,10 +380,12 @@ class SRR_CMOVN_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b(), self.get_d_15()]
 
-    def compute_result(self, d_a, d_b, d_15):
-        condition = (d_15 == 0)
-        result = self.irsb_c.ite(condition.rdt, d_b.rdt, d_a.rdt)
-        return result
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_15 = args[2]
+        condition = d_15 == 0
+        return self.irsb_c.ite(condition.rdt, d_b.rdt, d_a.rdt)
 
     def put(self, val, reg):
         offset = self._lookup_register(self.irsb_c.irsb.arch, reg)
@@ -413,7 +425,9 @@ class SRR_EQ_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a == d_b
 
     def commit_result(self, res):
@@ -450,7 +464,9 @@ class SRR_LT_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a < d_b
 
     def commit_result(self, res):
@@ -489,7 +505,9 @@ class SRR_SUB_A2_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a - d_b
 
         c = 0
@@ -539,7 +557,9 @@ class SRR_SUB_52_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_15(), self.get_d_b()]
 
-    def compute_result(self, d_15, d_b):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        d_b = args[1]
         result = d_15 - d_b
 
         c = 0
@@ -590,7 +610,9 @@ class SRR_SUB_5A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a - d_b
 
         c = 0
@@ -648,7 +670,9 @@ class SRR_SUBS_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = ssov32(d_a - d_b, self.max_pos, self.max_neg)
 
         # set flags
@@ -695,7 +719,8 @@ class SRR_MOV_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_b()]
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         return d_b
 
     def commit_result(self, res):
@@ -728,7 +753,8 @@ class SRR_MOV_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_b()]
 
-    def compute_result(self, d_b):
+    def compute_result(self, *args):
+        d_b = args[0]
         return d_b
 
     def commit_result(self, res):
@@ -761,7 +787,8 @@ class SRR_MOV_D_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         return a_b
 
     def commit_result(self, res):
@@ -794,7 +821,8 @@ class SRR_MOV_AA_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         return a_b
 
     def commit_result(self, res):
@@ -830,7 +858,9 @@ class SRR_OR_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a | d_b
 
     def commit_result(self, res):
@@ -866,7 +896,9 @@ class SRR_XOR_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         return d_a ^ d_b
 
     def commit_result(self, res):
@@ -905,7 +937,9 @@ class SRR_MUL_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a(), self.get_d_b()]
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a * d_b
 
         c = 0

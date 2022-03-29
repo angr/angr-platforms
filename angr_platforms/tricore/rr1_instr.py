@@ -7,14 +7,6 @@ import bitstring
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-branches
-# pylint: disable=line-too-long
 
 class RR1_MUL_H_B3_Instructions(Instruction):
     """ RR1 Packed Multiply Q Format Instructions:
@@ -143,131 +135,206 @@ class RR1_MUL_H_B3_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result = ""
         result_word0 = ""
         result_word1 = ""
         if self.data['op2'] == 0x1a:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result_word0, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result_word1, "d{0}".format(self.data['c']+1))  # E[c][62:32]
 
         elif self.data['op2'] == 0x19:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result_word0, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result_word1, "d{0}".format(self.data['c']+1))  # E[c][62:32]
 
         elif self.data['op2'] == 0x18:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result_word0, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result_word1, "d{0}".format(self.data['c']+1))  # E[c][62:32]
 
         elif self.data['op2'] == 0x1b:
-            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result_word0, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result_word1, "d{0}".format(self.data['c']+1))  # E[c][62:32]
 
         elif self.data['op2'] == 0x1e:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
             result = (result_word1.cast_to(Type.int_64) + result_word0.cast_to(Type.int_64)) << 16
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32, "d{0}".format(self.data['c']+1))         # E[c][62:32]
 
         elif self.data['op2'] == 0x1d:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
             result = (result_word1.cast_to(Type.int_64) + result_word0.cast_to(Type.int_64)) << 16
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32, "d{0}".format(self.data['c']+1))         # E[c][62:32]
 
         elif self.data['op2'] == 0x1c:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
             result = (result_word1.cast_to(Type.int_64) + result_word0.cast_to(Type.int_64)) << 16
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32, "d{0}".format(self.data['c']+1))         # E[c][62:32]
 
         elif self.data['op2'] == 0x1f:
-            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_word1 = (0x7fffffff & cond_sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
-            result_word0 = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
+            result_word1 = (0x7fffffff & cond_sc1) | \
+                           ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (cond_sc1^0xffffffff)
+            result_word0 = (0x7fffffff & cond_sc0) | \
+                           ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
             result = (result_word1.cast_to(Type.int_64) + result_word0.cast_to(Type.int_64)) << 16
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32, "d{0}".format(self.data['c']+1))         # E[c][62:32]
 
         elif self.data['op2'] == 0xe:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_hw1 = (0x7fffffff & cond_sc1) | (((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
-            result_hw0 = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result_hw1 = (0x7fffffff & cond_sc1) | \
+                         (((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
+            result_hw0 = (0x7fffffff & cond_sc0) | \
+                         (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             result = ((result_hw1 >> 16) << 16) | (result_hw0 >> 16)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif self.data['op2'] == 0xd:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_hw1 = (0x7fffffff & cond_sc1) | (((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
-            result_hw0 = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result_hw1 = (0x7fffffff & cond_sc1) | \
+                         (((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
+            result_hw0 = (0x7fffffff & cond_sc0) | \
+                         (((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             result = ((result_hw1 >> 16) << 16) | (result_hw0 >> 16)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif self.data['op2'] == 0xc:
-            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_hw1 = (0x7fffffff & cond_sc1) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
-            result_hw0 = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result_hw1 = (0x7fffffff & cond_sc1) | \
+                         (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
+            result_hw0 = (0x7fffffff & cond_sc0) | \
+                         (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             result = ((result_hw1 >> 16) << 16) | (result_hw0 >> 16)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif self.data['op2'] == 0xf:
-            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) &
+                                    ((d_b >> 16) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc1 = extend_to_32_bits(sc1 != 0)
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result_hw1 = (0x7fffffff & cond_sc1) | (((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
-            result_hw0 = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result_hw1 = (0x7fffffff & cond_sc1) | \
+                         (((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc1^0xffffffff)
+            result_hw0 = (0x7fffffff & cond_sc0) | \
+                         (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             result = ((result_hw1 >> 16) << 16) | (result_hw0 >> 16)
             self.put(result, "d{0}".format(self.data['c']))
 
@@ -401,10 +468,14 @@ class RR1_MUL_Q_93_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         op2 = self.data['op2']
         if op2 == 0x2:  # RR1_MUL.Q (32-bit)
-            result = (((d_a.cast_to(Type.int_64, signed=True) * d_b.cast_to(Type.int_64, signed=True)) << n.value) >> 32).cast_to(Type.int_32)
+            result = (((d_a.cast_to(Type.int_64, signed=True) *
+                        d_b.cast_to(Type.int_64, signed=True)) << n.value) >> 32).cast_to(Type.int_32)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif op2 == 0x1b:  # RR1_MUL.Q (64-bit)
@@ -417,7 +488,8 @@ class RR1_MUL_Q_93_Instructions(Instruction):
             self.put(result, "d{0}".format(self.data['c']))
 
         elif op2 == 0x19:  # RR1_MUL.Q L (64-bit)
-            result = ((d_a.cast_to(Type.int_64, signed=True) * extract_16s(d_b,0).cast_to(Type.int_64, signed=True)) << n.value)
+            result = ((d_a.cast_to(Type.int_64, signed=True) *
+                       extract_16s(d_b,0).cast_to(Type.int_64, signed=True)) << n.value)
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32 , "d{0}".format(self.data['c']+1))        # E[c][62:32]
 
@@ -426,32 +498,41 @@ class RR1_MUL_Q_93_Instructions(Instruction):
             self.put(result, "d{0}".format(self.data['c']))
 
         elif op2 == 0x18:  # RR1_MUL.Q U (64-bit)
-            result = ((d_a.cast_to(Type.int_64, signed=True) * extract_16s(d_b,1).cast_to(Type.int_64, signed=True)) << n.value)
+            result = ((d_a.cast_to(Type.int_64, signed=True) *
+                       extract_16s(d_b,1).cast_to(Type.int_64, signed=True)) << n.value)
             self.put(result & 0xffffffff, "d{0}".format(self.data['c']))    # E[c][31:0]
             self.put(result >> 32 , "d{0}".format(self.data['c']+1))        # E[c][62:32]
 
         elif op2 == 0x5:  # RR1_MUL.Q LL (32-bit)
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
+            result = (0x7fffffff & cond_sc0) | \
+                     ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif op2 == 0x4:  # RR1_MUL.Q UU (32-bit)
             sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result = (0x7fffffff & cond_sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
+            result = (0x7fffffff & cond_sc0) | \
+                     ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (cond_sc0^0xffffffff)
             self.put(result, "d{0}".format(self.data['c']))
 
         elif op2 == 0x7:  # RR1_MULR.Q LL (32-bit)
-            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
+            sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) &
+                                    ((d_b & 0xffff) == 0x8000) &
+                                    (n == 1).cast_to(Type.int_32))
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result = (0x7fffffff & cond_sc0) | \
+                     (((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             self.put(((result >> 16) << 16), "d{0}".format(self.data['c']))
 
         elif op2 == 0x6:  # RR1_MULR.Q UU (32-bit)
             sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
             cond_sc0 = extend_to_32_bits(sc0 != 0)
-            result = (0x7fffffff & cond_sc0) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
+            result = (0x7fffffff & cond_sc0) | \
+                     (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) + 0x8000) & (cond_sc0^0xffffffff)
             self.put(((result >> 16) << 16), "d{0}".format(self.data['c']))
 
         # set flags

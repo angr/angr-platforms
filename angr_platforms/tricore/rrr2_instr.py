@@ -6,12 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=duplicate-code
 
 class RRR2_MADD_32_Inst(Instruction):
     """ Multiply-Add 32-bit instruction:
@@ -54,7 +48,10 @@ class RRR2_MADD_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         result = d_d + (d_a * d_b)
 
         # set flags
@@ -112,7 +109,9 @@ class RRR2_MADD_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -185,7 +184,9 @@ class RRR2_MADD_U_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -261,10 +262,13 @@ class RRR2_MADDS_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, D_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
         max_neg = self.constant(INT32_MAX_NEG, Type.int_32)
-        result = ssov32(D_d + (d_a * d_b), max_pos, max_neg)
+        result = ssov32(d_d + (d_a * d_b), max_pos, max_neg)
 
         # set flags
         c = 0
@@ -321,7 +325,9 @@ class RRR2_MADDS_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -397,8 +403,11 @@ class RRR2_MADDS_U_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, D_d):
-        result = suov32(D_d + (d_a * d_b))  # Unsigned
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        result = suov32(d_d + (d_a * d_b))  # Unsigned
 
         # set flags
         c = 0
@@ -455,7 +464,9 @@ class RRR2_MADDS_U_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -531,8 +542,11 @@ class RRR2_MSUB_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, D_d):
-        result = D_d - (d_a * d_b)
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        result = d_d - (d_a * d_b)
 
         # set flags
         c = 0
@@ -589,7 +603,9 @@ class RRR2_MSUB_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -665,10 +681,13 @@ class RRR2_MSUBS_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, D_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
         max_neg = self.constant(INT32_MAX_NEG, Type.int_32)
-        result = ssov32(D_d - (d_a * d_b), max_pos, max_neg)
+        result = ssov32(d_d - (d_a * d_b), max_pos, max_neg)
 
         # set flags
         c = 0
@@ -725,7 +744,9 @@ class RRR2_MSUBS_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -798,7 +819,9 @@ class RRR2_MSUB_U_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object
@@ -874,10 +897,13 @@ class RRR2_MSUBS_U_32_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, D_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
         max_neg = self.constant(INT32_MAX_NEG, Type.int_32)
-        result = ssov32(D_d - (d_a * d_b), max_pos, max_neg)
+        result = ssov32(d_d - (d_a * d_b), max_pos, max_neg)
         # convert to unsigned
         unsigned_cond = extend_to_32_bits(result & 0x80000000 == 0x80000000)
         result = result & (unsigned_cond ^ 0xffffffff)
@@ -937,7 +963,9 @@ class RRR2_MSUBS_U_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         d_d_1 = self.get("d{0}".format(self.data['d']), Type.int_32)
         d_d_2 = self.get("d{0}".format(self.data['d']+1), Type.int_32)
         e_d = self.constant(0, Type.int_64)  # 64-bit object

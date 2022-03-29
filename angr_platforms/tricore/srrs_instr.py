@@ -5,10 +5,6 @@ Implementation of SRRS format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SRRS_ADDSC_A_Inst(Instruction):
     """ Add Scaled Index to Address instruction.
@@ -44,7 +40,10 @@ class SRRS_ADDSC_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_a_b(), self.get_n()
 
-    def compute_result(self, d_15, a_b, n):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        a_b = args[1]
+        n = args[2]
         return a_b + (d_15 << n)
 
     def commit_result(self, res):

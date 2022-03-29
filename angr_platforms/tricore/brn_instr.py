@@ -7,10 +7,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class BRN_Jump_Inst(Instruction):
     """ BRN Jump instructions:
@@ -68,11 +64,16 @@ class BRN_Jump_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_pc(), self.get_d_a(), self.get_disp15()]
 
-    def compute_result(self, pc, d_a, disp15):
-        if self.data["op2"] == 0:
+    def compute_result(self, *args):
+        pc = args[0]
+        d_a = args[1]
+        disp15 = args[2]
+        if self.data["op2"] == 0:  # BRN_JZ.T
             cond = d_a[self.data['n']] == 0
-        elif self.data["op2"] == 1:
+
+        elif self.data["op2"] == 1:  # BRN_JNZ.T
             cond = d_a[self.data['n']] == 1
+
         else:
             print("Error: Unknown OP2 '{0}'".format(self.data['op2']))
             print("BRN instruction OP=6F, OP2=Unknown")

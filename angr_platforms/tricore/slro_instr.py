@@ -5,10 +5,6 @@ Implementation of SLRO format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SLRO_LD_A_Inst(Instruction):
     """ Load Word to Address Register instruction.
@@ -40,9 +36,10 @@ class SLRO_LD_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_15(), self.get_offset()
 
-    def compute_result(self, a_15, offset):
-        result = self.load(a_15 + (offset << 2), Type.int_32)
-        return result
+    def compute_result(self, *args):
+        a_15 = args[0]
+        offset = args[1]
+        return self.load(a_15 + (offset << 2), Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -77,9 +74,10 @@ class SLRO_LD_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_15(), self.get_offset()
 
-    def compute_result(self, a_15, offset):
-        result = self.load(a_15 + offset, Type.int_8).cast_to(Type.int_32)
-        return result
+    def compute_result(self, *args):
+        a_15 = args[0]
+        offset = args[1]
+        return self.load(a_15 + offset, Type.int_8).cast_to(Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -114,9 +112,10 @@ class SLRO_LD_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_15(), self.get_offset()
 
-    def compute_result(self, a_15, offset):
-        result = self.load(a_15 + (offset << 1), Type.int_16).cast_to(Type.int_32, signed=True)
-        return result
+    def compute_result(self, *args):
+        a_15 = args[0]
+        offset = args[1]
+        return self.load(a_15 + (offset << 1), Type.int_16).cast_to(Type.int_32, signed=True)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -151,9 +150,10 @@ class SLRO_LD_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_15(), self.get_offset()
 
-    def compute_result(self, a_15, offset):
-        result = self.load(a_15 + (offset << 2), Type.int_32)
-        return result
+    def compute_result(self, *args):
+        a_15 = args[0]
+        offset = args[1]
+        return self.load(a_15 + (offset << 2), Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())

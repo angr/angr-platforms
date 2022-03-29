@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 import logging
 
-# pylint: disable=consider-using-f-string
 
 ENABLE_LOGGING = False  # True/False to enable/disable logging
 LOGFILES_PATH = "{0}/logs/".format(os.path.expanduser("~"))

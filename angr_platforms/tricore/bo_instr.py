@@ -8,15 +8,6 @@ import bitstring
 from .rtl import reverse16, extend_to_32_bits
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
-# pylint: disable=too-many-lines
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-branches
 
 class BO_LD_09_Instructions(Instruction):
     """ A class for LOAD instruction with OP=09 """
@@ -114,7 +105,9 @@ class BO_LD_09_Instructions(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_sign_ext_offset()]
 
-    def compute_result(self, a_b, sign_ext_offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        sign_ext_offset = args[1]
         result = ""
         op2 = self.data['op2']
         if op2 == 0x0:  # BO_LD.B_PostInc
@@ -377,7 +370,10 @@ class BO_LD_29_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_a_b_1(), self.get_sign_ext_offset()
 
-    def compute_result(self, a_b, a_b_1, sign_ext_offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        a_b_1 = args[1]
+        sign_ext_offset = args[2]
         result = ""
         op2 = self.data['op2']
         if op2 == 0x0:  # BO_LD.B_BitRev
@@ -474,7 +470,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_8).cast_to(Type.int_32, signed=True)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -485,7 +482,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_8)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -496,7 +494,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_16).cast_to(Type.int_32, signed=True)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -507,7 +506,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_16)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -516,10 +516,12 @@ class BO_LD_29_Instructions(Instruction):
             length = a_b_1 >> 16
             ea_0 = a_b + index
             ea_2 = a_b + index + (2 % length)
-            result = self.load(ea_2, Type.int_16).cast_to(Type.int_32) << 16 | self.load(ea_0, Type.int_16).cast_to(Type.int_32)
+            result = self.load(ea_2, Type.int_16).cast_to(Type.int_32) << 16 | \
+                     self.load(ea_0, Type.int_16).cast_to(Type.int_32)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -540,7 +542,8 @@ class BO_LD_29_Instructions(Instruction):
             self.put(result_1, "d{0}".format(self.data['a']+1))
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -551,7 +554,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_32)
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -566,7 +570,8 @@ class BO_LD_29_Instructions(Instruction):
             self.put(result_1, "a{0}".format(self.data['a']+1))
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -577,7 +582,8 @@ class BO_LD_29_Instructions(Instruction):
             result = self.load(ea, Type.int_16).cast_to(Type.int_32) << 16
             new_index = index + sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + length) & cond_new_index_neg) | ((new_index % length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + length) & cond_new_index_neg) | \
+                        ((new_index % length) & (cond_new_index_neg^0xffffffff))
             result_2 = ((length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result_2, "a{0}".format(self.data['b']+1))
 
@@ -650,7 +656,9 @@ class BO_49_Instructions(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_sign_ext_offset()]
 
-    def compute_result(self, a_b, sign_ext_offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        sign_ext_offset = args[1]
         result = ""
         op2 = self.data['op2']
         if op2 == 0x0:  # SWAP.W (Post-increment Addressing Mode)
@@ -831,7 +839,10 @@ class BO_69_Instructions(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_a_b_1(), self.get_sign_ext_offset()]
 
-    def compute_result(self, a_b, a_b_1, sign_ext_offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        a_b_1 = args[1]
+        sign_ext_offset = args[2]
         result = ""
         op2 = self.data['op2']
         if op2 == 0x0:  # SWAP.W (Bit-reverse Addressing Mode)
@@ -1000,7 +1011,7 @@ class BO_ST_89_Instructions(Instruction):
         """ Return D[a] register """
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
-    def compute_result(self):
+    def compute_result(self, *args):
         op2 = self.data['op2']
         if op2 == 0x6:  # BO_ST.A_PostInc
             self.store(self.a_a, self.a_b)
@@ -1220,7 +1231,7 @@ class BO_ST_A9_Instructions(Instruction):
     def d_a(self):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
-    def compute_result(self):
+    def compute_result(self, *args):
         op2 = self.data['op2']
         if op2 == 0x0:  # BO_ST.B_BitRev
             incr = self.a_b_1 >> 16
@@ -1233,7 +1244,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.d_a & 0xff, self.ea_0)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1252,7 +1264,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.d_a_1 >> 16, self.ea_6)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1267,7 +1280,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.a_a, self.ea_0)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1284,7 +1298,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.a_a_1, self.ea_4)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1299,7 +1314,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.d_a & 0xffff, self.ea_0)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1314,7 +1330,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.d_a >> 16, self.ea_0)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 
@@ -1329,7 +1346,8 @@ class BO_ST_A9_Instructions(Instruction):
             self.store(self.d_a, self.ea_0)
             new_index = self.index + self.sign_ext_offset
             cond_new_index_neg = extend_to_32_bits(new_index & 0x80000000 == 0x80000000)
-            new_index = ((new_index + self.length) & cond_new_index_neg) | ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
+            new_index = ((new_index + self.length) & cond_new_index_neg) | \
+                        ((new_index % self.length) & (cond_new_index_neg^0xffffffff))
             result = ((self.length & 0xffff) << 16) | (new_index & 0xffff)
             self.put(result, "a{0}".format(self.data['b']+1))
 

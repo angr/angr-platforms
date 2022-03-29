@@ -7,12 +7,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
-# pylint: disable=duplicate-code
 
 class BRR_Jump_Instruczions_7F(Instruction):
     """ Jump if Greater Than or Equal instruction.
@@ -71,11 +65,17 @@ class BRR_Jump_Instruczions_7F(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, d_a, d_b, pc, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRR_JGE
             cond = d_a.signed >= d_b
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRR_JGE.U
             cond = d_a >= d_b  # Unsigned comparison
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=7F, OP2=Unknown")
@@ -141,11 +141,17 @@ class BRR_Jump_Instructions_3F(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, d_a, d_b, pc, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRR_JLT
             cond = d_a.signed < d_b
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRR_JLT.U
             cond = d_a < d_b  # Unsigned comparison
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=3F, OP2=Unknown")
@@ -211,11 +217,17 @@ class BRR_Jump_Instructions_5F(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, d_a, d_b, pc, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRR_JEQ
             cond = d_a.signed == d_b
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRR_JNE
             cond = d_a.signed != d_b
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=5F, OP2=Unknown")
@@ -281,11 +293,17 @@ class BRR_Jump_Instructions_7D(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, a_a, a_b, pc, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
+        pc = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRR_JEQ.A
             cond = a_a.signed == a_b
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRR_JNE.A
             cond = a_a.signed != a_b
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=7D, OP2=Unknown")
@@ -351,12 +369,18 @@ class BRR_Jump_Instructions_1F(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, d_a, d_b, pc, disp15):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pc = args[2]
+        disp15 = args[3]
         condition = d_a.signed != d_b
-        if self.data['op2'] == 0:
-            self.put(d_a + 1, "d{0}".format(self.data['a']))  # unconditional increment
-        elif self.data['op2'] == 1:
-            self.put(d_a - 1, "d{0}".format(self.data['a']))  # unconditional decrement
+        if self.data['op2'] == 0:  # BRR_JNEI
+            self.put(d_a + 1, "d{0}".format(self.data['a']))
+
+        elif self.data['op2'] == 1:  # BRR_JNED
+            self.put(d_a - 1, "d{0}".format(self.data['a']))
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=1F, OP2=Unknown")
@@ -417,11 +441,16 @@ class BRR_Jump_Instructions_BD(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, a_a, pc, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        a_a = args[0]
+        pc = args[1]
+        disp15 = args[2]
+        if self.data['op2'] == 0:  # BRR_JZ.A
             cond = a_a.signed == 0
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRR_JNZ.A
             cond = a_a.signed != 0
+
         else:
             print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
             print("BRR instruction OP=BD, OP2=Unknown")
@@ -482,7 +511,10 @@ class BRR_Loop_Instructions_FD(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_pc(), self.get_disp15()
 
-    def compute_result(self, a_b, pc, disp15):
+    def compute_result(self, *args):
+        a_b = args[0]
+        pc = args[1]
+        disp15 = args[2]
         if self.data['op2'] == 0:  # LOOP
             cond = a_b.signed != 0
             self.put(a_b - 1, "a{0}".format(self.data['b']))

@@ -6,10 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import extend_to_32_bits
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RCRW_INSERT(Instruction):
     """ Insert Bit Field instruction:
@@ -50,7 +46,10 @@ class RCRW_INSERT(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d(), self.get_const4()
 
-    def compute_result(self, d_a, d_d, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d = args[1]
+        const4 = args[2]
         pos = (d_d & 0x1f).cast_to(Type.int_8)
         width = self.data['w']
 
@@ -102,7 +101,9 @@ class RCRW_IMASK(Instruction):
     def fetch_operands(self):
         return self.get_d_d(), self.get_const4()
 
-    def compute_result(self, d_d, const4):
+    def compute_result(self, *args):
+        d_d = args[0]
+        const4 = args[1]
         pos = (d_d & 0x1f).cast_to(Type.int_8)
         width = self.data['w']
 

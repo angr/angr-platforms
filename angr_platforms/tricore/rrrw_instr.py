@@ -7,10 +7,6 @@ import bitstring
 from .rtl import extend_to_32_bits, sign_extend_2
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RRRW_Instructions(Instruction):
     """ RRRW instructions:
@@ -87,7 +83,10 @@ class RRRW_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         pos = (d_d & 0x1f).cast_to(Type.int_8)
         width = self.data["w"]
 

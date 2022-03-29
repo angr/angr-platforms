@@ -5,10 +5,6 @@ Implementation of SC format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SC_AND_Inst(Instruction):
     """ Bitwise AND instruction.
@@ -40,7 +36,9 @@ class SC_AND_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_const8()
 
-    def compute_result(self, d_15, const8):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        const8 = args[1]
         return d_15 & const8
 
     def commit_result(self, res):
@@ -76,10 +74,11 @@ class SC_LD_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_10(), self.get_const8()
 
-    def compute_result(self, a_10, const8):
+    def compute_result(self, *args):
+        a_10 = args[0]
+        const8 = args[1]
         addr = a_10 + (const8 << 2)
-        result = self.load(addr, Type.int_32)
-        return result
+        return self.load(addr, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -114,10 +113,11 @@ class SC_LD_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_10(), self.get_const8()
 
-    def compute_result(self, a_10, const8):
+    def compute_result(self, *args):
+        a_10 = args[0]
+        const8 = args[1]
         addr = a_10 + (const8 << 2)
-        result = self.load(addr, Type.int_32)
-        return result
+        return self.load(addr, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -149,7 +149,8 @@ class SC_MOV_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_const8()]
 
-    def compute_result(self, const8):
+    def compute_result(self, *args):
+        const8 = args[0]
         return const8
 
     def commit_result(self, res):
@@ -185,7 +186,9 @@ class SC_OR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_const8()
 
-    def compute_result(self, d_15, const8):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        const8 = args[1]
         return d_15 | const8
 
     def commit_result(self, res):
@@ -221,7 +224,9 @@ class SC_SUB_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_10(), self.get_const8()
 
-    def compute_result(self, a_10, const8):
+    def compute_result(self, *args):
+        a_10 = args[0]
+        const8 = args[1]
         return a_10 - const8
 
     def commit_result(self, res):
@@ -256,7 +261,10 @@ class SC_ST_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_A_15(), self.get_a_10(), self.get_const8()
 
-    def compute_result(self, A_15, a_10, const8):
+    def compute_result(self, *args):
+        A_15 = args[0]
+        a_10 = args[1]
+        const8 = args[2]
         addr = a_10 + (const8 << 2)
         self.store(A_15, addr)
 
@@ -289,6 +297,9 @@ class SC_ST_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_a_10(), self.get_const8()
 
-    def compute_result(self, d_15, a_10, const8):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        a_10 = args[1]
+        const8 = args[2]
         addr = a_10 + (const8 << 2)
         self.store(d_15, addr)

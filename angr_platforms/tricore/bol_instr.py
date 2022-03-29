@@ -6,10 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class BOL_LD_A(Instruction):
     """ Load Word to Address Register instruction.
@@ -53,7 +49,9 @@ class BOL_LD_A(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_offset()]
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         ea = a_b + offset
         result = self.load(ea, Type.int_32)
         return result
@@ -103,7 +101,9 @@ class BOL_LEA(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_offset()]
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         ea = a_b + offset
         return ea
 
@@ -152,7 +152,9 @@ class BOL_LD_W(Instruction):
     def fetch_operands(self):
         return [self.get_a_b(), self.get_offset()]
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         addr = a_b + offset
         result = self.load(addr, Type.int_32)
         return result
@@ -202,6 +204,9 @@ class BOL_ST_W(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b(), self.get_offset()
 
-    def compute_result(self, d_a, a_b, offset):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
+        offset = args[2]
         ea = a_b + offset
         self.store(d_a, ea)

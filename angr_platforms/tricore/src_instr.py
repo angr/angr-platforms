@@ -6,12 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
-# pylint: disable=too-many-locals
 
 class SRC_ADD_92_Inst(Instruction):
     """ Add instruction.
@@ -46,7 +40,9 @@ class SRC_ADD_92_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_const4()
 
-    def compute_result(self, d_15, const4):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        const4 = args[1]
         result = d_15 + const4
 
         c = 0
@@ -97,7 +93,9 @@ class SRC_ADD_9A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         result = d_a + const4
 
         c = 0
@@ -147,7 +145,9 @@ class SRC_ADD_C2_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         result = (d_a + const4) & 0xffffffff
 
         c = 0
@@ -194,7 +194,9 @@ class SRC_ADD_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_const4()
 
-    def compute_result(self, a_a, const4):
+    def compute_result(self, *args):
+        a_a = args[0]
+        const4 = args[1]
         return a_a + const4
 
     def commit_result(self, res):
@@ -236,7 +238,10 @@ class SRC_CADD_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_15(), self.get_const4()
 
-    def compute_result(self, d_a, d_15, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_15 = args[1]
+        const4 = args[2]
         condition = extend_to_32_bits(d_15 != 0)
         result = ((d_a + const4) & condition) | (d_a & ~condition)
 
@@ -290,7 +295,10 @@ class SRC_CADDN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_15(), self.get_const4()
 
-    def compute_result(self, d_a, d_15, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_15 = args[1]
+        const4 = args[2]
         condition = extend_to_32_bits(d_15 == 0)
         result = ((d_a + const4) & condition) | (d_a & ~condition)
 
@@ -341,7 +349,10 @@ class SRC_CMOV_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_15(), self.get_const4()
 
-    def compute_result(self, d_a, d_15, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_15 = args[1]
+        const4 = args[2]
         condition = extend_to_32_bits(d_15 != 0)
         result = (const4 & condition) | (d_a & ~condition)
         return result
@@ -382,7 +393,10 @@ class SRC_CMOVN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_15(), self.get_const4()
 
-    def compute_result(self, d_a, d_15, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_15 = args[1]
+        const4 = args[2]
         condition = extend_to_32_bits(d_15 == 0)
         result = (const4 & condition) | (d_a & ~condition)
         return result
@@ -421,7 +435,9 @@ class SRC_EQ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         return d_a == const4
 
     def commit_result(self, res):
@@ -458,7 +474,9 @@ class SRC_LT_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         return d_a < const4
 
     def commit_result(self, res):
@@ -491,7 +509,8 @@ class SRC_MOV_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_const4()]
 
-    def compute_result(self, const4):
+    def compute_result(self, *args):
+        const4 = args[0]
         return const4
 
     def commit_result(self, res):
@@ -524,7 +543,8 @@ class SRC_MOV_A_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_const4()]
 
-    def compute_result(self, const4):
+    def compute_result(self, *args):
+        const4 = args[0]
         return const4
 
     def commit_result(self, res):
@@ -560,13 +580,15 @@ class SRC_SH_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         cond_const4_pos = (const4 & 0x8 == 0)  # const4 is positive
         result_1 = (d_a << const4) & extend_to_32_bits(cond_const4_pos)
 
         result_2 = 0
         if not const4 == 0:  # const4=0
-            cond_const4_neg = extend_to_6_bits(cond_const4_pos) ^ 0x3f  # convert the condition, but avoid to appear as negative in python
+            cond_const4_neg = extend_to_6_bits(cond_const4_pos) ^ 0x3f
             shift_count = twos_comp(const4, 4)    # if const4<0
             if shift_count < 0:
                 shift_count = shift_count * (-1)
@@ -614,7 +636,9 @@ class SRC_SHA_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         cond_const4_pos = (const4 & 0x8 == 0)  # const4 is positive
         result_1 = (d_a << const4) & extend_to_32_bits(cond_const4_pos)
         # compute carry out
@@ -624,13 +648,12 @@ class SRC_SHA_Inst(Instruction):
         else:
             carry_out_1_mask = (((1 << 32) - 1) >> (31 - lower_limit)) << (31 - lower_limit)
         cond_carry_out_1 = ((const4 & 0xf) == 0xf) & cond_const4_pos  # if const4[4:0]
-        #carry_out_1 = ((d_a & carry_out_1_mask) != 0) & extend_to_32_bits(cond_carry_out_1)
         carry_out_1 = carry(d_a, carry_out_1_mask, 0) & extend_to_32_bits(cond_carry_out_1)
 
         result_2 = 0
         carry_out_2 = 0
         if not const4 == 0:  # const4=0
-            cond_const4_neg = extend_to_6_bits(cond_const4_pos) ^ 0x3f  # convert the condition, but avoid to appear as negative in python
+            cond_const4_neg = extend_to_6_bits(cond_const4_pos) ^ 0x3f
             shift_count = twos_comp(const4, 4)    # if const4<0
             if shift_count < 0:
                 shift_count = shift_count * (-1)

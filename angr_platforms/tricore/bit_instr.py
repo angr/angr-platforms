@@ -7,11 +7,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
 
 class BIT_Acc_Logical_AND_Inst(Instruction):
     """ Accumulating Bit Logical AND instructions.
@@ -32,7 +27,7 @@ class BIT_Acc_Logical_AND_Inst(Instruction):
             op2 = 0x01
             User Status Flags: no change.
     """
-    name = 'BIT_Acc_Logical_AND_Inst'
+    name = 'BIT_Acc_Logical_AND_Inst ...'
     op = "{0}{1}".format(bin(4)[2:].zfill(4), bin(7)[2:].zfill(4))
     bin_format = op + 'a'*4 + 'b'*4 + 'c'*4 + 'd'*4 + 'e'*4 + 'f'*4
 
@@ -89,7 +84,10 @@ class BIT_Acc_Logical_AND_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         result = ""
         pos1 = self.data['pos1']
         pos2 = self.data['pos2']
@@ -104,6 +102,10 @@ class BIT_Acc_Logical_AND_Inst(Instruction):
 
         elif self.data['op2'] == 0x1:  # AND.OR.T
             result = (d_c & 0xfe) | ((d_c & 0x1) & (((d_a >> pos1) & 0x1) | ((d_b >> pos2) & 0x1)))
+
+        else:
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
+            sys.exit(1)
 
         return result
 
@@ -186,7 +188,10 @@ class BIT_Acc_Logical_OR_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         result = ""
         pos1 = self.data['pos1']
         pos2 = self.data['pos2']
@@ -201,6 +206,10 @@ class BIT_Acc_Logical_OR_Inst(Instruction):
 
         elif self.data['op2'] == 0x1:  # OR.OR.T
             result = (d_c & 0xfe) | ((d_c & 0x1) | (((d_a >> pos1) & 0x1) | ((d_b >> pos2) & 0x1)))
+
+        else:
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
+            sys.exit(1)
 
         return result
 
@@ -283,7 +292,10 @@ class BIT_Acc_Shift_Inst_27(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         result = ""
         pos1 = self.data['pos1']
         pos2 = self.data['pos2']
@@ -298,6 +310,10 @@ class BIT_Acc_Shift_Inst_27(Instruction):
 
         elif self.data['op2'] == 0x1:  # SH.OR.T
             result = (d_c << 1) | ((((d_a >> pos1) & 0x1) | ((d_b >> pos2) & 0x1)))
+
+        else:
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
+            sys.exit(1)
 
         return result
 
@@ -380,7 +396,10 @@ class BIT_Acc_Shift_Inst_A7(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_c()
 
-    def compute_result(self, d_a, d_b, d_c):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_c = args[2]
         result = ""
         pos1 = self.data['pos1']
         pos2 = self.data['pos2']
@@ -395,6 +414,10 @@ class BIT_Acc_Shift_Inst_A7(Instruction):
 
         elif self.data['op2'] == 0x3:  # OR.XOR.T
             result = (d_c << 1) | (((d_a >> pos1) & 0x1) ^ ((d_b >> pos2) & 0x1))
+
+        else:
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
+            sys.exit(1)
 
         return result
 
@@ -461,12 +484,6 @@ class BIT_Logical_Inst(Instruction):
     def get_dst_reg(self):
         return "d{0}".format(self.data['c'])
 
-    def get_pos2(self):
-        return self.data['pos2']
-
-    def get_pos1(self):
-        return self.data['pos1']
-
     def get_d_b(self):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
@@ -474,18 +491,29 @@ class BIT_Logical_Inst(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_a(), self.get_d_b(), self.get_pos1(), self.get_pos2()
+        return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b, pos1, pos2):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pos1 = self.data['pos1']
+        pos2 = self.data['pos2']
         result = ""
-        if self.data['op2'] == 0x0:
+        if self.data['op2'] == 0x0:  # BIT_AND.T
             result = ((d_a >> pos1) & 0x1) & ((d_b >> pos2) & 0x1)
-        elif self.data['op2'] == 0x3:
+
+        elif self.data['op2'] == 0x3:  # BIT_AND-Not
             result = ((d_a >> pos1) & 0x1) & ~((d_b >> pos2) & 0x1)
-        elif self.data['op2'] == 0x1:
+
+        elif self.data['op2'] == 0x1:  # BIT_OR.T
             result = ((d_a >> pos1) & 0x1) | ((d_b >> pos2) & 0x1)
-        elif self.data['op2'] == 0x2:
+
+        elif self.data['op2'] == 0x2:  # BIT_NOR.T
             result = (((d_a >> pos1) & 0x1) | ((d_b >> pos2) & 0x1)) ^ 0x1
+
+        else:
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
+            sys.exit(1)
 
         return result
 
@@ -556,12 +584,6 @@ class BIT_Logical_07_Inst(Instruction):
     def get_dst_reg(self):
         return "d{0}".format(self.data['c'])
 
-    def get_pos2(self):
-        return self.data['pos2']
-
-    def get_pos1(self):
-        return self.data['pos1']
-
     def get_d_b(self):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
@@ -569,9 +591,13 @@ class BIT_Logical_07_Inst(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_a(), self.get_d_b(), self.get_pos1(), self.get_pos2()
+        return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b, pos1, pos2):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pos1 = self.data['pos1']
+        pos2 = self.data['pos2']
         result = ""
         if self.data['op2'] == 0x0:  # NAND.T
             result = (((d_a >> pos1) & 0x1) & ((d_b >> pos2) & 0x1)) ^ 0x1
@@ -586,7 +612,7 @@ class BIT_Logical_07_Inst(Instruction):
             result = ((d_a >> pos1) & 0x1) ^ ((d_b >> pos2) & 0x1)
 
         else:
-            print("Error: Unknown OP code '{0}' in {1}!".format(self.data['op2'], self.name))
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
             sys.exit(1)
 
         return result
@@ -646,12 +672,6 @@ class BIT_Mov_Inst(Instruction):
     def get_dst_reg(self):
         return "d{0}".format(self.data['c'])
 
-    def get_pos2(self):
-        return self.data['pos2']
-
-    def get_pos1(self):
-        return self.data['pos1']
-
     def get_d_b(self):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
@@ -659,24 +679,28 @@ class BIT_Mov_Inst(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_a(), self.get_d_b(), self.get_pos1(), self.get_pos2()
+        return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b, pos1, pos2):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        pos1 = self.data['pos1']
+        pos2 = self.data['pos2']
         result = ""
-        if self.data['op2'] == 0x0:
+        if self.data['op2'] == 0x0:  # INS.T
             result = d_a & ((((1 << 32) - 1) >> (pos1+1)) << (pos1+1))  # Set result[31:(pos_1+1)]=d_a[31:(pos_1+1)]
             bit_at_pos_2 = (d_b >> pos2) & 0x1                          # Read d_b[pos_2]
             result = result | (bit_at_pos_2 << pos1)                    # Write d_b[pos_2] to result[pos_1]
             result = result | (d_a & (1 << pos1) - 1)                   # Set result[(pos_1-1):0]=d_a[(pos_1-1):0]
 
-        elif self.data['op2'] == 0x1:
+        elif self.data['op2'] == 0x1:  # INSN.T
             result = d_a & ((((1 << 32) - 1) >> (pos1+1)) << (pos1+1))
             bit_at_pos_2 = ((d_b >> pos2) & 0x1) ^ 0x1
             result = result | (bit_at_pos_2 << pos1)
             result = result | (d_a & (1 << pos1) - 1)
 
         else:
-            print("Error: Unknown OP code '{0}' in {1}!".format(self.data['op2'], self.name))
+            print("Error: Unknown OP2 '{0}' in {1}!".format(self.data['op2'], self.name))
             sys.exit(1)
 
         return result

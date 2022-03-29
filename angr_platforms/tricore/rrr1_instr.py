@@ -6,13 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-lines
-# pylint: disable=line-too-long
 
 class RRR1_MADD_H_83_1A_Inst(Instruction):
     """ Packed Multiply-Add Q Format instruction:
@@ -56,7 +49,10 @@ class RRR1_MADD_H_83_1A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -129,7 +125,10 @@ class RRR1_MADD_H_83_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -202,7 +201,10 @@ class RRR1_MADD_H_83_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffff)
@@ -275,7 +277,10 @@ class RRR1_MADD_H_83_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffff)
@@ -348,7 +353,10 @@ class RRR1_MADDS_H_83_3A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -425,7 +433,10 @@ class RRR1_MADDS_H_83_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -433,7 +444,6 @@ class RRR1_MADDS_H_83_39_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -505,7 +515,10 @@ class RRR1_MADDS_H_83_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -513,7 +526,6 @@ class RRR1_MADDS_H_83_38_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -585,7 +597,10 @@ class RRR1_MADDS_H_83_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffff)
@@ -593,7 +608,6 @@ class RRR1_MADDS_H_83_3B_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -668,7 +682,11 @@ class RRR1_MADD_Q_43_02_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d + (((d_a * d_b) << n.value) >> 32)
 
         # set flags
@@ -730,7 +748,10 @@ class RRR1_MADD_Q_43_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * d_b) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -804,7 +825,11 @@ class RRR1_MADD_Q_43_01_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d + (((d_a * (d_b & 0xffff)) << n.value) >> 16)
 
         # set flags
@@ -866,7 +891,10 @@ class RRR1_MADD_Q_43_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b & 0xffff)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -940,7 +968,11 @@ class RRR1_MADD_Q_43_00_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d + (((d_a * (d_b >> 16)) << n.value) >> 16)
 
         # set flags
@@ -1002,7 +1034,10 @@ class RRR1_MADD_Q_43_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b >> 16)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -1076,7 +1111,11 @@ class RRR1_MADD_Q_43_05_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
         result = d_d + mul_res
@@ -1140,7 +1179,10 @@ class RRR1_MADD_Q_43_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
@@ -1215,7 +1257,11 @@ class RRR1_MADD_Q_43_04_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
         result = d_d + mul_res
@@ -1279,7 +1325,10 @@ class RRR1_MADD_Q_43_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
@@ -1354,7 +1403,11 @@ class RRR1_MADDS_Q_43_22_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d + (((d_a * d_b) << n.value) >> 32)
 
         # compute ssov32
@@ -1421,12 +1474,14 @@ class RRR1_MADDS_Q_43_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * d_b) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + result_tmp
         result_w1 = e_d_1
 
@@ -1502,7 +1557,11 @@ class RRR1_MADDS_Q_43_21_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d + (((d_a * (d_b & 0xffff)) << n.value) >> 16)
 
         # compute ssov32
@@ -1569,12 +1628,14 @@ class RRR1_MADDS_Q_43_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b & 0xffff)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + result_tmp
         result_w1 = e_d_1
 
@@ -1650,7 +1711,11 @@ class RRR1_MADDS_Q_43_20_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d + (((d_a * (d_b >> 16)) << n.value) >> 16)
 
         # compute ssov32
@@ -1717,12 +1782,14 @@ class RRR1_MADDS_Q_43_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b >> 16)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + result_tmp
         result_w1 = e_d_1
 
@@ -1798,11 +1865,15 @@ class RRR1_MADDS_Q_43_25_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
-        result1 = D_d + mul_res
+        result1 = d_d + mul_res
 
         # compute ssov32
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
@@ -1868,13 +1939,15 @@ class RRR1_MADDS_Q_43_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (mul_res << 16)
         result_w1 = e_d_1
 
@@ -1950,11 +2023,15 @@ class RRR1_MADDS_Q_43_24_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
-        result1 = D_d + mul_res
+        result1 = d_d + mul_res
 
         # compute ssov32
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
@@ -2020,13 +2097,15 @@ class RRR1_MADDS_Q_43_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (mul_res << 16)
         result_w1 = e_d_1
 
@@ -2099,7 +2178,10 @@ class RRR1_MADDM_H_83_1E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2175,7 +2257,10 @@ class RRR1_MADDM_H_83_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2251,7 +2336,10 @@ class RRR1_MADDM_H_83_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2327,7 +2415,10 @@ class RRR1_MADDM_H_83_1F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2403,7 +2494,10 @@ class RRR1_MADDMS_H_83_3E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2413,7 +2507,6 @@ class RRR1_MADDMS_H_83_3E_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sum1 << 16)
         result_w1 = e_d_1 + (sum1 >> 16)
 
@@ -2486,7 +2579,10 @@ class RRR1_MADDMS_H_83_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2496,7 +2592,6 @@ class RRR1_MADDMS_H_83_3D_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sum1 << 16)
         result_w1 = e_d_1 + (sum1 >> 0xffff)
 
@@ -2569,7 +2664,10 @@ class RRR1_MADDMS_H_83_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2579,9 +2677,8 @@ class RRR1_MADDMS_H_83_3C_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sum1 << 16)
-        result_w1 = e_d_1 + (sum1 >> 0xffff) # TODO: >> 16
+        result_w1 = e_d_1 + (sum1 >> 0xffff)  # TODO: >> 16
 
         # compute ssov32
         max_pos = self.constant(INT32_MAX_POS, Type.int_32)
@@ -2652,7 +2749,10 @@ class RRR1_MADDMS_H_83_3F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -2662,7 +2762,6 @@ class RRR1_MADDMS_H_83_3F_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sum1 << 16)
         result_w1 = e_d_1 + (sum1 >> 16)
 
@@ -2735,15 +2834,18 @@ class RRR1_MADDR_H_83_0E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff))
         mul_res0 = (0x7fffffff & sc0) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc0^0xffffffff))
 
-        D_d = self.get("d{0}".format(self.data['d']), Type.int_32)
-        result_hw1 = (D_d & 0xffff0000) + mul_res1 + 0x8000
-        result_hw0 = (D_d << 16) + mul_res0 + 0x8000
+        d_d = self.get("d{0}".format(self.data['d']), Type.int_32)
+        result_hw1 = (d_d & 0xffff0000) + mul_res1 + 0x8000
+        result_hw0 = (d_d << 16) + mul_res0 + 0x8000
         result = (result_hw1 & 0xffff0000) | (result_hw0 >> 16)
 
         # set flags
@@ -2805,7 +2907,10 @@ class RRR1_MADDR_H_83_0D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff))
@@ -2875,15 +2980,18 @@ class RRR1_MADDR_H_83_0C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff))
         mul_res0 = (0x7fffffff & sc0) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc0^0xffffffff))
 
-        D_d = self.get("d{0}".format(self.data['d']), Type.int_32)
-        result_hw1 = (D_d & 0xffff0000) + mul_res1 + 0x8000
-        result_hw0 = (D_d << 16) + mul_res0 + 0x8000
+        d_d = self.get("d{0}".format(self.data['d']), Type.int_32)
+        result_hw1 = (d_d & 0xffff0000) + mul_res1 + 0x8000
+        result_hw0 = (d_d << 16) + mul_res0 + 0x8000
         result = (result_hw1 & 0xffff0000) | (result_hw0 >> 16)
 
         # set flags
@@ -2945,7 +3053,10 @@ class RRR1_MADDR_H_43_1E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff))
@@ -3016,15 +3127,18 @@ class RRR1_MADDR_H_83_0F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
         mul_res0 = (0x7fffffff & sc0) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc0^0xffffffff)
 
-        D_d = self.get("d{0}".format(self.data['d']), Type.int_32)
-        result_hw1 = (D_d & 0xffff0000) + mul_res1 + 0x8000
-        result_hw0 = (D_d << 16) + mul_res0 + 0x8000
+        d_d = self.get("d{0}".format(self.data['d']), Type.int_32)
+        result_hw1 = (d_d & 0xffff0000) + mul_res1 + 0x8000
+        result_hw0 = (d_d << 16) + mul_res0 + 0x8000
         result = (result_hw1 & 0xffff0000) | (result_hw0 >> 16)
 
         # set flags
@@ -3094,7 +3208,10 @@ class RRR1_MADDRS_H_83_2E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -3166,7 +3283,10 @@ class RRR1_MADDRS_H_83_2D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -3251,7 +3371,10 @@ class RRR1_MADDRS_H_83_2C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -3331,7 +3454,10 @@ class RRR1_MADDRS_H_43_3E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff))
@@ -3414,7 +3540,10 @@ class RRR1_MADDRS_H_83_2F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -3492,10 +3621,14 @@ class RRR1_MADDR_Q_43_07_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffffffff))
-        result = (D_d + mul_res + 0x8000) & 0xffff0000
+        result = (d_d + mul_res + 0x8000) & 0xffff0000
 
         # set flags
         c = 0
@@ -3559,10 +3692,14 @@ class RRR1_MADDR_Q_43_06_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffffffff))
-        result = (D_d + mul_res + 0x8000) & 0xffff0000
+        result = (d_d + mul_res + 0x8000) & 0xffff0000
 
         # set flags
         c = 0
@@ -3634,10 +3771,14 @@ class RRR1_MADDRS_Q_43_27_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffffffff))
-        sum_tmp = (D_d + mul_res + 0x8000).cast_to(Type.int_64)
+        sum_tmp = (d_d + mul_res + 0x8000).cast_to(Type.int_64)
         sum_tmp_ssov = ssov32(sum_tmp, self.max_pos, self.max_neg)
         result = sum_tmp_ssov & 0xffff0000
 
@@ -3711,10 +3852,14 @@ class RRR1_MADDRS_Q_43_26_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, D_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | (((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc^0xffffffff))
-        sum_tmp = (D_d + mul_res + 0x8000).cast_to(Type.int_64)
+        sum_tmp = (d_d + mul_res + 0x8000).cast_to(Type.int_64)
         sum_tmp_ssov = ssov32(sum_tmp, self.max_pos, self.max_neg)
         result = sum_tmp_ssov & 0xffff0000
 
@@ -3777,7 +3922,10 @@ class RRR1_MADDSU_H_C3_1A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -3850,7 +3998,10 @@ class RRR1_MADDSU_H_C3_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -3858,7 +4009,6 @@ class RRR1_MADDSU_H_C3_19_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 - mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -3924,7 +4074,10 @@ class RRR1_MADDSU_H_C3_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -3932,7 +4085,6 @@ class RRR1_MADDSU_H_C3_18_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 - mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -3998,7 +4150,10 @@ class RRR1_MADDSU_H_C3_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -4006,7 +4161,6 @@ class RRR1_MADDSU_H_C3_1B_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 - mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -4072,7 +4226,10 @@ class RRR1_MADDSUS_H_C3_3A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -4151,7 +4308,10 @@ class RRR1_MADDSUS_H_C3_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -4159,7 +4319,6 @@ class RRR1_MADDSUS_H_C3_39_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 - mul_res0
         result_w1 = e_d_1 + mul_res1
 
@@ -4231,7 +4390,10 @@ class RRR1_MADDSUS_H_C3_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -4310,7 +4472,10 @@ class RRR1_MADDSUS_H_C3_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -4389,7 +4554,10 @@ class RRR1_MADDSUM_H_C3_1E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4465,7 +4633,10 @@ class RRR1_MADDSUM_H_C3_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4475,7 +4646,6 @@ class RRR1_MADDSUM_H_C3_1D_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sub1 << 16)
         result_w1 = e_d_1 + (sub1 >> 16)
 
@@ -4542,7 +4712,10 @@ class RRR1_MADDSUM_H_C3_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4552,7 +4725,6 @@ class RRR1_MADDSUM_H_C3_1C_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sub1 << 16)
         result_w1 = e_d_1 + (sub1 >> 16)
 
@@ -4619,7 +4791,10 @@ class RRR1_MADDSUM_H_C3_1F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4695,7 +4870,10 @@ class RRR1_MADDSUMS_H_C3_3E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4705,7 +4883,6 @@ class RRR1_MADDSUMS_H_C3_3E_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sub1 << 16)
         result_w1 = e_d_1 + (sub1 >> 16)
 
@@ -4778,7 +4955,10 @@ class RRR1_MADDSUMS_H_C3_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4788,7 +4968,6 @@ class RRR1_MADDSUMS_H_C3_3D_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sub1 << 16)
         result_w1 = e_d_1 + (sub1 >> 16)
 
@@ -4861,7 +5040,10 @@ class RRR1_MADDSUMS_H_C3_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4871,7 +5053,6 @@ class RRR1_MADDSUMS_H_C3_3C_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sum1 << 16)
         result_w1 = e_d_1 + (sum1 >> 16)
 
@@ -4944,7 +5125,10 @@ class RRR1_MADDSUMS_H_C3_3F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
 
@@ -4954,7 +5138,6 @@ class RRR1_MADDSUMS_H_C3_3F_Inst(Instruction):
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 + (sub1 << 16)
         result_w1 = e_d_1 + (sub1 >> 16)
 
@@ -5027,7 +5210,10 @@ class RRR1_MADDSUR_H_C3_0E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -5097,7 +5283,10 @@ class RRR1_MADDSUR_H_C3_0D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -5167,7 +5356,10 @@ class RRR1_MADDSUR_H_C3_0C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -5237,7 +5429,10 @@ class RRR1_MADDSUR_H_C3_0F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -5307,7 +5502,10 @@ class RRR1_MADDSURS_H_C3_2E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -5384,7 +5582,10 @@ class RRR1_MADDSURS_H_C3_2D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -5461,7 +5662,10 @@ class RRR1_MADDSURS_H_C3_2C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -5537,7 +5741,10 @@ class RRR1_MADDSURS_H_C3_2F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -5614,7 +5821,10 @@ class RRR1_MSUB_H_A3_1A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -5687,7 +5897,10 @@ class RRR1_MSUB_H_A3_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -5760,7 +5973,10 @@ class RRR1_MSUB_H_A3_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffff)
@@ -5833,7 +6049,10 @@ class RRR1_MSUB_H_A3_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffff)
@@ -5906,7 +6125,10 @@ class RRR1_MSUBS_H_A3_3A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = (((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = (((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffff)
@@ -5983,7 +6205,10 @@ class RRR1_MSUBS_H_A3_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b & 0xffff)) << n.value) & (sc1^0xffffffff)
@@ -6063,7 +6288,10 @@ class RRR1_MSUBS_H_A3_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a >> 16) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -6143,7 +6371,10 @@ class RRR1_MSUBS_H_A3_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | (((d_a & 0xffff) * (d_b >> 16)) << n.value) & (sc1^0xffffffff)
@@ -6226,7 +6457,11 @@ class RRR1_MSUB_Q_63_02_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d - (((d_a * d_b) << n.value) >> 32)
 
         # set flags
@@ -6288,7 +6523,10 @@ class RRR1_MSUB_Q_63_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * d_b) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -6362,7 +6600,11 @@ class RRR1_MSUB_Q_63_01_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d - (((d_a * (d_b & 0xffff)) << n.value) >> 16)
 
         # set flags
@@ -6424,7 +6666,10 @@ class RRR1_MSUB_Q_63_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b & 0xffff)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -6498,7 +6743,11 @@ class RRR1_MSUB_Q_63_00_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result = d_d - (((d_a * (d_b >> 16)) << n.value) >> 16)
 
         # set flags
@@ -6560,7 +6809,10 @@ class RRR1_MSUB_Q_63_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b >> 0xffff)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -6634,7 +6886,11 @@ class RRR1_MSUB_Q_63_05_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
         result = d_d - mul_res
@@ -6698,7 +6954,10 @@ class RRR1_MSUB_Q_63_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
@@ -6773,7 +7032,11 @@ class RRR1_MSUB_Q_63_04_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
         result = d_d - mul_res
@@ -6837,7 +7100,10 @@ class RRR1_MSUB_Q_63_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
@@ -6912,7 +7178,11 @@ class RRR1_MSUBS_Q_63_22_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d - (((d_a * d_b) << n.value) >> 32)
 
         # compute ssov32
@@ -6979,7 +7249,10 @@ class RRR1_MSUBS_Q_63_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * d_b) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -7055,7 +7328,11 @@ class RRR1_MSUBS_Q_63_21_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d - (((d_a * (d_b & 0xffff)) << n.value) >> 16)
 
         # compute ssov32
@@ -7122,7 +7399,10 @@ class RRR1_MSUBS_Q_63_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b & 0xffff)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
@@ -7198,7 +7478,11 @@ class RRR1_MSUBS_Q_63_20_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         result1 = d_d - (((d_a * (d_b >> 16)) << n.value) >> 16)
 
         # compute ssov32
@@ -7265,12 +7549,14 @@ class RRR1_MSUBS_Q_63_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         result_tmp = (d_a * (d_b >> 16)) << n.value
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][62:32]
-
         result_w0 = e_d_0 - result_tmp
         result_w1 = e_d_1
 
@@ -7346,7 +7632,11 @@ class RRR1_MSUBS_Q_63_25_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
@@ -7416,7 +7706,10 @@ class RRR1_MSUBS_Q_63_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a & 0xffff) * (d_b & 0xffff)) << n.value) & (sc^0xffff))
 
@@ -7493,7 +7786,11 @@ class RRR1_MSUBS_Q_63_24_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
@@ -7563,7 +7860,10 @@ class RRR1_MSUBS_Q_63_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc = extend_to_16_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res = (0x7fffffff & sc) | ((((d_a >> 16) * (d_b >> 16)) << n.value) & (sc^0xffff))
 
@@ -7642,7 +7942,10 @@ class RRR1_MSUBAD_H_E3_1A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -7714,7 +8017,10 @@ class RRR1_MSUBAD_H_E3_19_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -7786,7 +8092,10 @@ class RRR1_MSUBAD_H_E3_18_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -7858,7 +8167,10 @@ class RRR1_MSUBAD_H_E3_1B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -7938,7 +8250,10 @@ class RRR1_MSUBADS_H_E3_3A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -8018,7 +8333,10 @@ class RRR1_MSUBADS_H_E3_39_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -8100,7 +8418,10 @@ class RRR1_MSUBADS_H_E3_38_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -8182,7 +8503,10 @@ class RRR1_MSUBADS_H_E3_3B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -8254,11 +8578,18 @@ class RRR1_MSUBADM_H_E3_1E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8329,11 +8660,18 @@ class RRR1_MSUBADM_H_E3_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8403,11 +8741,18 @@ class RRR1_MSUBADM_H_E3_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8477,11 +8822,18 @@ class RRR1_MSUBADM_H_E3_1F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8559,11 +8911,18 @@ class RRR1_MSUBADMS_H_E3_3E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8574,7 +8933,9 @@ class RRR1_MSUBADMS_H_E3_3E_Inst(Instruction):
         ovf_val = (result ^ e_d) & (e_d ^ sub_words)
         cond_ovf_neg = extend_bits((ovf_val<0), 64)
         cond_e_d_pos = extend_bits((e_d >= 0), 64)
-        result = (self.max_pos & cond_ovf_neg & cond_e_d_pos) | (self.max_neg & cond_ovf_neg & (cond_e_d_pos^0xffffffffffffffff)) | (result & (cond_ovf_neg^0xffffffffffffffff))
+        result = (self.max_pos & cond_ovf_neg & cond_e_d_pos) | \
+                 (self.max_neg & cond_ovf_neg & (cond_e_d_pos^0xffffffffffffffff)) | \
+                 (result & (cond_ovf_neg^0xffffffffffffffff))
 
         result_0 = (result & 0xffffffff).cast_to(Type.int_32)
         result_1 = (result >> 32).cast_to(Type.int_32)
@@ -8648,11 +9009,18 @@ class RRR1_MSUBADMS_H_E3_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8738,11 +9106,18 @@ class RRR1_MSUBADMS_H_E3_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8828,11 +9203,18 @@ class RRR1_MSUBADMS_H_E3_3F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        result_word1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        result_word0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        result_word1 = ((0x7fffffff & sc1) | \
+                        ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                        (sc1^0xffffffff)).cast_to(Type.int_64)
+        result_word0 = ((0x7fffffff & sc0) | \
+                        ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                        (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -8913,7 +9295,11 @@ class RRR1_MSUBADR_H_E3_0E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -8985,7 +9371,11 @@ class RRR1_MSUBADR_H_E3_0D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -9057,7 +9447,11 @@ class RRR1_MSUBADR_H_E3_0C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -9129,7 +9523,11 @@ class RRR1_MSUBADR_H_E3_0F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -9209,7 +9607,11 @@ class RRR1_MSUBADRS_H_E3_2E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -9291,7 +9693,11 @@ class RRR1_MSUBADRS_H_E3_2D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)
@@ -9373,7 +9779,11 @@ class RRR1_MSUBADRS_H_E3_2C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -9455,7 +9865,11 @@ class RRR1_MSUBADRS_H_E3_2F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d(), self.get_n()
 
-    def compute_result(self, d_a, d_b, d_d, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
+        n = args[3]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         mul_res1 = (0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)
@@ -9526,11 +9940,18 @@ class RRR1_MSUBM_H_A3_1E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -9600,11 +10021,18 @@ class RRR1_MSUBM_H_A3_1D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -9674,11 +10102,18 @@ class RRR1_MSUBM_H_A3_1C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -9748,11 +10183,18 @@ class RRR1_MSUBM_H_A3_1F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -9830,11 +10272,18 @@ class RRR1_MSUBMS_H_A3_3E_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -9921,11 +10370,18 @@ class RRR1_MSUBMS_H_A3_3D_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,0)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -10012,11 +10468,18 @@ class RRR1_MSUBMS_H_A3_3C_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b & 0xffff) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,0)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]
@@ -10103,11 +10566,18 @@ class RRR1_MSUBMS_H_A3_3F_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_n()
 
-    def compute_result(self, d_a, d_b, n):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        n = args[2]
         sc1 = extend_to_32_bits(((d_a & 0xffff) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
         sc0 = extend_to_32_bits(((d_a >> 16) == 0x8000) & ((d_b >> 16) == 0x8000) & (n == 1).cast_to(Type.int_32))
-        mul_res1 = ((0x7fffffff & sc1) | ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) & (sc1^0xffffffff)).cast_to(Type.int_64)
-        mul_res0 = ((0x7fffffff & sc0) | ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) & (sc0^0xffffffff)).cast_to(Type.int_64)
+        mul_res1 = ((0x7fffffff & sc1) | \
+                    ((extract_16s(d_a,0) * extract_16s(d_b,1)) << n.value) &
+                    (sc1^0xffffffff)).cast_to(Type.int_64)
+        mul_res0 = ((0x7fffffff & sc0) | \
+                    ((extract_16s(d_a,1) * extract_16s(d_b,1)) << n.value) &
+                    (sc0^0xffffffff)).cast_to(Type.int_64)
 
         e_d_0 = self.get("d{0}".format(self.data['d']), Type.int_32)    # E[d][31:0]
         e_d_1 = self.get("d{0}".format(self.data['d']+1), Type.int_32)  # E[d][63:32]

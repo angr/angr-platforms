@@ -7,10 +7,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class BRC_Jump_Instructions_df(Instruction):
     """ Jump if Equal instruction:
@@ -69,11 +65,17 @@ class BRC_Jump_Instructions_df(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_pc(), self.get_const4(), self.get_disp15()
 
-    def compute_result(self, d_a, pc, const4, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRC_JEQ
             cond = d_a.signed == const4
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRC_JNE
             cond = d_a.signed != const4
+
         else:
             print("Error: Unknown op2 '{0}'!".format(self.data['op2']))
             print("BRC instruction OP=DF, OP2=Unknown")
@@ -139,11 +141,17 @@ class BRC_Jump_Instructions_ff(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_pc(), self.get_const4(), self.get_disp15()
 
-    def compute_result(self, d_a, pc, const4, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRC_JGE
             cond = d_a.signed >= const4
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRC_JGE.U
             cond = d_a >= const4  # unsigned comparison
+
         else:
             print("Error: Unknown op2 '{0}'!".format(self.data['op2']))
             print("BRC instruction OP=FF, OP2=Unknown")
@@ -209,11 +217,17 @@ class BRC_Jump_Instructions_bf(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_pc(), self.get_const4(), self.get_disp15()
 
-    def compute_result(self, d_a, pc, const4, disp15):
-        if self.data['op2'] == 0:
+    def compute_result(self, *args):
+        d_a = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp15 = args[3]
+        if self.data['op2'] == 0:  # BRC_JLT
             cond = d_a.signed < const4
-        elif self.data['op2'] == 1:
+
+        elif self.data['op2'] == 1:  # BRC_JLT.U
             cond = d_a < const4  # unsigned comparison
+
         else:
             print("Error: Unknown op2 '{0}'!".format(self.data['op2']))
             print("BRC instruction OP=BF, OP2=Unknown")
@@ -279,12 +293,18 @@ class BRC_Jump_Instructions_9f(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_pc(), self.get_const4(), self.get_disp15()
 
-    def compute_result(self, d_a, pc, const4, disp15):
+    def compute_result(self, *args):
+        d_a = args[0]
+        pc = args[1]
+        const4 = args[2]
+        disp15 = args[3]
         cond = d_a.signed != const4
-        if self.data['op2'] == 0:
-            self.put(d_a + 1, "d{0}".format(self.data['a']))  # unconditional increment
-        elif self.data['op2'] == 1:
-            self.put(d_a - 1, "d{0}".format(self.data['a']))  # unconditional decrement
+        if self.data['op2'] == 0:  # BRC_JNEI
+            self.put(d_a + 1, "d{0}".format(self.data['a']))
+
+        elif self.data['op2'] == 1:  # BRC_JNED
+            self.put(d_a - 1, "d{0}".format(self.data['a']))
+
         else:
             print("Error: Unknown op2 '{0}'!".format(self.data['op2']))
             print("BRC instruction OP=9F, OP2=Unknown")

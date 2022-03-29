@@ -6,11 +6,6 @@ from pyvex.lifting.util import Type, Instruction, JumpKind
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
 
 class B_CALL_Inst(Instruction):
     """ Call instruction.
@@ -44,7 +39,9 @@ class B_CALL_Inst(Instruction):
     def fetch_operands(self):
         return self.get_pc(), self.get_disp24()
 
-    def compute_result(self, pc, disp24):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp24 = args[1]
         MASK_FCX_FCXS = 0x000f0000
         MASK_FCX_FCXO = 0x0000ffff
         fcx = self.get("fcx", Type.int_32)
@@ -131,7 +128,9 @@ class B_CALLA_Inst(Instruction):
     def fetch_operands(self):
         return self.get_pc(), self.get_disp24()
 
-    def compute_result(self, pc, disp24):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp24 = args[1]
         MASK_FCX_FCXS = 0x000f0000
         MASK_FCX_FCXO = 0x0000ffff
         fcx = self.get("fcx", Type.int_32)
@@ -219,7 +218,9 @@ class B_J_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_pc(), self.get_disp24()]
 
-    def compute_result(self, pc, disp24):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp24 = args[1]
         dest = pc + (disp24 << 1)
         self.jump(None, dest)
 
@@ -252,7 +253,8 @@ class B_JA_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_disp24()]
 
-    def compute_result(self, disp24):
+    def compute_result(self, *args):
+        disp24 = args[0]
         dest = ((disp24 >> 20) << 28) | ((disp24 & 0xfffff) << 1)
         self.jump(None, dest)
 
@@ -288,7 +290,9 @@ class B_JL_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_pc(), self.get_disp24()]
 
-    def compute_result(self, pc, disp24):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp24 = args[1]
         ret_addr = pc + 4
         dest = pc + (disp24 << 1)
         self.put(ret_addr, "a11")
@@ -326,7 +330,9 @@ class B_JLA_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_pc(), self.get_disp24()]
 
-    def compute_result(self, pc, disp24):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp24 = args[1]
         ret_addr = pc + 4
         dest = ((disp24 >> 20) << 28) | ((disp24 & 0xfffff) << 1)
         self.put(ret_addr, "a11")

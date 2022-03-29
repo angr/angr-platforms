@@ -5,10 +5,6 @@ Implementation of SB format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SB_J_Inst(Instruction):
     """ Jump Unconditional instruction.
@@ -36,7 +32,9 @@ class SB_J_Inst(Instruction):
     def fetch_operands(self):
         return self.get_pc(), self.get_disp8()
 
-    def compute_result(self, pc, disp8):
+    def compute_result(self, *args):
+        pc = args[0]
+        disp8 = args[1]
         dest = pc + (disp8 << 1)
         self.jump(None, dest)
 
@@ -69,7 +67,10 @@ class SB_JNZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_disp8()
 
-    def compute_result(self, d_15, pc, disp8):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        disp8 = args[2]
         cond = d_15 != 0
         dest = pc + (disp8 << 1)
         self.jump(cond, dest)
@@ -103,7 +104,10 @@ class SB_JZ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_disp8()
 
-    def compute_result(self, d_15, pc, disp8):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        disp8 = args[2]
         cond = d_15 == 0
         dest = pc + (disp8 << 1)
         self.jump(cond, dest)

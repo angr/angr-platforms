@@ -5,10 +5,6 @@ Implementation of SBRN format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SBRN_JZ_T_Inst(Instruction):
     """ Jump if Zero Bit instruction.
@@ -43,7 +39,11 @@ class SBRN_JZ_T_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_disp4(), self.get_n()
 
-    def compute_result(self, d_15, pc, disp4, n):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        disp4 = args[2]
+        n = args[3]
         cond = d_15[n] == 0
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)
@@ -81,7 +81,11 @@ class SBRN_JNZ_T_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_pc(), self.get_disp4(), self.get_n()
 
-    def compute_result(self, d_15, pc, disp4, n):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        pc = args[1]
+        disp4 = args[2]
+        n = args[3]
         cond = d_15[n] == 1
         dest = pc + (disp4 << 1)
         self.jump(cond, dest)

@@ -6,11 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=line-too-long
 
 class RRR_CADD_Inst(Instruction):
     """ Conditional Add instruction.
@@ -52,7 +47,10 @@ class RRR_CADD_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = extend_to_32_bits(d_d != 0)
         result = ((d_a + d_b) & condition) | (d_a & ~condition)
 
@@ -111,7 +109,10 @@ class RRR_CADDN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = extend_to_32_bits(d_d == 0)
         result = ((d_a + d_b) & condition) | (d_a & ~condition)
 
@@ -170,7 +171,10 @@ class RRR_CSUB_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = extend_to_32_bits(d_d != 0)
         result = ((d_a - d_b) & condition) | (d_a & ~condition)
 
@@ -229,7 +233,10 @@ class RRR_CSUBN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = extend_to_32_bits(d_d == 0)
         result = ((d_a - d_b) & condition) | (d_a & ~condition)
 
@@ -281,7 +288,10 @@ class RRR_DVADJ_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_d_d(), self.get_d_d_2()
 
-    def compute_result(self, d_b, d_d, d_d_2):
+    def compute_result(self, *args):
+        d_b = args[0]
+        d_d = args[1]
+        d_d_2 = args[2]
         result = ((d_d_2 == d_b) and (d_d_2[31])).ite(
             (d_d[31]).ite(d_d.cast_to(Type.int_64),
                           (d_d+1).cast_to(Type.int_64)),
@@ -324,7 +334,10 @@ class RRR_DVSTEP_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_d_d(), self.get_d_d_2()
 
-    def compute_result(self, d_b, d_d, d_d_2):
+    def compute_result(self, *args):
+        d_b = args[0]
+        d_d = args[1]
+        d_d_2 = args[2]
         dividend_sign = d_d_2[31]  # E[d][63]
         divisor_sign = d_b[31]
         quotient_sign = dividend_sign != divisor_sign
@@ -417,7 +430,10 @@ class RRR_DVSTEP_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_b(), self.get_d_d(), self.get_d_d_2()
 
-    def compute_result(self, d_b, d_d, d_d_2):
+    def compute_result(self, *args):
+        d_b = args[0]
+        d_d = args[1]
+        d_d_2 = args[2]
         divisor = d_b
         dividend_quotient = d_d  # E[d][31:0]
         remainder = d_d_2        # E[d][63:32]
@@ -511,7 +527,10 @@ class RRR_SEL_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = d_d != 0
         return self.ite(condition, d_a, d_b)
 
@@ -559,7 +578,10 @@ class RRR_SELN_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b(), self.get_d_d()
 
-    def compute_result(self, d_a, d_b, d_d):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
+        d_d = args[2]
         condition = d_d == 0
         return self.ite(condition, d_a, d_b)
 

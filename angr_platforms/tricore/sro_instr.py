@@ -5,10 +5,6 @@ Implementation of SRO format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SRO_LD_A_Inst(Instruction):
     """ Load Word to Address Register instruction.
@@ -41,10 +37,11 @@ class SRO_LD_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_offset()
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         addr = a_b + (offset << 2)
-        result = self.load(addr, Type.int_32)
-        return result
+        return self.load(addr, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -80,10 +77,11 @@ class SRO_LD_BU_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_offset()
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         addr = a_b + offset
-        result = self.load(addr, Type.int_8).cast_to(Type.int_32)
-        return result
+        return self.load(addr, Type.int_8).cast_to(Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -119,10 +117,11 @@ class SRO_LD_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_offset()
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         addr = a_b + (offset << 1)
-        result = self.load(addr, Type.int_16).cast_to(Type.int_32, signed=True)
-        return result
+        return self.load(addr, Type.int_16).cast_to(Type.int_32, signed=True)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -158,10 +157,11 @@ class SRO_LD_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_b(), self.get_offset()
 
-    def compute_result(self, a_b, offset):
+    def compute_result(self, *args):
+        a_b = args[0]
+        offset = args[1]
         addr = a_b + (offset << 2)
-        result = self.load(addr, Type.int_32)
-        return result
+        return self.load(addr, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -196,7 +196,10 @@ class SRO_ST_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_15(), self.get_a_b(), self.get_offset()
 
-    def compute_result(self, a_15, a_b, offset):
+    def compute_result(self, *args):
+        a_15 = args[0]
+        a_b = args[1]
+        offset = args[2]
         addr = a_b + (offset << 2)
         self.store(a_15, addr)
 
@@ -230,7 +233,10 @@ class SRO_ST_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_a_b(), self.get_offset()
 
-    def compute_result(self, d_15, a_b, offset):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        a_b = args[1]
+        offset = args[2]
         addr = a_b + offset
         val = d_15 & 0xff
         self.store(val, addr)
@@ -265,7 +271,10 @@ class SRO_ST_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_a_b(), self.get_offset()
 
-    def compute_result(self, d_15, a_b, offset):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        a_b = args[1]
+        offset = args[2]
         addr = a_b + (offset << 1)
         val = d_15 & 0xffff
         self.store(val, addr)
@@ -300,6 +309,9 @@ class SRO_ST_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_15(), self.get_a_b(), self.get_offset()
 
-    def compute_result(self, d_15, a_b, offset):
+    def compute_result(self, *args):
+        d_15 = args[0]
+        a_b = args[1]
+        offset = args[2]
         addr = a_b + (offset << 2)
         self.store(d_15, addr)

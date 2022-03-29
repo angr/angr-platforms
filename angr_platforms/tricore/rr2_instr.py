@@ -6,10 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RR2_MUL_Inst(Instruction):
     """ Multiply instruction.
@@ -48,7 +44,9 @@ class RR2_MUL_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a.cast_to(Type.int_64) * d_b.cast_to(Type.int_64)
         result = result & 0xffffffff
 
@@ -114,7 +112,9 @@ class RR2_MULS_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result1 = d_a.cast_to(Type.int_64, signed=True) * d_b.cast_to(Type.int_64, signed=True)
         result = ssov32(result1, self.max_pos, self.max_neg)
 
@@ -169,7 +169,9 @@ class RR2_MUL_6A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a.cast_to(Type.int_64) * d_b.cast_to(Type.int_64)
         result_1 = result.cast_to(Type.int_32) & 0xffffffff
         result_2 = (result >> 32).cast_to(Type.int_32)
@@ -222,7 +224,9 @@ class RR2_MUL_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a.cast_to(Type.int_64) * d_b.cast_to(Type.int_64)
         result_1 = result.cast_to(Type.int_32) & 0xffffffff
         result_2 = (result >> 32).cast_to(Type.int_32)
@@ -278,7 +282,9 @@ class RR2_MULS_U_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = d_a.cast_to(Type.int_64) * d_b.cast_to(Type.int_64)  # Unsigned
         result = suov32(result)
 

@@ -6,10 +6,6 @@ import sys
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RCPW_INSERT(Instruction):
     """ Insert Bit Field instruction.
@@ -49,7 +45,9 @@ class RCPW_INSERT(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const4()
 
-    def compute_result(self, d_a, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const4 = args[1]
         pos = self.data['p']
         width = self.data['w']
         if (pos + width > 32) or (width == 0):
@@ -100,7 +98,8 @@ class RCPW_IMASK(Instruction):
     def fetch_operands(self):
         return [self.get_const4()]
 
-    def compute_result(self, const4):
+    def compute_result(self, *args):
+        const4 = args[0]
         pos = self.data['p']
         width = self.data['w']
         if (pos + width > 32) or (width == 0):

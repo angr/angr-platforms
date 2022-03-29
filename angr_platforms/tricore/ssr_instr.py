@@ -5,10 +5,6 @@ Implementation of SSR format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SSR_ST_A_Inst(Instruction):
     """ Store Word from Address Register instruction.
@@ -37,7 +33,9 @@ class SSR_ST_A_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         self.store(a_a, a_b)
 
 class SSR_ST_A_E4_Inst(Instruction):
@@ -67,7 +65,9 @@ class SSR_ST_A_E4_Inst(Instruction):
     def fetch_operands(self):
         return self.get_a_a(), self.get_a_b()
 
-    def compute_result(self, a_a, a_b):
+    def compute_result(self, *args):
+        a_a = args[0]
+        a_b = args[1]
         self.store(a_a, a_b)
         self.put(a_b+4, "a{0}".format(self.data['b']))
 
@@ -98,7 +98,9 @@ class SSR_ST_B_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         val = d_a.cast_to(Type.int_8)
         self.store(val, a_b)
 
@@ -129,7 +131,9 @@ class SSR_ST_B_24_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         val = d_a & 0xff
         self.store(val, a_b)
         self.put(a_b+1, "a{0}".format(self.data['b']))
@@ -161,7 +165,9 @@ class SSR_ST_H_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         val = d_a & 0xffff
         self.store(val, a_b)
 
@@ -192,7 +198,9 @@ class SSR_ST_H_A4_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         val = d_a & 0xffff
         self.store(val, a_b)
         self.put(a_b+2, "a{0}".format(self.data['b']))
@@ -224,7 +232,9 @@ class SSR_ST_W_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         self.store(d_a, a_b)
 
 class SSR_ST_W_64_Inst(Instruction):
@@ -254,6 +264,8 @@ class SSR_ST_W_64_Inst(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_a_b()
 
-    def compute_result(self, d_a, a_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        a_b = args[1]
         self.store(d_a, a_b)
         self.put(a_b+4, "a{0}".format(self.data['b']))

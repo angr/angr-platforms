@@ -6,11 +6,6 @@ from pyvex.lifting.util import Type, Instruction, JumpKind
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
 
 class SR_DEBUG_Inst(Instruction):
     """ Debug instruction.
@@ -28,7 +23,7 @@ class SR_DEBUG_Inst(Instruction):
         log_this(self.name, data, hex(self.addr))
         return data
 
-    def compute_result(self):
+    def compute_result(self, *args):
         # if DBGSR.DE == 0, execute NOP.
         pass
 
@@ -55,7 +50,8 @@ class SR_JI_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_a()]
 
-    def compute_result(self, a_a):
+    def compute_result(self, *args):
+        a_a = args[0]
         dest = (a_a >> 1) << 1
         self.jump(None, dest)
 
@@ -68,7 +64,7 @@ class SR_NOP_Inst(Instruction):
     name = 'SR_NOP'
     op = "{0}{1}".format(bin(0)[2:].zfill(4), bin(0)[2:].zfill(4))
     op2 = "{0}".format(bin(0)[2:].zfill(4))
-    bin_format = op + op2 + 'i' * 4
+    bin_format = op + op2 + 'i'*4
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
@@ -84,7 +80,7 @@ class SR_NOT_Inst(Instruction):
     name = 'SR_NOT'
     op = "{0}{1}".format(bin(4)[2:].zfill(4), bin(6)[2:].zfill(4))
     op2 = "{0}".format(bin(0)[2:].zfill(4))
-    bin_format = op + op2 + 'a' * 4
+    bin_format = op + op2 + 'a'*4
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
@@ -102,7 +98,8 @@ class SR_NOT_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         return ~d_a
 
     def commit_result(self, res):
@@ -133,8 +130,10 @@ class SR_RET_Inst(Instruction):
     def fetch_operands(self):
         return self.get_psw(), self.get_a_11()
 
-    def compute_result(self, psw, a_11):
-        dest = (a_11 >> 1) << 1  # PC = {A11 [31: 1], 1’b0}
+    def compute_result(self, *args):
+        psw = args[0]
+        a_11 = args[1]
+        dest = (a_11 >> 1) << 1
         MASK_PCXI_PCXS = 0x000f0000
         MASK_PCXI_PCXO = 0x0000ffff
         pcxi = self.get("pcxi", Type.int_32)
@@ -206,7 +205,8 @@ class SR_RFE_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a11()]
 
-    def compute_result(self, a11):
+    def compute_result(self, *args):
+        a11 = args[0]
         # TODO: restore upper context register
         dest = (a11 >> 1) << 1
         self.jump(None, dest, jumpkind=JumpKind.Ret)
@@ -241,7 +241,8 @@ class SR_RSUB_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         result = (0 - d_a)
 
         # set flags
@@ -270,7 +271,7 @@ class SR_SAT_HU_Inst(Instruction):
     name = 'SR_SAT.HU'
     op = "{0}{1}".format(bin(3)[2:].zfill(4), bin(2)[2:].zfill(4))
     op2 = "{0}".format(bin(3)[2:].zfill(4))
-    bin_format = op + op2 + 'a' * 4
+    bin_format = op + op2 + 'a'*4
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
@@ -288,7 +289,8 @@ class SR_SAT_HU_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_d_a()]
 
-    def compute_result(self, d_a):
+    def compute_result(self, *args):
+        d_a = args[0]
         pos_cond = extend_to_32_bits(d_a > 0xffff)
         result = (0xffff & pos_cond) | d_a & (pos_cond^0xffffffff)
         return result

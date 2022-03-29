@@ -6,12 +6,6 @@ from pyvex.lifting.util import Type, Instruction
 import bitstring
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=line-too-long
 
 class RCRR_Instructions(Instruction):
     """ Insert Bit Field instruction.
@@ -72,11 +66,15 @@ class RCRR_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d_1(), self.get_d_d_2(), self.get_const4()
 
-    def compute_result(self, d_a, d_d_1, d_d_2, const4):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d_1 = args[1]
+        d_d_2 = args[2]
+        const4 = args[3]
         # E[d] = d_d_2 | d_d_1
         pos = d_d_1 & 0x1f
         width = d_d_2 & 0x1f
-        #if (pos + width > 32) or (width == 0):
+        #TODO if (pos + width > 32) or (width == 0):
         #        print("Undefined result for (pos + width > 32)!")
         #        exit(1)
 
@@ -88,7 +86,8 @@ class RCRR_Instructions(Instruction):
             power_2_cond_3 = ((width >> 2 & 1) == 1).cast_to(Type.int_8)
             power_2_cond_4 = ((width >> 3 & 1) == 1).cast_to(Type.int_8)
             power_2_cond_5 = ((width >> 4 & 1) == 1).cast_to(Type.int_8)
-            power_2_calc = ((((const_2 << power_2_cond_1) << power_2_cond_2) << power_2_cond_3) << power_2_cond_4) << power_2_cond_5
+            power_2_calc = ((((const_2 << power_2_cond_1) <<
+                              power_2_cond_2) << power_2_cond_3) << power_2_cond_4) << power_2_cond_5
             mask = ((power_2_calc - 1) << pos.cast_to(Type.int_8)).cast_to(Type.int_32)
             result = (d_a & ~mask) | ((const4 << pos.cast_to(Type.int_8)) & mask)
 

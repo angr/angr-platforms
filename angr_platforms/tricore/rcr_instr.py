@@ -8,12 +8,6 @@ import bitstring
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
 
 class RCR_Instructions_OP_AB(Instruction):
     """ RCR instructions with OP=AB.
@@ -92,7 +86,10 @@ class RCR_Instructions_OP_AB(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d(), self.get_const9_sign_ext()
 
-    def compute_result(self, d_a, d_d, const9_sign_ext):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d = args[1]
+        const9_sign_ext = args[2]
         result = ""
         if self.data['op2'] == 0x0:  # CADD
             condition = extend_to_32_bits(d_d != 0)
@@ -232,7 +229,11 @@ class RCR_Instructions_OP_13(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d(), self.get_const9(), self.get_const9_sign_ext()
 
-    def compute_result(self, d_a, d_d, const9, const9_sign_ext):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d = args[1]
+        const9 = args[2]
+        const9_sign_ext = args[3]
         result = ""
         if self.data['op2'] == 1:  # MADD (32-bit)
             result = d_d + (d_a * const9_sign_ext)
@@ -431,7 +432,11 @@ class RCR_Instructions_OP_33(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_d(), self.get_const9(), self.get_const9_sign_ext()
 
-    def compute_result(self, d_a, d_d, const9, const9_sign_ext):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_d = args[1]
+        const9 = args[2]
+        const9_sign_ext = args[3]
         result = ""
         if self.data['op2'] == 1:  # MSUB (32-bit)
             result = d_d - (d_a * const9_sign_ext)

@@ -4,10 +4,6 @@ A module for RTL functions.
 """
 from pyvex.lifting.util import Type
 
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=too-many-arguments
-# pylint: disable=line-too-long
 
 INT32_MAX_POS  =  0x7fffffff  #(1 << (32 - 1))-1
 UINT32_MAX_POS =  0xffffffff
@@ -278,6 +274,7 @@ def get_abs_val(val, bits):
 
 def clo32(val):
     """ Count Leading Ones starting from bit 32. """
+    # pylint: disable=line-too-long
     first_bit = val[31] ^ 0x0
     ctr = (1 & val[31]) + \
           (1 & val[30]) + \
@@ -317,6 +314,7 @@ def clo32(val):
 
 def clo16(val):
     """ Count Leading Ones starting from bit 16. """
+    # pylint: disable=line-too-long
     first_bit = val[15] ^ 0x0
     ctr = (1 & val[15]) + \
           (1 & val[14]) + \
@@ -356,6 +354,7 @@ def cls(val, disp):
 
 def clz16(val):
     """ Count Leading Zeros starting from bit 16. """
+    # pylint: disable=line-too-long
     first_bit = val[15] ^ 0x1
     ctr = (1 & (val[15]^1)) + \
           (1 & (val[14]^1)) + \
@@ -379,6 +378,7 @@ def clz16(val):
 
 def clz32(val):
     """ Count Leading Zeros starting from bit 32. """
+    # pylint: disable=line-too-long
     first_bit = val[31] ^ 0x1
     ctr = (1 & (val[31]^1)) + \
           (1 & (val[30]^1)) + \
@@ -414,15 +414,6 @@ def clz32(val):
           (1 & (val[0] ^1) & (val[30]^1) & (val[29]^1) & (val[28]^1) & (val[27]^1) & (val[26]^1) & (val[25]^1) & (val[24]^1) & (val[23]^1) & (val[22]^1) & (val[21]^1) & (val[20]^1) & (val[19]^1) & (val[18]^1) & (val[17]^1) & (val[16]^1) & (val[15]^1) & (val[14]^1) & (val[13]^1) & (val[12]^1) & (val[11]^1) & (val[10]^1) & (val[9]^1) & (val[8]^1) & (val[7]^1) & (val[6]^1) & (val[5]^1) & (val[4]^1) & (val[3]^1) & (val[2]^1) & (val[1]^1))
 
     return ctr * first_bit
-
-
-def change_Endness(val):
-    """ Change endness to LE for ST instructions. """
-    result = ((val         & 0xff) << 24) | \
-             (((val >> 8)  & 0xff) << 16) | \
-             (((val >> 16) & 0xff) << 8)  | \
-             ((val >> 24)  & 0xff)
-    return result
 
 
 def reverse16(n):

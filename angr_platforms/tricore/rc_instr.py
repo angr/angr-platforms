@@ -8,14 +8,6 @@ import bitstring
 from .rtl import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 from .logger import log_this, log_val
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-branches
-# pylint: disable=line-too-long
 
 class RC_Instructions_8B(Instruction):
     """ A class for instructions with OP=8B """
@@ -168,7 +160,10 @@ class RC_Instructions_8B(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const9(), self.get_const9_sign_extended()
 
-    def compute_result(self, d_a, const9, const9_sign_extended):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const9 = args[1]
+        const9_sign_extended = args[2]
         result = ""
         if self.data['op2'] == 0x0:  # ADD
             result = d_a + const9_sign_extended
@@ -557,7 +552,9 @@ class RC_Instructions_8F(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const9()
 
-    def compute_result(self, d_a, const9):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const9 = args[1]
         result = ""
         if self.data['op2'] == 0x0:  # Shift
             sha = self.data['const9'] & 0x3f  # const9[5:0]
@@ -565,7 +562,7 @@ class RC_Instructions_8F(Instruction):
             result_1 = (d_a << sha) & extend_to_32_bits(cond_sha_pos)
             result_2 = 0
             if not sha == 0:  # sha=0
-                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f  # convert the condition, but avoid to appear as negative in python
+                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f
                 shift_count = twos_comp(sha, 6)    # if sha<0
                 if shift_count < 0:
                     shift_count = shift_count * (-1)
@@ -591,7 +588,7 @@ class RC_Instructions_8F(Instruction):
             result_2 = 0
             carry_out_2 = 0
             if not sha == 0:  # sha=0
-                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f  # convert the condition, but avoid to appear as negative in python
+                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f
                 shift_count = twos_comp(sha, 6)    # if sha<0
                 if shift_count < 0:
                     shift_count = shift_count * (-1)
@@ -631,7 +628,7 @@ class RC_Instructions_8F(Instruction):
             result_2 = 0
             carry_out_2 = 0
             if not sha == 0:  # sha=0
-                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f  # convert the condition, but avoid to appear as negative in python
+                cond_sha_neg = extend_to_6_bits(cond_sha_pos) ^ 0x3f
                 shift_count = twos_comp(sha, 6)    # if sha<0
                 if shift_count < 0:
                     shift_count = shift_count * (-1)
@@ -686,7 +683,7 @@ class RC_Instructions_8F(Instruction):
             result_hw_1_neg = 0
             result_hw_2_neg = 0
             if not sha == 0:  # sha=0
-                cond_sha_neg = cond_sha_pos ^ 0xffff  # convert the condition, but avoid to appear as negative in python
+                cond_sha_neg = cond_sha_pos ^ 0xffff
                 shift_count = twos_comp(sha, 5)    # if sha<0
                 if shift_count < 0:
                     shift_count = shift_count * (-1)  # TODO: get abs value
@@ -712,13 +709,12 @@ class RC_Instructions_8F(Instruction):
             result_hw_0_neg = 0
             result_hw_1_neg = 0
             if not sha == 0:  # sha=0
-                cond_sha_neg = extend_to_16_bits(cond_sha_pos) ^ 0xffff  # convert the condition, but avoid to appear as negative in python
+                cond_sha_neg = extend_to_16_bits(cond_sha_pos) ^ 0xffff
                 shift_count = twos_comp(sha, 5)    # if sha<0
                 if shift_count < 0:
                     shift_count = shift_count * (-1)
                 cond_mask_2 = extend_bits((d_a & 0x80000000 != 0), shift_count)     # D[a][31] is set
                 mask_2 = (((1 << shift_count) - 1) << (16 - shift_count)) & cond_mask_2
-                #result_2 = (mask_2 | (d_a >> shift_count)) & extend_to_32_bits(cond_sha_neg)
                 result_hw_0_neg = (mask_2 | ((d_a & 0xffff) >> shift_count)) & extend_to_16_bits(cond_sha_neg)
                 result_hw_1_neg = (mask_2 | ((d_a >> 16) >> shift_count)) & extend_to_16_bits(cond_sha_neg)
 
@@ -747,7 +743,6 @@ class RC_Instructions_53(Instruction):
                                                                  data['a'],
                                                                  data['b']))
         a = tmp[20:24]
-        # zfill const9 to 12 bits (easier to get its HEX value)
         const9 = bitstring.BitArray(bin="{0}".format(tmp[11:20].bin.zfill(12)))
         op2 = bitstring.BitArray(bin="{0}".format(tmp[4:11]))
         op2 = int(op2.bin, 2)
@@ -801,7 +796,10 @@ class RC_Instructions_53(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_const9(), self.get_const9_sign_extended()
 
-    def compute_result(self, d_a, const9, const9_sign_extended):
+    def compute_result(self, *args):
+        d_a = args[0]
+        const9 = args[1]
+        const9_sign_extended = args[2]
         result = ""
         if self.data['op2'] == 0x1:  # MUL (32-bit)
             result = d_a * const9_sign_extended
@@ -928,7 +926,8 @@ class RC_Instructions_AD(Instruction):
     def fetch_operands(self):
         return [self.get_const9()]
 
-    def compute_result(self, const9):
+    def compute_result(self, *args):
+        const9 = args[0]
         if self.data['op2'] == 0x4:  # SYSCALL
             # trap(SYS, const9[7:0]) TODO
             log_val("RC_Instructions_AD: trap(SYS, const9) - const9={0}".format(const9))

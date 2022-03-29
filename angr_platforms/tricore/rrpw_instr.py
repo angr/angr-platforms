@@ -8,10 +8,6 @@ import bitstring
 from .rtl import extend_to_32_bits, sign_extend
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class RRPW_OP_37_Instructions(Instruction):
     """ RRPW instructions:
@@ -85,7 +81,9 @@ class RRPW_OP_37_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         pos = self.data["p"]
         width = self.data["w"]
         if (pos + width > 32) or (width == 0):
@@ -176,11 +174,12 @@ class RRPW_OP_77_Instructions(Instruction):
     def fetch_operands(self):
         return self.get_d_a(), self.get_d_b()
 
-    def compute_result(self, d_a, d_b):
+    def compute_result(self, *args):
+        d_a = args[0]
+        d_b = args[1]
         result = ""
-        if self.data['op2'] == 0:
+        if self.data['op2'] == 0:  # RRPW_DEXTR
             pos = self.data["pos"]
-            #result = ((((d_a << 31) | d_b) << pos) & 0xffffffff00000000) >> 31
             tmp_1 = d_a << pos
             tmp_2 = (d_b & (((1 << pos)-1) << (32 - pos))) >> (32 - pos)
             result = tmp_1 | tmp_2

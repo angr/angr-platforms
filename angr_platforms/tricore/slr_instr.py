@@ -5,10 +5,6 @@ Implementation of SLR format instructions.
 from pyvex.lifting.util import Type, Instruction
 from .logger import log_this
 
-# pylint: disable=consider-using-f-string
-# pylint: disable=missing-function-docstring
-# pylint: disable=invalid-name
-# pylint: disable=arguments-differ
 
 class SLR_LD_A_D4_Inst(Instruction):
     """ Load Word to Address Register instruction.
@@ -37,9 +33,9 @@ class SLR_LD_A_D4_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
-        result = self.load(a_b, Type.int_32)
-        return result
+    def compute_result(self, *args):
+        a_b = args[0]
+        return self.load(a_b, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -71,7 +67,8 @@ class SLR_LD_A_C4_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         result = self.load(a_b, Type.int_32)
         self.put(a_b + 4, "a{0}".format(self.data['b']))  # post increment
         return result
@@ -106,9 +103,9 @@ class SLR_LD_BU_14_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
-        result = self.load(a_b, Type.int_8)
-        return result
+    def compute_result(self, *args):
+        a_b = args[0]
+        return self.load(a_b, Type.int_8)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -140,7 +137,8 @@ class SLR_LD_BU_04_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         result = self.load(a_b, Type.int_8)
         self.put(a_b + 1, "a{0}".format(self.data['b']))  # post increment
         return result
@@ -175,9 +173,9 @@ class SLR_LD_H_94_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
-        result = self.load(a_b, Type.int_16).cast_to(Type.int_32, signed=True)
-        return result
+    def compute_result(self, *args):
+        a_b = args[0]
+        return self.load(a_b, Type.int_16).cast_to(Type.int_32, signed=True)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -209,7 +207,8 @@ class SLR_LD_H_84_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         result = self.load(a_b, Type.int_16).cast_to(Type.int_32, signed=True)
         self.put(a_b + 2, "a{0}".format(self.data['b']))  # post increment
         return result
@@ -244,9 +243,9 @@ class SLR_LD_W_54_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
-        result = self.load(a_b, Type.int_32)
-        return result
+    def compute_result(self, *args):
+        a_b = args[0]
+        return self.load(a_b, Type.int_32)
 
     def commit_result(self, res):
         self.put(res, self.get_dst_reg())
@@ -278,7 +277,8 @@ class SLR_LD_W_44_Inst(Instruction):
     def fetch_operands(self):
         return [self.get_a_b()]
 
-    def compute_result(self, a_b):
+    def compute_result(self, *args):
+        a_b = args[0]
         result = self.load(a_b, Type.int_32)
         self.put(a_b + 4, "a{0}".format(self.data['b']))  # post increment
         return result
