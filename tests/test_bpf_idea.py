@@ -1,5 +1,4 @@
 
-import nose
 import os
 
 import angr
@@ -33,9 +32,9 @@ def test_idea_correct_flag():
     # Execute until it returns
     simgr.explore(find=(MAX_INSTR_ID * 8,))
 
-    nose.tools.assert_equal(len(simgr.found), 1)
-    nose.tools.assert_equal(simgr.found[0].history.addr, 4058 * 8)  # executed until "ret ALLOW"
-    nose.tools.assert_equal(simgr.found[0].regs._res._model_concrete.value, 1)  # the result is ALLOW
+    assert len(simgr.found) == 1
+    assert simgr.found[0].history.addr == 4058 * 8  # executed until "ret ALLOW"
+    assert simgr.found[0].regs._res._model_concrete.value == 1  # the result is ALLOW
 
 
 def test_idea_incorrect_flag():
@@ -62,9 +61,9 @@ def test_idea_incorrect_flag():
     # Execute until it returns
     simgr.explore(find=(MAX_INSTR_ID * 8,))
 
-    nose.tools.assert_equal(len(simgr.found), 1)
-    nose.tools.assert_equal(simgr.found[0].history.addr, 4045 * 8)  # executed until "ret DENY"
-    nose.tools.assert_equal(simgr.found[0].regs._res._model_concrete.value, 0)  # the result is DENY
+    assert len(simgr.found) == 1
+    assert simgr.found[0].history.addr == 4045 * 8  # executed until "ret DENY"
+    assert simgr.found[0].regs._res._model_concrete.value == 0  # the result is DENY
 
 
 def main():
