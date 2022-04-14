@@ -1,7 +1,6 @@
 from angr_platforms.msp430 import arch_msp430, lift_msp430, simos_msp430
 import os
 import angr
-import nose
 
 
 def test_tutorial():
@@ -13,8 +12,8 @@ def test_tutorial():
     simgr = p.factory.simulation_manager(save_unconstrained=True)
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_not_in(b'\0', stdin_contents[:8])
-    nose.tools.assert_equal(stdin_contents[8], 0)
+    assert b'\0' not in stdin_contents[:8]
+    assert stdin_contents[8] == 0
 
 if __name__ == '__main__':
     test_tutorial()

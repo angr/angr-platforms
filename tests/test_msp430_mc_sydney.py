@@ -1,7 +1,6 @@
 from angr_platforms.msp430 import arch_msp430, lift_msp430, simos_msp430
 import angr
 import os
-import nose
 
 def test_sydney():
     thebin = str(os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -13,7 +12,7 @@ def test_sydney():
     simgr = p.factory.simulation_manager()
     simgr.explore(find=0x4462)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_true('47544e6b7b5f443a00' in stdin_contents.hex())
+    assert '47544e6b7b5f443a00' in stdin_contents.hex()
 
 if __name__ == '__main__':
     test_sydney()

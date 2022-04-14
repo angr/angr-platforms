@@ -1,5 +1,4 @@
 import os
-import nose
 
 import angr
 from angr_platforms.risc_v import *
@@ -25,7 +24,7 @@ def test_schoolbook_multiplication():
 
     simgr.explore(find=(end,))
 
-    nose.tools.assert_equal(len(simgr.found), 1)
+    assert len(simgr.found) == 1
 
 
 def main():

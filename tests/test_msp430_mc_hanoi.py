@@ -1,6 +1,5 @@
 from angr_platforms.msp430 import arch_msp430, lift_msp430, simos_msp430
 import angr
-import nose
 import os
 
 def test_hanoi():
@@ -13,7 +12,7 @@ def test_hanoi():
     simgr = p.factory.simulation_manager()
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_equals(stdin_contents.hex(), '00000000000000000000000000000000960000000000000000000000')
+    assert stdin_contents.hex() == '00000000000000000000000000000000960000000000000000000000'
 
 if __name__ == '__main__':
     test_hanoi()

@@ -1,7 +1,6 @@
 import logging
 from angr_platforms.msp430 import arch_msp430, lift_msp430, simos_msp430
 import angr
-import nose
 import os
 
 
@@ -15,7 +14,7 @@ def test_new_orleans():
     simgr = p.factory.simulation_manager()
     simgr.explore(find=p.loader.find_symbol('unlock_door').rebased_addr)
     stdin_contents = simgr.found[0].posix.dumps(0)
-    nose.tools.assert_true('7d493c6a51373f' in stdin_contents.hex())
+    assert '7d493c6a51373f' in stdin_contents.hex()
 
 if __name__ == '__main__':
     test_new_orleans()
