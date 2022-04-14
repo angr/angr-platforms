@@ -1,7 +1,8 @@
-import os
 import logging
+import os
 import angr
 
+import angr_platforms.bf
 
 def test_hello():
     hellobf = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/bf/hello.bf'))
