@@ -1,8 +1,6 @@
 import logging
 import os
 
-from nose.plugins.attrib import attr
-
 from angr import SimState
 from angr.storage.memory_mixins import DefaultListPagesMemory
 from angr_platforms import ct64
@@ -32,7 +30,6 @@ def test_quick_ct64():
         assert active.posix.dumps(0) != b''
         assert deinterlace(active.posix.dumps(1)) == b'PASSWORD: '
 
-@attr(speed='slow')
 def test_crackme():
     p = ct64.load_rom(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../test_programs/ct64/distribute.rom'))
 
@@ -54,6 +51,8 @@ def test_crackme():
         assert False, "Failed to find any path containing the flag"
     out = deinterlace(simgr.one_found.posix.dumps(0))
     print(repr(out))
+
+test_crackme.speed="slow"
 
 if __name__ == '__main__':
     logging.getLogger('angr.sim_manager').setLevel('DEBUG')
