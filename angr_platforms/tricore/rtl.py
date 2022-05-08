@@ -53,12 +53,13 @@ def advanced_overflow_64(val):
 
 def set_usb(psw, C, V, SV, AV, SAV):
     """ Set User Status Bits. """
-    psw = (C   << 31) | \
-          (V   << 30) | \
-          (SV  << 29) | \
-          (AV  << 28) | \
-          (SAV << 27)
-    return psw
+    psw = psw & 0x7ffffff  # zero psw[31-27]
+    temp = (C   << 31) | \
+           (V   << 30) | \
+           (SV  << 29) | \
+           (AV  << 28) | \
+           (SAV << 27)
+    return psw | temp
 
 
 def extend_to_32_bits(val):
