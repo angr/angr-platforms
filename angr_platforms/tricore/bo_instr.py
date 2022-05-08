@@ -179,7 +179,7 @@ class BO_LD_09_Instructions(Instruction):
 
         elif op2 == 0x10:  # BO_LD.B_PreInc
             ea = a_b + sign_ext_offset
-            result = self.load(ea, Type.int_8).cast_to(Type.int32, signed=True)
+            result = self.load(ea, Type.int_8).cast_to(Type.int_32, signed=True)
             self.put(result, "d{0}".format(self.data['a']))
             self.put(ea, "a{0}".format(self.data['b']))
 
@@ -191,7 +191,7 @@ class BO_LD_09_Instructions(Instruction):
 
         elif op2 == 0x12:  # BO_LD.H_PreInc
             ea = a_b + sign_ext_offset
-            result = self.load(ea, Type.int_16).cast_to(Type.int32, signed=True)
+            result = self.load(ea, Type.int_16).cast_to(Type.int_32, signed=True)
             self.put(result, "d{0}".format(self.data['a']))
             self.put(ea, "a{0}".format(self.data['b']))
 
