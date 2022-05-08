@@ -312,12 +312,16 @@ class RCR_Instructions_OP_13(Instruction):
 
         # set flags
         c = 0
-        if self.data['op2'] in [0x1, 0x5]:  # 32-bit
+        if self.data['op2'] in [0x1, 0x4, 0x5]:  # 32-bit
             v = overflow(result)
             av = advanced_overflow(result)
-        elif self.data['op2'] in [0x2, 0x3, 0x7]:  # 64-bit
+        elif self.data['op2'] in [0x2, 0x3, 0x6, 0x7]:  # 64-bit
             v = overflow_64(result).cast_to(Type.int_32)
             av = advanced_overflow_64(result).cast_to(Type.int_32)
+        else:
+            print("Error: Unknown OP2 '{0}'!".format(self.data['op2']))
+            print("RCR instruction OP=13, OP2=Unknown")
+            sys.exit(1)
         psw = self.get_psw()
         cond_sv = (v == 0)
         cond_sav = (av == 0)
