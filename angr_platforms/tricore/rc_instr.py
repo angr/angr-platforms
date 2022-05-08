@@ -908,7 +908,7 @@ class RC_Instructions_AD(Instruction):
         op2 = bitstring.BitArray(bin="{0}".format(tmp[4:11]))
         op2 = int(op2.bin, 2)
 
-        if op2 == 0xad:
+        if op2 == 0x4:
             self.name = "RC_SYSCALL"
         else:
             self.name = "UNKNOWN"
