@@ -125,7 +125,7 @@ class RLC_ADDIH_A(Instruction):
         User Status Flags: no change
     """
     name = 'RLC_ADDIH.A'
-    op = "{0}{1}".format(bin(ord('1'))[2:].zfill(8), bin(ord('1'))[2:].zfill(8))
+    op = "{0}{1}".format(bin(1)[2:].zfill(4), bin(1)[2:].zfill(4))
     bin_format = op + 'a'*4 + 'b'*4 + 'c'*4 + 'd'*4 + 'e'*4 + 'f'*4
 
     def parse(self, bitstrm):
@@ -426,7 +426,7 @@ class RLC_MTCR(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return [self.get_d_a()]
+        return self.get_d_a(), self.get_const16()
 
     def compute_result(self, *args):
         d_a = args[0]

@@ -38,7 +38,7 @@ class RR_ABS_Inst(Instruction):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_b()
+        return [self.get_d_b()]
 
     def compute_result(self, *args):
         d_b = args[0]
@@ -92,7 +92,7 @@ class RR_ABS_B_Inst(Instruction):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_b()
+        return [self.get_d_b()]
 
     def compute_result(self, *args):
         d_b = args[0]
@@ -160,7 +160,7 @@ class RR_ABS_H_Inst(Instruction):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_b()
+        return [self.get_d_b()]
 
     def compute_result(self, *args):
         d_b = args[0]
@@ -573,7 +573,7 @@ class RR_ABSS_Inst(Instruction):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_b()
+        return [self.get_d_b()]
 
     def compute_result(self, *args):
         d_b = args[0]
@@ -625,7 +625,7 @@ class RR_ABSS_H_Inst(Instruction):
         return self.get("d{0}".format(self.data['b']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_b()
+        return [self.get_d_b()]
 
     def compute_result(self, *args):
         d_b = args[0]
@@ -661,7 +661,7 @@ class RR_ADD_Inst(Instruction):
         User Status Flags: V, SV, AV, SAV
     """
     name = 'RR_ADD'
-    op = "{0}{1}".format(bin(ord('0'))[2:].zfill(8), bin(ord('b'))[2:].zfill(8))
+    op = "{0}{1}".format(bin(0)[2:].zfill(4), bin(0xb)[2:].zfill(4))
     op2 = "{0}".format(bin(0)[2:].zfill(4))
     bin_format = op + 'b'*4 + 'a'*4 + op2 + 'i'*4 + 'c'*4 + op2
 
@@ -901,9 +901,9 @@ class RR_ADDC_Inst(Instruction):
         User Status Flags: C, V, SV, AV, SAV
     """
     name = 'RR_ADDC'
-    op = "{0}{1}".format(bin(ord('0'))[2:].zfill(8), bin(ord('b'))[2:].zfill(8))
-    op2_1 = "{0}".format(bin(5)[2:].zfill(4))
-    op2_2 = "{0}".format(bin(0)[2:].zfill(4))
+    op = "{0}{1}".format(bin(0)[2:].zfill(4), bin(0xb)[2:].zfill(4))
+    op2_1 = "{0}".format(bin(0)[2:].zfill(4))
+    op2_2 = "{0}".format(bin(5)[2:].zfill(4))
     bin_format = op + 'b'*4 + 'a'*4 + op2_2 + 'i'*4 + 'c'*4 + op2_1
 
     def parse(self, bitstrm):
@@ -1383,7 +1383,7 @@ class RR_AND_Inst(Instruction):
 
     def compute_result(self, *args):
         d_a = args[0]
-        d_b = args[0]
+        d_b = args[1]
         return d_a & d_b
 
     def commit_result(self, res):
@@ -1446,9 +1446,9 @@ class RR_AND_GE_Inst(Instruction):
     """
     name = 'RR_AND.GE'
     op = "{0}{1}".format(bin(0)[2:].zfill(4), bin(0xb)[2:].zfill(4))
-    op2_1 = "{0}".format(bin(4)[2:].zfill(4))
-    op2_2 = "{0}".format(bin(2)[2:].zfill(4))
-    bin_format = op + 'a'*4 + 'b'*4 + op2_1 + 'i'*4 + 'c'*4 + op2_2
+    op2_1 = "{0}".format(bin(2)[2:].zfill(4))
+    op2_2 = "{0}".format(bin(4)[2:].zfill(4))
+    bin_format = op + 'b'*4 + 'a'*4 + op2_2 + 'i'*4 + 'c'*4 + op2_1
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
@@ -1494,9 +1494,9 @@ class RR_AND_GE_U_Inst(Instruction):
     """
     name = 'RR_AND.GE.U'
     op = "{0}{1}".format(bin(0)[2:].zfill(4), bin(0xb)[2:].zfill(4))
-    op2_1 = "{0}".format(bin(5)[2:].zfill(4))
-    op2_2 = "{0}".format(bin(2)[2:].zfill(4))
-    bin_format = op + 'b'*4 + 'a'*4 + op2_1 + 'i'*4 + 'c'*4 + op2_2
+    op2_1 = "{0}".format(bin(2)[2:].zfill(4))
+    op2_2 = "{0}".format(bin(5)[2:].zfill(4))
+    bin_format = op + 'b'*4 + 'a'*4 + op2_2 + 'i'*4 + 'c'*4 + op2_1
 
     def parse(self, bitstrm):
         data = Instruction.parse(self, bitstrm)
@@ -1527,8 +1527,8 @@ class RR_AND_GE_U_Inst(Instruction):
         d_a = args[0]
         d_b = args[1]
         d_c = args[2]
-        bit = d_c[0] and (d_a >= d_b)        # D[c][0] AND D[a] >= D[b]
-        result = ((d_c >> 1) << 1) | bit     # D[c][31:1] | bit
+        bit = d_c[0] & (d_a >= d_b)         # D[c][0] AND D[a] >= D[b]
+        result = ((d_c >> 1) << 1) | bit    # D[c][31:1] | bit
         return result
 
     def commit_result(self, res):
@@ -3515,7 +3515,7 @@ class RR_MAX_U_Inst(Instruction):
 
     def compute_result(self, *args):
         d_a = args[0]
-        d_b = args[0]
+        d_b = args[1]
         condition = d_a > d_b
         return self.ite(condition, d_a, d_b)
 
@@ -4743,7 +4743,7 @@ class RR_PARITY_Inst(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_a()
+        return [self.get_d_a()]
 
     def compute_result(self, *args):
         d_a = args[0]
@@ -4793,7 +4793,7 @@ class RR_SAT_HU_Inst(Instruction):
         return self.get("d{0}".format(self.data['a']), Type.int_32)
 
     def fetch_operands(self):
-        return self.get_d_a()
+        return [self.get_d_a()]
 
     def compute_result(self, *args):
         d_a = args[0]
