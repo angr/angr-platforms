@@ -3,7 +3,8 @@ from angr.procedures import SIM_PROCEDURES as P, SIM_LIBRARIES as L
 from angr.procedures.definitions import SimSyscallLibrary
 from angr import SimProcedure
 from angr.calling_conventions import SimCC, register_syscall_cc, register_default_cc, SimCCUnknown, SimRegArg
-from .arch_bf import ArchBF
+
+from arch_bf import ArchBF
 
 
 class WriteByteAtPtr(SimProcedure):
