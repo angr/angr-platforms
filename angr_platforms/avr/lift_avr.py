@@ -1645,18 +1645,18 @@ def main():
     for num, test in enumerate(tests):
         print(num)
         lifter = LifterAVR(ArchAVR(), 0)
-        lifter._lift(data=test)
+        lifter.lift(data=test)
 
     print("Lifter test:")
     for test in tests:
         lifter = LifterAVR(ArchAVR(), 0)
-        lifter._lift(data=test)
+        lifter.lift(data=test)
         lifter.irsb.pp()
 
     print("Full tests:")
     fulltest = b"".join(tests)
     lifter = LifterAVR(ArchAVR(), 0)
-    lifter._lift(data=fulltest)
+    lifter.lift(data=fulltest)
     lifter.irsb.pp()
 
 

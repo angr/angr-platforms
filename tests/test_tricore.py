@@ -18,7 +18,7 @@ class TestTricoreLifter(unittest.TestCase):
         print("Lifting (ABS format) ldmst 1000, e2", "-"*50)
         inst = b'e5020005'
         lifter = LifterTRICORE(ArchTRICORE(), 0)
-        lifter._lift(data=inst)
+        lifter.lift(inst)
         lifter.irsb.pp()
         self.assertEqual(lifter.irsb.arch.name, 'TRICORE')
         self.assertEqual(lifter.irsb.stmts_used, 14)
@@ -27,7 +27,7 @@ class TestTricoreLifter(unittest.TestCase):
         print("\nLifting (ABSB format) st.t 0x1000, 1, 0", "-"*50)
         inst = b'D5010001'
         lifter = LifterTRICORE(ArchTRICORE(), 0)
-        lifter._lift(data=inst)
+        lifter.lift(inst)
         lifter.irsb.pp()
         self.assertEqual(lifter.irsb.arch.name, 'TRICORE')
         self.assertEqual(lifter.irsb.stmts_used, 21)
