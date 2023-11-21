@@ -255,10 +255,10 @@ if __name__ == '__main__':
 
     test1 = b'<>+-[].,'
     test2 = b'<>+-[].,'
-    lifter = LifterBF(arch=archinfo.arch_from_id('bf'), addr=0)
+    lifter = LifterBF(archinfo.arch_from_id('bf'), 0)
     lifter.lift(data=test1)
     lifter.irsb.pp()
 
-    lifter = LifterBF(arch=ArchBF(), addr=0)
+    lifter = LifterBF(ArchBF(), 0)
     lifter.lift(data=test2)
     lifter.irsb.pp()
