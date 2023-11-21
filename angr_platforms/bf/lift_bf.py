@@ -1,16 +1,7 @@
-import archinfo
-import pyvex
+import bitstring
 from pyvex.lifting.util import *
 from pyvex.lifting import register
-from .arch_bf import ArchBF
-import bitstring
-import sys
-import os
-import claripy
-from angr import SimValueError
-import logging
 
-log = logging.getLogger("LifterBF")
 
 # This is actually a BrainFuck lifter for pyVEX.  I'm not joking.
 # Created by edg on 1/14/2017
@@ -246,19 +237,3 @@ class LifterBF(GymratLifter):
 
 # Tell PyVEX that this lifter exists.
 register(LifterBF, 'BF')
-
-if __name__ == '__main__':
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    import logging
-    logging.getLogger('pyvex').setLevel(logging.DEBUG)
-    logging.basicConfig()
-
-    test1 = b'<>+-[].,'
-    test2 = b'<>+-[].,'
-    lifter = LifterBF(arch=archinfo.arch_from_id('bf'), addr=0)
-    lifter.lift(data=test1)
-    lifter.irsb.pp()
-
-    lifter = LifterBF(arch=ArchBF(), addr=0)
-    lifter.lift(data=test2)
-    lifter.irsb.pp()
