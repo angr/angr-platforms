@@ -21,6 +21,7 @@ def test_prog_always_returns_42(filename: str) -> None:
 
 
 class TestEbpf(unittest.TestCase):
+    # pylint:disable=missing-class-docstring,no-self-use
     def test_trivial_return(self):
         test_prog_always_returns_42("return_42.o")
 
