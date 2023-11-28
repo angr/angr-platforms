@@ -41,4 +41,4 @@ class TestEbpf(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestEbpf().test_ebpf_lift()
+    unittest.main()
