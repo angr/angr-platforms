@@ -69,7 +69,7 @@ class ArchRISCV(Arch):
     instruction_alignment = 4
     persistent_regs = []
     # These prologs and eplilogs had to be commented out because they are a bit
-    # too generic and match a log of false positives. This has the effect of
+    # too generic and match a lot of false positives. This has the effect of
     # poisoning the BoyScout analysis in angr when used for any other arch.
     # If you need this, please uncomment and add more specific regexes if
     # possible, or open an issue on github to discuss.
