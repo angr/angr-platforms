@@ -68,23 +68,31 @@ class ArchRISCV(Arch):
     max_inst_bytes = 4
     instruction_alignment = 4
     persistent_regs = []
-    function_prologs = {
-        br'[\x00-\xff][\x00-\xf1]\x01\x13',
-        # addi sp, sp, xxx
-        # 0b000000000000_00010_000_00010_0010011 0x00010113
-        # 0b111111111111_00010_000_00010_0010011 0xfff10113
-        br'[\x00-\xff][\x00-\xf1][\x20-\x2f][\x23-\xa3]'
-        # sw xx, xx(sp)
-        # 0b0000000_00000_00010_010_00000_0100011 0x00012023
-        # 0b1111111_11111_00010_010_11111_0100011 0xfff12fa3
-    }
-    function_epilogs = {
-        br'[\x00-\xff][\x00-\xf1][\x20-\x2f][\x23-\x83]',
-        # ld xx, xx(sp)
-        # 0b0000000_00000_00010_010_00000_0000011 0x00012003
-        # 0b1111111_11111_00010_010_11111_0000011 0xfff12f83
-        br'[\x00-\xff][\x00-\xf1]\x01\x13'  # addi sp, sp, xxx
-    }
+    # These prologs and eplilogs had to be commented out because they are a bit
+    # too generic and match a lot of false positives. This has the effect of
+    # poisoning the BoyScout analysis in angr when used for any other arch.
+    # If you need this, please uncomment and add more specific regexes if
+    # possible, or open an issue on github to discuss.
+    #
+    # function_prologs = {
+    #     br'[\x00-\xff][\x00-\xf1]\x01\x13',
+    #     # addi sp, sp, xxx
+    #     # 0b000000000000_00010_000_00010_0010011 0x00010113
+    #     # 0b111111111111_00010_000_00010_0010011 0xfff10113
+    #     br'[\x00-\xff][\x00-\xf1][\x20-\x2f][\x23-\xa3]'
+    #     # sw xx, xx(sp)
+    #     # 0b0000000_00000_00010_010_00000_0100011 0x00012023
+    #     # 0b1111111_11111_00010_010_11111_0100011 0xfff12fa3
+    # }
+    # function_epilogs = {
+    #     br'[\x00-\xff][\x00-\xf1][\x20-\x2f][\x23-\x83]',
+    #     # ld xx, xx(sp)
+    #     # 0b0000000_00000_00010_010_00000_0000011 0x00012003
+    #     # 0b1111111_11111_00010_010_11111_0000011 0xfff12f83
+    #     br'[\x00-\xff][\x00-\xf1]\x01\x13'  # addi sp, sp, xxx
+    # }
+    function_prologs = set()
+    function_epilogs = set()
     ret_instruction = b'\x00\x00\x80\x67'
     nop_instruction = b'\x13\x00\x00\x00'
 
