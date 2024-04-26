@@ -2,6 +2,11 @@
 
 This is a collection of extensions to angr to handle new platforms!
 
+> [!WARNING]  
+> Many of the platforms in this repo are better supported using angr's pcode engine.
+> We highly reccomend you try using that first if it supports your use case, as angr's pcode engine and pypcode are better maintained and there are more people able to help solve any issues you might encounter.
+> This repo sees very little development and we cannot promise that any issues here are addressed in a timely manner.
+
 Here you can find the following:
 
 * ```BrainFuck support (yes, really)``` (by @subwire) Includes a arch description, loader, VEX lifter, native symexec engine, SimOS
