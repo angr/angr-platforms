@@ -94,10 +94,7 @@ class Instruction_SLTI(I_Instruction):
 
     # TODO: ISA manual mentions sign extension, check if properly implemented
     def compute_result(self, src1, imm):
-        src1.is_signed = True
-        imm.is_signed = True
-        val = 1 if src1.signed < imm.signed else 0
-        return self.constant(val, Type.int_32)
+        return (src1.signed < imm.signed).ite(1, 0)
 
 
 class Instruction_SLTIU(I_Instruction):
@@ -106,10 +103,7 @@ class Instruction_SLTIU(I_Instruction):
     name = 'SLTIU'
 
     def compute_result(self, src1, imm):
-        src1.is_signed = False
-        imm.is_signed = False
-        val = 1 if src1 < imm else 0
-        return self.constant(val, Type.int_32)
+        return (src1 < imm).ite(1, 0)
 
 class Instruction_LB(I_Instruction):
     func3='000'

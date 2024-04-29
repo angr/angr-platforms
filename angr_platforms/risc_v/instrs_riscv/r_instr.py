@@ -94,10 +94,7 @@ class Instruction_SLT(R_Instruction):
     name='SLT'
 
     def compute_result(self, src1, src2):
-        src1.is_signed = True
-        src2.is_signed = True
-        val = 1 if src1 < src2 else 0
-        return self.constant(val, Type.int_32)
+        return (src1.signed < src2.signed).ite(1, 0)
 
 
 class Instruction_SLTU(R_Instruction):
@@ -107,10 +104,7 @@ class Instruction_SLTU(R_Instruction):
     name = 'SLTU'
 
     def compute_result(self, src1, src2):
-        src1.is_signed = False
-        src1.is_signed = False
-        val = 1 if src1 < src2 else 0
-        return self.constant(val, Type.int_32)
+        return (src1 < src2).ite(1, 0)
 
 
 class Instruction_MUL(R_Instruction):
