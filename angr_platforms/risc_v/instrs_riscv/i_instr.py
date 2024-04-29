@@ -118,7 +118,7 @@ class Instruction_LB(I_Instruction):
 
     def compute_result(self, src, imm):
         addr = src + imm.signed
-        value = self.load(addr, Type.int_8).cast_to(Type.int_32)
+        value = self.load(addr, Type.int_8).widen_signed(Type.int_32)
         return value.signed
 
 class Instruction_LH(I_Instruction):
@@ -128,7 +128,7 @@ class Instruction_LH(I_Instruction):
 
     def compute_result(self, src, imm):
         addr = src + imm
-        value = self.load(addr, Type.int_16).cast_to(Type.int_32)
+        value = self.load(addr, Type.int_16).widen_signed(Type.int_32)
         return value.signed
 
 class Instruction_LW(I_Instruction):
@@ -149,7 +149,7 @@ class Instruction_LBU(I_Instruction):
     def compute_result(self, src, imm):
         addr = src + imm.signed
 
-        return self.load(addr, Type.int_8).cast_to(Type.int_32)
+        return self.load(addr, Type.int_8).widen_unsigned(Type.int_32)
 
 class Instruction_LHU(I_Instruction):
     func3='101'
@@ -158,7 +158,7 @@ class Instruction_LHU(I_Instruction):
 
     def compute_result(self, src, imm):
         addr= src+imm.signed
-        return self.load(addr, Type.int_16).cast_to(Type.int_32)
+        return self.load(addr, Type.int_16).widen_unsigned(Type.int_32)
 
 
 class Instruction_JALR(I_Instruction):
