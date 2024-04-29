@@ -94,7 +94,7 @@ class I_Instruction(RISCV_Instruction):
         return self.constant(data, Type.int_32)
 
     def get_shift_amount(self):
-        num = BitArray(bin=self.data['I']).int
+        num = BitArray(bin=self.data['I']).uint
         return self.constant(num, Type.int_8)
 
     def get_optional_func7(self):
