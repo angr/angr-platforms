@@ -82,7 +82,8 @@ class Instruction_SRAI(I_Instruction):
         return data
 
     def compute_result(self, src1, _):
-        return (~((~src1) >> self.get_shift_amount())) & self.constant(0xffffffff, Type.int_32)
+        shftamnt = self.get_shift_amount()
+        return src1.sar(shftamnt).cast_to(Type.int_32)
 
 
 class Instruction_SLTI(I_Instruction):

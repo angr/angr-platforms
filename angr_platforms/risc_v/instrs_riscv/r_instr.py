@@ -59,7 +59,7 @@ class Instruction_SLL(R_Instruction):
     name = 'SLL'
 
     def compute_result(self, src1, src2):
-        shftamnt = self.get(int(self.data['S'], 2), Type.int_8)
+        shftamnt = src2.narrow_low(Type.int_5).cast_to(Type.int_8)
         return (src1 << shftamnt) & self.constant(0xffffffff, Type.int_32)
 
 
@@ -70,7 +70,7 @@ class Instruction_SRL(R_Instruction):
     name = 'SRL'
 
     def compute_result(self, src1, src2):
-        shftamnt = self.get(int(self.data['S'], 2), Type.int_8)
+        shftamnt = src2.narrow_low(Type.int_5).cast_to(Type.int_8)
         return (src1 >> shftamnt) & self.constant(0xffffffff, Type.int_32)
 
 # Arithmetic shift is not easily mapped, so leaving this as an TODO
@@ -83,8 +83,8 @@ class Instruction_SRA(R_Instruction):
     name = 'SRA'
 
     def compute_result(self, src1, src2):
-        shftamnt = self.get(int(self.data['S'], 2), Type.int_8)
-        return (~((~src1) >> shftamnt)) & self.constant(0xffffffff, Type.int_32)
+        shftamnt = src2.narrow_low(Type.int_5).cast_to(Type.int_8)
+        return src1.sar(shftamnt).cast_to(Type.int_32)
 
 
 class Instruction_SLT(R_Instruction):
