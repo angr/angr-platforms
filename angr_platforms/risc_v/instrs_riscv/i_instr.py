@@ -82,7 +82,8 @@ class Instruction_SRAI(I_Instruction):
         return data
 
     def compute_result(self, src1, _):
-        return (~((~src1) >> self.get_shift_amount())) & self.constant(0xffffffff, Type.int_32)
+        shftamnt = self.get_shift_amount()
+        return src1.sar(shftamnt).cast_to(Type.int_32)
 
 
 class Instruction_SLTI(I_Instruction):
@@ -93,10 +94,7 @@ class Instruction_SLTI(I_Instruction):
 
     # TODO: ISA manual mentions sign extension, check if properly implemented
     def compute_result(self, src1, imm):
-        src1.is_signed = True
-        imm.is_signed = True
-        val = 1 if src1.signed < imm.signed else 0
-        return self.constant(val, Type.int_32)
+        return (src1.signed < imm.signed).ite(1, 0)
 
 
 class Instruction_SLTIU(I_Instruction):
@@ -105,10 +103,7 @@ class Instruction_SLTIU(I_Instruction):
     name = 'SLTIU'
 
     def compute_result(self, src1, imm):
-        src1.is_signed = False
-        imm.is_signed = False
-        val = 1 if src1 < imm else 0
-        return self.constant(val, Type.int_32)
+        return (src1 < imm).ite(1, 0)
 
 class Instruction_LB(I_Instruction):
     func3='000'
@@ -117,7 +112,7 @@ class Instruction_LB(I_Instruction):
 
     def compute_result(self, src, imm):
         addr = src + imm.signed
-        value = self.load(addr, Type.int_8).cast_to(Type.int_32)
+        value = self.load(addr, Type.int_8).widen_signed(Type.int_32)
         return value.signed
 
 class Instruction_LH(I_Instruction):
@@ -127,7 +122,7 @@ class Instruction_LH(I_Instruction):
 
     def compute_result(self, src, imm):
         addr = src + imm
-        value = self.load(addr, Type.int_16).cast_to(Type.int_32)
+        value = self.load(addr, Type.int_16).widen_signed(Type.int_32)
         return value.signed
 
 class Instruction_LW(I_Instruction):
@@ -148,7 +143,7 @@ class Instruction_LBU(I_Instruction):
     def compute_result(self, src, imm):
         addr = src + imm.signed
 
-        return self.load(addr, Type.int_8).cast_to(Type.int_32)
+        return self.load(addr, Type.int_8).widen_unsigned(Type.int_32)
 
 class Instruction_LHU(I_Instruction):
     func3='101'
@@ -157,7 +152,7 @@ class Instruction_LHU(I_Instruction):
 
     def compute_result(self, src, imm):
         addr= src+imm.signed
-        return self.load(addr, Type.int_16).cast_to(Type.int_32)
+        return self.load(addr, Type.int_16).widen_unsigned(Type.int_32)
 
 
 class Instruction_JALR(I_Instruction):
