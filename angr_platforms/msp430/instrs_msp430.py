@@ -648,7 +648,7 @@ class Instruction_MOV(Type3Instruction):
                 self.jump(None, newpc, jumpkind=JumpKind.Ret)
             else:
                 # If we're setting PC, but not from SP+, it's a BR instead
-                self.jump(None, self.constant(self.addr, REGISTER_TYPE))
+                self.jump(None, src)
         return src
 
     def negative(self, src, dst, ret):
