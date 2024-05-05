@@ -507,7 +507,7 @@ class Instruction_RRA(Type1Instruction):
     opcode = "010"
     name = 'rra'
 
-    def compute_result(self, src, writeout):
+    def compute_result(self, src):
         # Do it
         src >>= 1
         # A shitty sign-extend
