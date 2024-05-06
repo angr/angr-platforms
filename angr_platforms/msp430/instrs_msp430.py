@@ -330,7 +330,7 @@ class MSP430Instruction(Instruction):
             reg_str = "%d(%s)" % (imm, reg_name)
         # Indirect mode; fetch address in register; store is a write there.
         elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-            reg_str = "@%s" % reg_str
+            reg_str = "@%s" % reg_name
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
             reg_str = "@%s+" % reg_name
@@ -648,7 +648,7 @@ class Instruction_MOV(Type3Instruction):
                 self.jump(None, newpc, jumpkind=JumpKind.Ret)
             else:
                 # If we're setting PC, but not from SP+, it's a BR instead
-                self.jump(None, self.constant(self.addr, REGISTER_TYPE))
+                self.jump(None, src)
         return src
 
     def negative(self, src, dst, ret):
