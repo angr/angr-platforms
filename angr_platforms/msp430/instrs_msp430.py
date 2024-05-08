@@ -475,7 +475,7 @@ class Instruction_RRC(Type1Instruction):
 
     def compute_result(self, src):
         # Get carry-in
-        carryin = self.get_carry()
+        carryin = self.get_carry().cast_to(src.ty)
         # Do it
         src >>= 1
         # Put the carry-in in the right place
@@ -729,7 +729,7 @@ class Instruction_SUBC(Instruction_SUB):
     name = 'subc'
 
     def compute_result(self, src, dst):
-        return dst - src - self.constant(1, src.ty) + self.get_carry()
+        return dst - src - self.constant(1, src.ty) + self.get_carry().cast_to(src.ty)
 
     def carry(self, src, dst, ret):
         # Works for .w and .b mode
@@ -761,17 +761,17 @@ class Instruction_DADD(Type3Instruction):
         for x in range(0, bits, 4):
             srcs += src[x:x+3]
             dsts += dst[x:x+3]
-        carry = self.get_carry()
+        carry = self.get_carry().cast_to(src.ty)
         rets = []
         for s, d in zip(srcs, dsts):
             r = s + d + carry
-            carry = r / 10
+            carry = r // 10
             r %= 10
-            rets += r
+            rets.append(r)
         self._carry = carry #Carry computed in-line. save it.
         # Smash the digits back together
         for r, x in zip(rets, range(0, bits, 4)):
-                ret |= (r << x).cast_to(Type.int_16)
+                ret |= (r << x).cast_to(src.ty)
         return ret
 
     def carry(self, src, dst, ret):
