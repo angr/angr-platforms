@@ -292,14 +292,16 @@ class MSP430Instruction(Instruction):
         # val = val.cast_to(ty)
         return dst_str
 
-    def fetch_dst(self, dst_bits, mode_bits, imm_bits, ty):
+    def fetch_dst(self, dst_bits, mode_bits, imm_bits, ty, do_fetch=True):
         """
         Fetch the destination argument.
         :param dst_bits:
         :param mode_bits:
         :param imm_bits:
         :param ty:
-        :return: The VexValue representing the destination, and the writeout function for it
+        :param do_fetch:
+        :return: The VexValue representing the destination (if do_fetch is set;
+                 else None), and the writeout function for it
         """
         dst_num = int(dst_bits, 2)
         dst_name = ArchMSP430.register_index[dst_num]
@@ -312,7 +314,7 @@ class MSP430Instruction(Instruction):
             dst_imm = int(imm_bits, 2)
 
         # two-op instructions always have a dst and a writeout
-        val, writeout = self.fetch_reg(dst_num, dst_mode, dst_imm, ty)
+        val, writeout = self.fetch_reg(dst_num, dst_mode, dst_imm, ty, do_fetch)
         # val = val.cast_to(ty)
         return val, writeout
 
@@ -340,7 +342,7 @@ class MSP430Instruction(Instruction):
             raise Exception('Unknown mode found')
         return reg_str
 
-    def fetch_reg(self, reg_num, reg_mode, imm, ty):
+    def fetch_reg(self, reg_num, reg_mode, imm, ty, do_fetch=True):
         """
         Resolve the operand for register-based modes.
         :param reg_num: The Register Number
@@ -349,11 +351,12 @@ class MSP430Instruction(Instruction):
         :param ty: The Type (byte or word)
         :return: The VexValue of the operand, and the writeout function, if any.
         """
+        val = None
         # Boring register mode.  A write is just a Put.
         if reg_mode == ArchMSP430.Mode.REGISTER_MODE:
             # Fetch the register
-            reg_vv = self.get(reg_num, ty)
-            val = reg_vv
+            if do_fetch:
+                val = self.get(reg_num, ty)
             writeout = lambda v: self.put(v.cast_to(REGISTER_TYPE), reg_num)
         # Indexed mode, add the immediate to the register
         # A write here is a store to reg + imm
@@ -361,13 +364,15 @@ class MSP430Instruction(Instruction):
             # Fetch the register
             reg_vv = self.get(reg_num, REGISTER_TYPE)
             addr_val = reg_vv + imm
-            val = self.load(addr_val, ty)
+            if do_fetch:
+                val = self.load(addr_val, ty)
             writeout = lambda v: self.store(v, addr_val)
         # Indirect mode; fetch address in register; store is a write there.
         elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
             # Fetch the register
             reg_vv = self.get(reg_num, REGISTER_TYPE)
-            val = self.load(reg_vv, ty)
+            if do_fetch:
+                val = self.load(reg_vv, ty)
             writeout = lambda v: self.store(v, reg_vv)
         # Indirect Autoincrement mode. Increment the register by the type size, then access it
         elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
@@ -380,11 +385,13 @@ class MSP430Instruction(Instruction):
             # Do the increment, now
             self.put(reg_vv + incconst, reg_num)
             # Now load it.
-            val = self.load(reg_vv, ty)
+            if do_fetch:
+                val = self.load(reg_vv, ty)
             writeout = lambda v: self.store(v, reg_num)
         elif reg_mode == ArchMSP430.Mode.ABSOLUTE_MODE:
             imm_vv = self.constant(imm, REGISTER_TYPE)
-            val = self.load(imm_vv, ty)
+            if do_fetch:
+                val = self.load(imm_vv, ty)
             writeout = lambda v: self.store(v, imm_vv)
         else:
             raise Exception('Unknown mode found')
@@ -457,10 +464,10 @@ class Type3Instruction(MSP430Instruction):
         # pylint: disable=arguments-differ
         pass
 
-    def fetch_operands(self):
+    def fetch_operands(self, do_fetch=True):
         ty = Type.int_16 if self.data['b'] == '0' else Type.int_8
         src, _ = self.fetch_src(self.data['s'], self.data['A'], self.data['S'], ty)
-        dst, self.commit_func = self.fetch_dst(self.data['d'], self.data['a'], self.data['D'], ty)
+        dst, self.commit_func = self.fetch_dst(self.data['d'], self.data['a'], self.data['D'], ty, do_fetch)
         return src, dst
 
 ##
@@ -618,11 +625,13 @@ class Instruction_MOV(Type3Instruction):
     opcode = '0100'
     name = 'mov'
 
+    # NOTE: MOV is the only Type3Instruction that does *not* read its
+    # destination operand (i.e., do_fetch=False), as it will be overwritten
     def fetch_operands(self):
         if self.data['s'] == '0001' and self.data['d'] == '0000':
             return None, None
         else:
-            return Type3Instruction.fetch_operands(self)
+            return Type3Instruction.fetch_operands(self, do_fetch=False)
 
     def disassemble(self):
         # support useful pseudo-ops for disassembly
