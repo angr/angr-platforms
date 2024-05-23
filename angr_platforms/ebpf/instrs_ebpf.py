@@ -757,7 +757,8 @@ class Exit64(Jump64Instruction):
     operation_bin = "1001"
 
     def compute_result(self):
-        self.jump(None, 0, JumpKind.Exit)  # irrelevant addr
+        # NOTE: BPF_EXIT actually means function return
+        self.jump(None, 0, JumpKind.Ret)  # irrelevant addr
 
 
 Jump = (
