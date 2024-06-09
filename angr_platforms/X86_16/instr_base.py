@@ -404,11 +404,11 @@ class InstrBase(ExecInstr, ParseInstr, EmuInstr):
 
     def int_imm8(self) -> None:
         self.emu.lifter_instruction.put(self.emu.constant(self.instr.imm8), "ip_at_syscall")
-        exit = self.emu.constant(self.instr.imm8) == 0x21 and self.emu.get_gpreg(reg8_t.AH) == 0x4c
-        self.emu.lifter_instruction.jump(~exit, 0, JumpKind.Exit)
-        self.emu.lifter_instruction.jump(None, self.emu.get_gpreg(reg16_t.IP) + 2, JumpKind.Syscall)
-        #raise Exception("INT %x" % self.instr.imm8)
-        #self.emu.queue_interrupt(self.instr.imm8, False)
+        if self.instr.imm8 == 0x21:
+            exit = self.emu.get_gpreg(reg8_t.AH) == 0x4c
+            self.emu.lifter_instruction.jump(~exit, 0, JumpKind.Exit)
+        else:
+            self.emu.lifter_instruction.jump(None, self.emu.get_gpreg(reg16_t.IP) + 2, JumpKind.Syscall)
 
     def iret(self) -> None:
         ip = self.emu.pop16()
