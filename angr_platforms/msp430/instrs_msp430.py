@@ -658,7 +658,9 @@ class Instruction_MOV(Type3Instruction):
             else:
                 # If we're setting PC, but not from SP+, it's a BR instead
                 self.jump(None, src)
-        return src
+            return None
+        else:
+            return src
 
     def negative(self, src, dst, ret):
         # pylint: disable=arguments-differ
