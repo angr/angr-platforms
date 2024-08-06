@@ -1,7 +1,8 @@
-
 import os
 
 import angr
+import claripy
+
 from angr_platforms.bpf import *
 from angr_platforms.bpf.lift_bpf import MAX_INSTR_ID
 
@@ -34,7 +35,7 @@ def test_idea_correct_flag():
 
     assert len(simgr.found) == 1
     assert simgr.found[0].history.addr == 4058 * 8  # executed until "ret ALLOW"
-    assert simgr.found[0].regs._res._model_concrete.value == 1  # the result is ALLOW
+    assert claripy.backends.concrete.convert(simgr.found[0].regs._res).value == 1  # the result is ALLOW
 
 
 def test_idea_incorrect_flag():
@@ -63,7 +64,7 @@ def test_idea_incorrect_flag():
 
     assert len(simgr.found) == 1
     assert simgr.found[0].history.addr == 4045 * 8  # executed until "ret DENY"
-    assert simgr.found[0].regs._res._model_concrete.value == 0  # the result is DENY
+    assert claripy.backends.concrete.convert(simgr.found[0].regs._res).value == 0  # the result is DENY
 
 
 def main():
