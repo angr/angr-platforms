@@ -93,7 +93,7 @@ class SimCT64K(angr.SimOS):
         return state
 
     def _hard_checker(self, state, addr):
-        crange = state.solver.And(addr >= 0x200, addr < 0x300)
+        crange = claripy.And(addr >= 0x200, addr < 0x300)
         if not state.solver.satisfiable(extra_constraints=(crange,)):
             return None
 
@@ -126,7 +126,7 @@ angr.simos.register_simos('ct64k', SimCT64K)
 
 # output
 def hard_200_rd(state):
-    return state.solver.BVV(0, 16)
+    return claripy.BVV(0, 16)
 
 def hard_200_wr(state, v):
     state.posix.fd[1].write_data(v)
