@@ -70,10 +70,10 @@ class ParseInstr(X86Instruction):
         if self.chk[opcode] & CHK_IMM32:
             self.instr.imm32 = self.emu.get_code32(0)
             #self.emu.update_eip(4)
-        elif self.chk[opcode] & CHK_IMM16:
+        if self.chk[opcode] & CHK_IMM16:
             self.instr.imm16 = self.emu.get_code16(0)
             #self.emu.update_eip(2)
-        elif self.chk[opcode] & CHK_IMM8:
+        if self.chk[opcode] & CHK_IMM8:
             self.instr.imm8 = struct.unpack("b", struct.pack("B", self.emu.get_code8(0)))[0]
             #self.emu.update_eip(1)
         if self.chk[opcode] & CHK_PTR16:

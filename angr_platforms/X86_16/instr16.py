@@ -80,6 +80,7 @@ class Instr16(InstrBase):
         self.set_funcflag(0xC3, self.ret, 0)
         self.set_funcflag(0xC4, self.les_es_r16_m16, CHK_MODRM)
         self.set_funcflag(0xC7, self.mov_rm16_imm16, CHK_MODRM | CHK_IMM16)
+        self.set_funcflag(0xC8, self.enter, CHK_IMM16 | CHK_IMM8)
         self.set_funcflag(0xC9, self.leave, 0)
         self.set_funcflag(0xE0, self.loop16ne, CHK_IMM8)
         self.set_funcflag(0xE1, self.loop16e, CHK_IMM8)
@@ -973,7 +974,7 @@ class Instr16(InstrBase):
 
     def callf_m16_16(self):
         m32 = self.get_m()
-        ip = self.emu.read_mem16(m32)  # TODO: check segemnt, probably self.emu.get_data16(select_segment(),
+        ip = self.emu.read_mem16(m32)  # TODO: check segment, probably self.emu.get_data16(select_segment(),
         cs = self.emu.read_mem16(m32 + 2)
         self.emu.callf(cs, ip)
 
@@ -990,3 +991,25 @@ class Instr16(InstrBase):
     def push_rm16(self):
         rm16 = self.get_rm16()
         self.emu.push16(rm16)
+
+    def enter(self):
+        bytes_ = self.instr.imm16
+        level = self.instr.imm8
+        level &= 0x1f
+
+        self.emu.push16(self.emu.get_gpreg(reg16_t.BP))
+        ss = self.emu.get_sgreg(sgreg_t.SS)
+        sp = self.emu.get_gpreg(reg16_t.SP)
+        self.emu.set_gpreg(reg16_t.BP, sp)
+
+        bp = sp - 2
+        if level:
+            for i in range(1, level):
+                bp -= 2
+                sp -= 2
+                self.emu.put_data16(ss, sp, self.emu.get_data16(ss, bp))
+            sp -= 2
+            self.emu.put_data16(ss, sp, self.emu.get_gpreg(reg16_t.BP))
+            self.emu.push16(bp)
+        sp -= bytes_
+        self.emu.set_gpreg(reg16_t.SP, sp)

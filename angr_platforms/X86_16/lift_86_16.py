@@ -63,7 +63,7 @@ class Instruction_ANY(Instruction):
             else:
                 self.instr16.exec()
         except Exception as ex:
-            logger.error("Exception during instruction execution: %s", ex)
+            logger.exception("Exception during instruction execution")
             raise ex from Exception
 
     def disassemble(self):

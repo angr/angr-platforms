@@ -180,8 +180,8 @@ class Arch86_16(Arch):
         # Register(name="emnote", size=4, artificial=True),
         Register(name="cmstart", size=4),
         Register(name="cmlen", size=4),
-        Register(name="nraddr", size=4),
-        Register(name="sc_class", size=4),
+        Register(name="nraddr", size=4, artificial=True),
+        Register(name="sc_class", size=4, artificial=True),
         Register(name="ip_at_syscall", size=4, concrete=False, artificial=True),
         Register(
             name="eflags",

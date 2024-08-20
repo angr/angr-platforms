@@ -389,26 +389,29 @@ class InstrBase(ExecInstr, ParseInstr, EmuInstr):
     def retf_imm16(self) -> None:
         self.set_gpreg(reg16_t.SP, self.get_gpreg(reg16_t.SP) + self.instr.imm16)
         ip = self.emu.pop16()
-        cs = self.emu.pop16()
-        self.emu.lifter_instruction.jump(None, self.emu.trans_v2p(0, cs, ip), jumpkind=JumpKind.Ret)
+        seg = self.emu.pop16()
+        addr = self.emu.v2p(seg, ip)
+        self.emu.lifter_instruction.jump(None, addr, jumpkind=JumpKind.Ret)
 
     def retf(self) -> None:
         ip = self.emu.pop16()
-        cs = self.emu.pop16()
-        self.emu.set_sgreg(sgreg_t.CS, cs)
-        self.emu.lifter_instruction.jump(None, self.emu.trans_v2p(0, cs, ip), jumpkind=JumpKind.Ret)
+        seg = self.emu.pop16()
+        self.emu.set_sgreg(sgreg_t.CS, seg)
+        addr = self.emu.v2p(seg, ip)
+        self.emu.lifter_instruction.jump(None, addr, jumpkind=JumpKind.Ret)
+
 
     def int3(self) -> None:
         self.instr.imm8 = 3
         self.int_imm8()
 
     def int_imm8(self) -> None:
-        self.emu.lifter_instruction.put(self.emu.constant(self.instr.imm8), "ip_at_syscall")
-        if self.instr.imm8 == 0x21:
-            exit = self.emu.get_gpreg(reg8_t.AH) == 0x4c
-            self.emu.lifter_instruction.jump(~exit, 0, JumpKind.Exit)
-        else:
-            self.emu.lifter_instruction.jump(None, self.emu.get_gpreg(reg16_t.IP) + 2, JumpKind.Syscall)
+        #self.emu.lifter_instruction.put(self.emu.constant(self.instr.imm8), "ip_at_syscall")
+        #if self.instr.imm8 == 0x21:
+        #    exit = self.instr.imm8 == 0x21 and self.emu.get_gpreg(reg8_t.AH) == 0x4c
+        self.emu.lifter_instruction.jump(None, 0xff021, JumpKind.Call)
+        #else:
+        #    self.emu.lifter_instruction.jump(None, self.emu.get_gpreg(reg16_t.IP) + 2, JumpKind.Syscall)
 
     def iret(self) -> None:
         ip = self.emu.pop16()
@@ -416,7 +419,8 @@ class InstrBase(ExecInstr, ParseInstr, EmuInstr):
         flags = self.emu.pop16()
         self.emu.set_gpreg(reg16_t.FLAGS, flags)
         self.emu.set_sgreg(sgreg_t.CS, cs)
-        self.emu.lifter_instruction.jump(None, self.emu.trans_v2p(0, cs, ip), jumpkind=JumpKind.Ret)
+        addr = laddr
+        self.emu.lifter_instruction.jump(None, addr, jumpkind=JumpKind.Ret)
 
     def in_al_imm8(self) -> None:
         self.emu.set_gpreg(reg8_t.AL, self.emu.in_io8(self.instr.imm8))
@@ -426,7 +430,7 @@ class InstrBase(ExecInstr, ParseInstr, EmuInstr):
         self.emu.out_io8(self.instr.imm8, al)
 
     def jmp(self) -> None:
-        ip = self.emu.get_gpreg(reg16_t.IP) + self.emu.constant(self.instr.imm8 + 2, Type.int_8).widen_signed(Type.int_16)
+        ip = self.emu.get_gpreg(reg16_t.IP) + self.emu.constant(self.instr.imm8, Type.int_8).widen_signed(Type.int_16) + 2
         self.emu.lifter_instruction.jump(None, ip, JumpKind.Boring)
 
     def in_al_dx(self) -> None:
