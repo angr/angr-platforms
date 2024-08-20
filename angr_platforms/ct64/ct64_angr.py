@@ -1,20 +1,25 @@
-import angr
-import claripy
-import cle
-import archinfo
 import logging
 import struct
+
+import angr
+import archinfo
+import claripy
+import cle
 
 from .ct64_engine import UberEngineWithCT64K
 
 l = logging.getLogger('angr.ct64k')
 
 def load_rom(rom):
-    return angr.Project(rom, main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000}, engine=UberEngineWithCT64K)
+    return angr.Project(
+        rom, 
+        main_opts={'backend': CT64KBlob, 'arch': ArchCT64K(), 'base_addr': 0x1000, 'entry_point': 0x1000}, 
+        engine=UberEngineWithCT64K
+    )
 
 class ArchCT64K(archinfo.Arch):
     def __init__(self, endness=archinfo.Endness.BE):
-        super(ArchCT64K, self).__init__(endness)
+        super().__init__(endness)
 
     name = 'CT64K'
     bits = 16
@@ -63,7 +68,7 @@ class SimCT64K(angr.SimOS):
             0x200: (hard_200_rd, hard_200_wr),
             0x201: (hard_201_rd, hard_201_wr),
         }
-        super(SimCT64K, self).__init__(project, 'ct64k')
+        super().__init__(project, 'ct64k')
 
     def configure_project(self):
         pass
@@ -73,7 +78,7 @@ class SimCT64K(angr.SimOS):
             addr = 0x1000
 
         permissions_backer = (True, {(0, 0xffff): 7})
-        state = super(SimCT64K, self).state_blank(addr=addr, permissions_backer=permissions_backer, **kwargs)
+        state = super().state_blank(addr=addr, permissions_backer=permissions_backer, **kwargs)
 
         state.register_plugin('registers', state.memory)
         state.memory.id = 'reg'
@@ -93,7 +98,7 @@ class SimCT64K(angr.SimOS):
         return state
 
     def _hard_checker(self, state, addr):
-        crange = state.solver.And(addr >= 0x200, addr < 0x300)
+        crange = claripy.And(addr >= 0x200, addr < 0x300)
         if not state.solver.satisfiable(extra_constraints=(crange,)):
             return None
 
@@ -126,7 +131,7 @@ angr.simos.register_simos('ct64k', SimCT64K)
 
 # output
 def hard_200_rd(state):
-    return state.solver.BVV(0, 16)
+    return claripy.BVV(0, 16)
 
 def hard_200_wr(state, v):
     state.posix.fd[1].write_data(v)

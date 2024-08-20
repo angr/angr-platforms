@@ -81,7 +81,7 @@ class Instruction2(Instruction):
 
         state.regs._ip += self.LEN
         state.memory.store(dest, value)
-        successors.add_successor(state, state.regs._ip, state.solver.true, 'Ijk_Boring')
+        successors.add_successor(state, state.regs._ip, claripy.true, 'Ijk_Boring')
 
     def value(self, state):
         raise NotImplementedError
@@ -171,7 +171,7 @@ class SR(Instruction2):
     NAME = 'SR'
 
     def value(self, state):
-        return state.solver.LShR(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
+        return claripy.LShR(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
 
 class SL(Instruction2):
     NAME = 'SL'
@@ -206,7 +206,7 @@ class InstructionJump(Instruction):
 
         jumpkind = 'Ijk_Exit' if self.NAME == 'HF' and state.solver.is_true(self.imm == successors.addr) else 'Ijk_Boring'
         successors.add_successor(yes_state, self.imm, guard, jumpkind)
-        successors.add_successor(no_state, state.solver.BVV(successors.addr + self.LEN, 16), state.solver.Not(guard), jumpkind)
+        successors.add_successor(no_state, claripy.BVV(successors.addr + self.LEN, 16), claripy.Not(guard), jumpkind)
 
     def condition(self, state):
         raise NotImplementedError
@@ -215,13 +215,13 @@ class JG(InstructionJump):
     NAME = 'JG'
 
     def condition(self, state):
-        return state.solver.UGT(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
+        return claripy.UGT(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
 
 class JL(InstructionJump):
     NAME = 'JL'
 
     def condition(self, state):
-        return state.solver.ULT(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
+        return claripy.ULT(state.memory.load(self.rm, size=1), state.memory.load(self.mem, size=1))
 
 class JQ(InstructionJump):
     NAME = 'JQ'
