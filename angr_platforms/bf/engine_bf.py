@@ -41,8 +41,8 @@ class BFMixin(angr.engines.SuccessorsMixin):
             state.scratch.jump_table = self._build_jump_table(state)
         try:
             return state.scratch.jump_table[addr]
-        except KeyError:
-            raise ValueError("There is no entry in the jump table at address %d" % addr)
+        except KeyError as err:
+            raise ValueError("There is no entry in the jump table at address %d" % addr) from err
 
     #def lift(self, addr=None, clemory=None, insn_bytes=None, size=None, arch=None, **kwargs):
 
@@ -96,25 +96,33 @@ class BFMixin(angr.engines.SuccessorsMixin):
                 # ...except if it IS symbolic.  That means we ran off the memory.
                 # Drop the mic and go home.  We're done here.
                 the_end = state.copy()
-                successors.add_successor(the_end, state.ip, claripy.true(), "Ijk_Exit", add_guard=False, exit_stmt_idx=-1,
-                                         exit_ins_addr=state.ip, source=my_block)
+                successors.add_successor(
+                    the_end,
+                    state.ip,
+                    claripy.true(),
+                    "Ijk_Exit",
+                    add_guard=False,
+                    exit_stmt_idx=-1,
+                    exit_ins_addr=state.ip,
+                    source=my_block
+                )
                 break
             # Step 1: Decode.  If it's a....
             if inst == '>':
                 # Increment ptr
-                state.regs.ptr = (state.regs.ptr + 1)
+                state.regs.ptr = state.regs.ptr + 1
             elif inst == "<":
-                state.regs.ptr = (state.regs.ptr - 1)
+                state.regs.ptr = state.regs.ptr - 1
             elif inst == "-":
                 # Decrement the byte at ptr in memory
                 # NOTE: We're doing the "wrap-around" variation of BF
                 oldval = state.memory.load(state.regs.ptr, 1)
-                newval = (oldval - 1)
+                newval = oldval - 1
                 state.memory.store(state.regs.ptr, newval, 1)
             elif inst == "+":
                 # Increment the byte at ptr in memory
                 oldval = state.memory.load(state.regs.ptr, 1)
-                newval = (oldval + 1)
+                newval = oldval + 1
                 state.memory.store(state.regs.ptr, newval, 1)
             elif inst == ".":
                 # Syscall: write byte at mem to stdout
@@ -184,4 +192,3 @@ class UberEngineWithBF(angr.engines.UberEngine, BFMixin):
     This is a class that "mixes" together the standard symbolic execution stack and the brainfuck interpreter.
     Giving it to angr will do everything we want.
     """
-    pass
