@@ -96,7 +96,7 @@ class BFMixin(angr.engines.SuccessorsMixin):
                 # ...except if it IS symbolic.  That means we ran off the memory.
                 # Drop the mic and go home.  We're done here.
                 the_end = state.copy()
-                successors.add_successor(the_end, state.ip, claripy.true, "Ijk_Exit", add_guard=False, exit_stmt_idx=-1,
+                successors.add_successor(the_end, state.ip, claripy.true(), "Ijk_Exit", add_guard=False, exit_stmt_idx=-1,
                                          exit_ins_addr=state.ip, source=my_block)
                 break
             # Step 1: Decode.  If it's a....
@@ -121,7 +121,7 @@ class BFMixin(angr.engines.SuccessorsMixin):
                 newstate = state.copy()
                 newstate.regs.inout = 1  # Set this to 0 to cause a write syscall
                 newstate.ip = state.ip + 1
-                successors.add_successor(newstate, newstate.ip, claripy.true, "Ijk_Syscall",
+                successors.add_successor(newstate, newstate.ip, claripy.true(), "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end a basic block.
                 break
@@ -130,7 +130,7 @@ class BFMixin(angr.engines.SuccessorsMixin):
                 new_state = state.copy()
                 new_state.regs.inout = 0  # This must be 0 when we do a syscall to get a read!
                 new_state.ip = state.ip + 1
-                successors.add_successor(new_state, new_state.ip, claripy.true, "Ijk_Syscall",
+                successors.add_successor(new_state, new_state.ip, claripy.true(), "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end the basic block
                 break

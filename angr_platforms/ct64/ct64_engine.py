@@ -81,7 +81,7 @@ class Instruction2(Instruction):
 
         state.regs._ip += self.LEN
         state.memory.store(dest, value)
-        successors.add_successor(state, state.regs._ip, claripy.true, 'Ijk_Boring')
+        successors.add_successor(state, state.regs._ip, claripy.true(), 'Ijk_Boring')
 
     def value(self, state):
         raise NotImplementedError
