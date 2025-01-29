@@ -1,7 +1,7 @@
 import angr
 import claripy
 
-class CT64KMixin(angr.engines.SuccessorsMixin):
+class CT64KMixin(angr.engines.SuccessorsEngine):
     def process_successors(self, successors, **kwargs):
         state = self.state
         if state.arch.name != 'CT64K':

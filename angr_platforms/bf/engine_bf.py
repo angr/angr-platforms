@@ -5,7 +5,7 @@ import claripy
 l = logging.getLogger(__name__)
 
 
-class BFMixin(angr.engines.SuccessorsMixin):
+class BFMixin(angr.engines.SuccessorsEngine):
     """
     This is a SimEngine mixin for executing BrainFuck.  Oh yeah, you're not hallucinating.
     """
