@@ -55,7 +55,7 @@ class SimBF(SimUserland):
     """
 
     def __init__(self, project, **kwargs):
-        super(SimBF, self).__init__(project, syscall_library=L['brainfuck'], name="BF", **kwargs)
+        super(SimBF, self).__init__(project, syscall_library=L['brainfuck'][0] if isinstance(L['brainfuck'], list) else L['brainfuck'], name="BF", **kwargs)
 
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ
