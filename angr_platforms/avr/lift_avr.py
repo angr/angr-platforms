@@ -328,15 +328,18 @@ class AVRInstruction(Instruction):
     # So if PC = 0x8, that refers to the instruction located at byte offset 0x8<<1 = 0x10
 
     def relative_jump(self, condition, offset, **kwargs):
-        self.absolute_jump(condition, self.get_pc() + offset, **kwargs)
+        self.absolute_jump(condition, self.get_pc() + (offset << 1), **kwargs)
+
+    def absolute_jump_word(self, condition, addr_word, **kwargs):
+        self.absolute_jump(condition, addr_word << 1, **kwargs)
 
     def absolute_jump(self, condition, addr, **kwargs):
         if not isinstance(addr, int):
             addr = addr.cast_to(Type.int_32)
-        self.jump(condition, self.arch.flash_offset + (addr << 1), **kwargs)
+        self.jump(condition, self.arch.flash_offset + addr, **kwargs)
 
     def get_pc(self):
-        return (self.addr - self.arch.flash_offset) >> 1
+        return self.addr - self.arch.flash_offset
 #
 # Some "instruction formats".  These only get you so far in AVR.
 #
@@ -1276,9 +1279,9 @@ class Instruction_CALL(NoFlags, AVRInstruction):
     def compute_result(self, dst):
         sp = self.get_reg("SP")
         sp -= self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp)
+        self.store_data(self.constant(self.get_pc() + 4, self.pc_type), sp)
         self.put_reg(sp, "SP")
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+        self.absolute_jump_word(None, dst, jumpkind=JumpKind.Call)
 
 class Instruction_EICALL(NoFlags, AVRInstruction):
     bin_format = "1001010100011001"
@@ -1292,7 +1295,7 @@ class Instruction_EICALL(NoFlags, AVRInstruction):
         return (dst, )
 
     def compute_result(self, dst):
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+        self.absolute_jump_word(None, dst, jumpkind=JumpKind.Call)
 
 class Instruction_EIJMP(NoFlags, AVRInstruction):
     bin_format = "1001010000011001"
@@ -1319,9 +1322,9 @@ class Instruction_ICALL(NoFlags, AVRInstruction):
 
     def compute_result(self, dst):
         sp = self.get_reg('SP') - self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp)
+        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp)
         self.put_reg(sp, 'SP')
-        self.absolute_jump(None, dst, jumpkind=JumpKind.Call)
+        self.absolute_jump_word(None, dst, jumpkind=JumpKind.Call)
 
 class Instruction_IJMP(NoFlags, AVRInstruction):
     bin_format = '1001010000001001'
@@ -1332,7 +1335,7 @@ class Instruction_IJMP(NoFlags, AVRInstruction):
         return (z, )
 
     def compute_result(self, dst):
-        self.absolute_jump(None, dst)
+        self.absolute_jump_word(None, dst)
 
 class Instruction_JMP(NoFlags, AVRInstruction):
     bin_format = "1001010kkkkk110k"
@@ -1350,7 +1353,7 @@ class Instruction_JMP(NoFlags, AVRInstruction):
         return (int(self.data['k'], 2), )
 
     def compute_result(self, dst):
-        self.absolute_jump(None, dst)
+        self.absolute_jump_word(None, dst)
 
 class Instruction_RCALL(NoFlags, AVRInstruction):
     # A relative call to k
@@ -1364,7 +1367,7 @@ class Instruction_RCALL(NoFlags, AVRInstruction):
         # Store return address
         sp = self.get_reg('SP')
         sp -= self.arch.call_sp_fix
-        self.store_data(self.constant(self.get_pc() + 1, self.pc_type), sp)
+        self.store_data(self.constant(self.get_pc() + 2, self.pc_type), sp)
         self.put_reg(sp, "SP")
         # HACK: if the call target is the next instruction, treat this as a boring jump
         # gcc likes to use rcall to reserve space on stack. these calls are not actually calls,
