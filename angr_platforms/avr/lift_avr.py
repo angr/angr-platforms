@@ -80,9 +80,9 @@ class AVRInstruction(Instruction):
             return self.get(int(name, 2), REG_TYPE)
         else:
             try:
-                reg, width = self.arch.registers[name]
+                _, width = self.arch.registers[name]
                 ty = REG_TYPE if width == 1 else DOUBLEREG_TYPE
-                return self.get(reg, ty)
+                return self.get(name, ty)
             except KeyError as e:
                 raise ValueError("Invalid register for name: " + name) from e
 
@@ -96,8 +96,7 @@ class AVRInstruction(Instruction):
             return
         else:
             try:
-                reg, _ = self.arch.registers[name]
-                self.put(value, reg)
+                self.put(value, name)
                 return
             except KeyError as e:
                 raise ValueError("Invalid register for put: " + name) from e
