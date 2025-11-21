@@ -59,7 +59,7 @@ def compute_overflow_sub(src, dst, res):
 
 class AVRInstruction(Instruction):
     # TODO: allow changing this based on arch, support pc overflow
-    pc_type = Type.int_24
+    pc_type = Type.int_16
 
     def lift(self, irsb_c, past_instructions, future_instructions):
         self.apply_context(past_instructions, future_instructions)
