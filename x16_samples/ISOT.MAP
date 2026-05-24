@@ -1,0 +1,204 @@
+
+ Start  Stop   Length Name                   Class
+ 00000H 0104AH 0104BH _TEXT                  CODE
+ 0104CH 0104CH 00000H C_ETEXT                ENDCODE
+ 01050H 01091H 00042H NULL                   BEGDATA
+ 01092H 012ABH 0021AH _DATA                  DATA
+ 012ACH 012B9H 0000EH CDATA                  DATA
+ 012BAH 012BAH 00000H XIFB                   DATA
+ 012BAH 012BAH 00000H XIF                    DATA
+ 012BAH 012BAH 00000H XIFE                   DATA
+ 012BAH 012BAH 00000H XIB                    DATA
+ 012BAH 012BAH 00000H XI                     DATA
+ 012BAH 012BAH 00000H XIE                    DATA
+ 012BAH 012BAH 00000H XPB                    DATA
+ 012BAH 012BAH 00000H XP                     DATA
+ 012BAH 012BAH 00000H XPE                    DATA
+ 012BAH 012BAH 00000H XCB                    DATA
+ 012BAH 012BAH 00000H XC                     DATA
+ 012BAH 012BAH 00000H XCE                    DATA
+ 012BAH 012BAH 00000H XCFB                   DATA
+ 012BAH 012BAH 00000H XCF                    DATA
+ 012BAH 012BAH 00000H XCFE                   DATA
+ 012BAH 012BAH 00000H CONST                  CONST
+ 012BAH 012C1H 00008H HDR                    MSG
+ 012C2H 0138FH 000CEH MSG                    MSG
+ 01390H 01391H 00002H PAD                    MSG
+ 01392H 01392H 00001H EPAD                   MSG
+ 01394H 013C1H 0002EH _BSS                   BSS
+ 013C2H 013C2H 00000H XOB                    BSS
+ 013C2H 013C2H 00000H XO                     BSS
+ 013C2H 013C2H 00000H XOE                    BSS
+ 013D0H 019CFH 00600H c_common               BSS
+ 019D0H 021CFH 00800H STACK                  STACK
+
+ Origin   Group
+ 0105:0   DGROUP
+
+  Address         Publics by Name
+
+ 0105:0106       STKHQQ
+ 0000:0722       _cprintf
+ 0105:0344       _edata
+ 0105:0980       _end
+ 0105:00F4       _environ
+ 0105:00CD       _errno
+ 0000:028E       _exit
+ 0000:06A4       _int86
+ 0000:0F48       _int86x
+ 0000:0100       _main
+ 0000:0FDC       _putch
+ 0000:067E       _strlen
+ 0000:069A       _ultoa
+ 0105:00B2       __abrkp
+ 0105:0062       __abrktb
+ 0105:00B2       __abrktbe
+ 0105:00B4       __acfinfo
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+ 0105:0104       __adbgmsg
+ 0105:0060       __aexit_rtn
+ 0105:00C1       __aintdiv
+ 0000:01BB       __amsg_exit
+ 0105:005C       __asizds
+ 0105:0246       __asizeC
+ 0105:0247       __asizeD
+ 0000:0118       __astart
+ 0105:005E       __atopsp
+ 0105:0780       __buferr
+ 0105:0580       __bufin
+ 0105:0380       __bufout
+ 0105:0238       __cfltcvt_tab
+ 0105:00FC       __child
+ 0000:0360       __chkstk
+ 0000:01CA       __cinit
+ 0000:01AC       __cintDIV
+ 0000:0FEC       __cltoasub
+ 0000:02EA       __ctermsub
+ 0000:0FF8       __cxtoa
+ 0105:00D8       __doserrno
+ 0000:062A       __dosret0
+ 0000:063D       __dosretax
+ 0000:0632       __dosreturn
+ 0105:00D5       __dosvermajor
+ 0105:00D6       __dosverminor
+ 0000:02A5       __exit
+ 0105:00C5       __fac
+ 0000:033A       __FF_MSGBANNER
+ 0105:025E       __fpinit
+ 0000:035A       __fptrap
+ 0105:00FF       __intno
+ 0105:011E       __iob
+ 0105:01BE       __iob2
+ 0105:0236       __lastiob
+ 0000:064A       __maperror
+ 0000:05E8       __myalloc
+ 0105:00DA       __nfile
+ 0000:0594       __NMSG_TEXT
+ 0000:05BF       __NMSG_WRITE
+ 0000:0376       __nullcheck
+ 0105:00D8       __oserr
+ 0105:00DC       __osfile
+ 0105:00D5       __osmajor
+ 0105:00D6       __osminor
+ 0105:00D7       __osmode
+ 0105:00D5       __osversion
+ 0105:00FE       __ovlflag
+ 0105:0100       __ovlvec
+ 0105:00F6       __pgmptr
+ 0105:00D3       __psp
+ 0105:00D1       __pspadr
+ 0000:0398       __setargv
+ 0000:0526       __setenvp
+ 0105:0244       __sigintoff
+ 0105:0242       __sigintseg
+ 0105:00CF       __umaskval
+ 0105:00F0       ___argc
+ 0105:00F2       ___argv
+
+  Address         Publics by Value
+
+ 0000:0100       _main
+ 0000:0118       __astart
+ 0000:01AC       __cintDIV
+ 0000:01BB       __amsg_exit
+ 0000:01CA       __cinit
+ 0000:028E       _exit
+ 0000:02A5       __exit
+ 0000:02EA       __ctermsub
+ 0000:033A       __FF_MSGBANNER
+ 0000:035A       __fptrap
+ 0000:0360       __chkstk
+ 0000:0376       __nullcheck
+ 0000:0398       __setargv
+ 0000:0526       __setenvp
+ 0000:0594       __NMSG_TEXT
+ 0000:05BF       __NMSG_WRITE
+ 0000:05E8       __myalloc
+ 0000:062A       __dosret0
+ 0000:0632       __dosreturn
+ 0000:063D       __dosretax
+ 0000:064A       __maperror
+ 0000:067E       _strlen
+ 0000:069A       _ultoa
+ 0000:06A4       _int86
+ 0000:0722       _cprintf
+ 0000:0F48       _int86x
+ 0000:0FDC       _putch
+ 0000:0FEC       __cltoasub
+ 0000:0FF8       __cxtoa
+ 0105:005C       __asizds
+ 0105:005E       __atopsp
+ 0105:0060       __aexit_rtn
+ 0105:0062       __abrktb
+ 0105:00B2       __abrkp
+ 0105:00B2       __abrktbe
+ 0105:00B4       __acfinfo
+ 0105:00C1       __aintdiv
+ 0105:00C5       __fac
+ 0105:00CD       _errno
+ 0105:00CF       __umaskval
+ 0105:00D1       __pspadr
+ 0105:00D3       __psp
+ 0105:00D5       __osmajor
+ 0105:00D5       __dosvermajor
+ 0105:00D5       __osversion
+ 0105:00D6       __dosverminor
+ 0105:00D6       __osminor
+ 0105:00D7       __osmode
+ 0105:00D8       __doserrno
+ 0105:00D8       __oserr
+ 0105:00DA       __nfile
+ 0105:00DC       __osfile
+ 0105:00F0       ___argc
+ 0105:00F2       ___argv
+ 0105:00F4       _environ
+ 0105:00F6       __pgmptr
+ 0105:00FC       __child
+ 0105:00FE       __ovlflag
+ 0105:00FF       __intno
+ 0105:0100       __ovlvec
+ 0105:0104       __adbgmsg
+ 0105:0106       STKHQQ
+ 0105:011E       __iob
+ 0105:01BE       __iob2
+ 0105:0236       __lastiob
+ 0105:0238       __cfltcvt_tab
+ 0105:0242       __sigintseg
+ 0105:0244       __sigintoff
+ 0105:0246       __asizeC
+ 0105:0247       __asizeD
+ 0105:025E       __fpinit
+ 0105:0344       _edata
+ 0105:0380       __bufout
+ 0105:0580       __bufin
+ 0105:0780       __buferr
+ 0105:0980       _end
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+
+Program entry point at 0000:0118
+
+Segments              31
+Groups                1
+Bytes in symbol table  7546

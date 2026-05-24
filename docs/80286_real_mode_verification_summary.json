@@ -1,0 +1,7182 @@
+{
+  "suite": "80286_real_mode",
+  "files": [
+    {
+      "opcode": "00",
+      "path": "/home/xor/vextest/80286/v1_real_mode/00.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add [ds:bx+Eh],bl",
+      "results": [
+        {
+          "opcode": "00",
+          "idx": 0,
+          "name": "add [ds:bx+Eh],bl",
+          "hash": "626be5084b331080eb08256c12a62d24afdf2a03",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "01",
+      "path": "/home/xor/vextest/80286/v1_real_mode/01.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add [ds:bx-5409h],dx",
+      "results": [
+        {
+          "opcode": "01",
+          "idx": 0,
+          "name": "add [ds:bx-5409h],dx",
+          "hash": "8a51328f572d633c6a0e804cb05cd6efce8b9899",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "02",
+      "path": "/home/xor/vextest/80286/v1_real_mode/02.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add cl,[ds:bx+si]",
+      "results": [
+        {
+          "opcode": "02",
+          "idx": 0,
+          "name": "add cl,[ds:bx+si]",
+          "hash": "fd15ce03a20b4bbd6f9640a2ea8db1e9751c7019",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "03",
+      "path": "/home/xor/vextest/80286/v1_real_mode/03.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add bx,cx",
+      "results": [
+        {
+          "opcode": "03",
+          "idx": 0,
+          "name": "add bx,cx",
+          "hash": "5f182630a27640ab4d3b3e3b4add58e56789c780",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "04",
+      "path": "/home/xor/vextest/80286/v1_real_mode/04.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add al,1Ah",
+      "results": [
+        {
+          "opcode": "04",
+          "idx": 0,
+          "name": "add al,1Ah",
+          "hash": "e4b75aad446c103c3704e35f5006726801b27563",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "05",
+      "path": "/home/xor/vextest/80286/v1_real_mode/05.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add ax,95C4h",
+      "results": [
+        {
+          "opcode": "05",
+          "idx": 0,
+          "name": "add ax,95C4h",
+          "hash": "91ab23dd6e29aedb2915406683de1ab992df4605",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "06",
+      "path": "/home/xor/vextest/80286/v1_real_mode/06.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push es",
+      "results": [
+        {
+          "opcode": "06",
+          "idx": 0,
+          "name": "push es",
+          "hash": "89b8d1da1f5dec8eec8a4af4b53d4eecc4563ffd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "07",
+      "path": "/home/xor/vextest/80286/v1_real_mode/07.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop es",
+      "results": [
+        {
+          "opcode": "07",
+          "idx": 0,
+          "name": "pop es",
+          "hash": "7c3c53817e519e23ae1c55f4c512deb81e1866c4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "08",
+      "path": "/home/xor/vextest/80286/v1_real_mode/08.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or [ss:bp+di],ah",
+      "results": [
+        {
+          "opcode": "08",
+          "idx": 0,
+          "name": "or [ss:bp+di],ah",
+          "hash": "cd48d3292edd9ea095b02aec37b69f6f21a533ba",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "09",
+      "path": "/home/xor/vextest/80286/v1_real_mode/09.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or [ds:si-7809h],dx",
+      "results": [
+        {
+          "opcode": "09",
+          "idx": 0,
+          "name": "or [ds:si-7809h],dx",
+          "hash": "c481147bd317852b7ed713896bba0969ea597e7e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "0A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/0A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or bl,[ss:bp+di+9]",
+      "results": [
+        {
+          "opcode": "0A",
+          "idx": 0,
+          "name": "or bl,[ss:bp+di+9]",
+          "hash": "0be8c33b1c0fad14029e01508df2ad40201919d0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "0B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/0B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or dx,[ss:bp+si]",
+      "results": [
+        {
+          "opcode": "0B",
+          "idx": 0,
+          "name": "or dx,[ss:bp+si]",
+          "hash": "c97e2cc542047404386b08fa692fdb7a24680591",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "0C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/0C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or al,B0h",
+      "results": [
+        {
+          "opcode": "0C",
+          "idx": 0,
+          "name": "or al,B0h",
+          "hash": "c919d07101695d66cf48ec7c225dddc059cd7178",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "0D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/0D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or ax,DF5Bh",
+      "results": [
+        {
+          "opcode": "0D",
+          "idx": 0,
+          "name": "or ax,DF5Bh",
+          "hash": "f9c8bf3fe211ed7be292fb60c8acda02a1c4f218",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "0E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/0E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push cs",
+      "results": [
+        {
+          "opcode": "0E",
+          "idx": 0,
+          "name": "push cs",
+          "hash": "3c23b9629316544b79d0cdfd8b3dc9119c212c34",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "10",
+      "path": "/home/xor/vextest/80286/v1_real_mode/10.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc al,al",
+      "results": [
+        {
+          "opcode": "10",
+          "idx": 0,
+          "name": "adc al,al",
+          "hash": "d69eaaeabcb61e7a1b0297857182444610724424",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "11",
+      "path": "/home/xor/vextest/80286/v1_real_mode/11.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc bp,sp",
+      "results": [
+        {
+          "opcode": "11",
+          "idx": 0,
+          "name": "adc bp,sp",
+          "hash": "81dc3723314706b366560f10aedaf3d27aa5b84c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "12",
+      "path": "/home/xor/vextest/80286/v1_real_mode/12.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc cl,[ds:di-137Ah]",
+      "results": [
+        {
+          "opcode": "12",
+          "idx": 0,
+          "name": "adc cl,[ds:di-137Ah]",
+          "hash": "0c19874c1bec2dfeb0accb972cd32ac0eac80dec",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "13",
+      "path": "/home/xor/vextest/80286/v1_real_mode/13.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc bx,di",
+      "results": [
+        {
+          "opcode": "13",
+          "idx": 0,
+          "name": "adc bx,di",
+          "hash": "dee56a0ae24dded1fd48e4066e1e4b4531dc2462",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "14",
+      "path": "/home/xor/vextest/80286/v1_real_mode/14.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc al,A7h",
+      "results": [
+        {
+          "opcode": "14",
+          "idx": 0,
+          "name": "adc al,A7h",
+          "hash": "6cf55007e7399f02ed8b96e4f68c62f13ab2ac58",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "15",
+      "path": "/home/xor/vextest/80286/v1_real_mode/15.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc ax,5714h",
+      "results": [
+        {
+          "opcode": "15",
+          "idx": 0,
+          "name": "adc ax,5714h",
+          "hash": "0542be6fd5c1d839850d2807e16337d6d912a8d3",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "16",
+      "path": "/home/xor/vextest/80286/v1_real_mode/16.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push ss",
+      "results": [
+        {
+          "opcode": "16",
+          "idx": 0,
+          "name": "push ss",
+          "hash": "1486503f369aa9bdf7239556234472f8e19247cf",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "17",
+      "path": "/home/xor/vextest/80286/v1_real_mode/17.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop ss",
+      "results": [
+        {
+          "opcode": "17",
+          "idx": 0,
+          "name": "pop ss",
+          "hash": "c5dab2b4a30226e1d2a755c477d4f2920421d296",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "18",
+      "path": "/home/xor/vextest/80286/v1_real_mode/18.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb [cs:bp-6246h],ah",
+      "results": [
+        {
+          "opcode": "18",
+          "idx": 0,
+          "name": "sbb [cs:bp-6246h],ah",
+          "hash": "f421bfbb0fedbf0c9388deb2c66ca1784d04edad",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "19",
+      "path": "/home/xor/vextest/80286/v1_real_mode/19.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb [ss:bp+di],cx",
+      "results": [
+        {
+          "opcode": "19",
+          "idx": 0,
+          "name": "sbb [ss:bp+di],cx",
+          "hash": "b30b15d13f6a46c502651cb11b7440d1ac80bfbd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb bh,dl",
+      "results": [
+        {
+          "opcode": "1A",
+          "idx": 0,
+          "name": "sbb bh,dl",
+          "hash": "abd5e8f26bd7fc75ab09b65bbd370d4713ee0fec",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock sbb bx,[ss:bp+si-7Ch]",
+      "results": [
+        {
+          "opcode": "1B",
+          "idx": 0,
+          "name": "lock sbb bx,[ss:bp+si-7Ch]",
+          "hash": "f5ecaaae11c50ea1e1cb98c1378b894aa9d70d13",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb al,55h",
+      "results": [
+        {
+          "opcode": "1C",
+          "idx": 0,
+          "name": "sbb al,55h",
+          "hash": "efbdc4d3e3023b2b057d85e65d99aebdaca384b0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb ax,FDDEh",
+      "results": [
+        {
+          "opcode": "1D",
+          "idx": 0,
+          "name": "sbb ax,FDDEh",
+          "hash": "16645eebc98bba38d52ace2961f08b7e2031bfa1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push ds",
+      "results": [
+        {
+          "opcode": "1E",
+          "idx": 0,
+          "name": "push ds",
+          "hash": "f79fee89c03d65ecf480bc17487e1ab1a7981e67",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "1F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/1F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop ds",
+      "results": [
+        {
+          "opcode": "1F",
+          "idx": 0,
+          "name": "pop ds",
+          "hash": "7e7c3f0a14bb0b02b5a9aea580bce39c9dcd7774",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "20",
+      "path": "/home/xor/vextest/80286/v1_real_mode/20.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and dh,dl",
+      "results": [
+        {
+          "opcode": "20",
+          "idx": 0,
+          "name": "and dh,dl",
+          "hash": "3804772ce99094593a76444b2209c041c05e2784",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "21",
+      "path": "/home/xor/vextest/80286/v1_real_mode/21.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and cx,bp",
+      "results": [
+        {
+          "opcode": "21",
+          "idx": 0,
+          "name": "and cx,bp",
+          "hash": "21777f5f35e7846e7aed2a6c3c493df3e0e61243",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "22",
+      "path": "/home/xor/vextest/80286/v1_real_mode/22.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and dl,[ds:si+3EC8h]",
+      "results": [
+        {
+          "opcode": "22",
+          "idx": 0,
+          "name": "and dl,[ds:si+3EC8h]",
+          "hash": "4a41e567c06245910bae944f1efe4ceb1ea5c21e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "23",
+      "path": "/home/xor/vextest/80286/v1_real_mode/23.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and si,[ds:bx+di]",
+      "results": [
+        {
+          "opcode": "23",
+          "idx": 0,
+          "name": "and si,[ds:bx+di]",
+          "hash": "b0f3b475cd7ff8df754556d720376b3b2bf137ad",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "24",
+      "path": "/home/xor/vextest/80286/v1_real_mode/24.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and al,FCh",
+      "results": [
+        {
+          "opcode": "24",
+          "idx": 0,
+          "name": "and al,FCh",
+          "hash": "eccc20145fa0b46c6d625531fb44fc501644035f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "25",
+      "path": "/home/xor/vextest/80286/v1_real_mode/25.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and ax,268Dh",
+      "results": [
+        {
+          "opcode": "25",
+          "idx": 0,
+          "name": "and ax,268Dh",
+          "hash": "8bba7374116cdb531b0c85cb707053a7ccd8b3b7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "27",
+      "path": "/home/xor/vextest/80286/v1_real_mode/27.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "daa",
+      "results": [
+        {
+          "opcode": "27",
+          "idx": 0,
+          "name": "daa",
+          "hash": "9ce4b8a211cfc8efe1b712bf63bcb56fdc3496d4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "28",
+      "path": "/home/xor/vextest/80286/v1_real_mode/28.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub [ss:bp+si-Eh],ah",
+      "results": [
+        {
+          "opcode": "28",
+          "idx": 0,
+          "name": "sub [ss:bp+si-Eh],ah",
+          "hash": "b49cbff242057b2bcca498834ab0982c1cf1b3b5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "29",
+      "path": "/home/xor/vextest/80286/v1_real_mode/29.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub [ds:20A8h],ax",
+      "results": [
+        {
+          "opcode": "29",
+          "idx": 0,
+          "name": "sub [ds:20A8h],ax",
+          "hash": "0b401e094914801ebcf6c7f80892b65dfff73b2b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "2A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/2A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub ah,[ss:bp-6Ch]",
+      "results": [
+        {
+          "opcode": "2A",
+          "idx": 0,
+          "name": "sub ah,[ss:bp-6Ch]",
+          "hash": "33a5fd4ae4b3f3c44bb377705ed613833805ddae",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "2B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/2B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub ax,sp",
+      "results": [
+        {
+          "opcode": "2B",
+          "idx": 0,
+          "name": "sub ax,sp",
+          "hash": "99b1a401bc3f9108b030c1be4015892e92a3fad9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "2C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/2C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub al,84h",
+      "results": [
+        {
+          "opcode": "2C",
+          "idx": 0,
+          "name": "sub al,84h",
+          "hash": "299e32f0693c90082f8f3ed9ea25b4bb4ab37665",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "2D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/2D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub ax,C37Fh",
+      "results": [
+        {
+          "opcode": "2D",
+          "idx": 0,
+          "name": "sub ax,C37Fh",
+          "hash": "db423b58f740caf6126d7669c30006f02c227c6f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "2F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/2F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "das",
+      "results": [
+        {
+          "opcode": "2F",
+          "idx": 0,
+          "name": "das",
+          "hash": "d0a6424d68976d48aa6fa00579b960555fe31d8b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "30",
+      "path": "/home/xor/vextest/80286/v1_real_mode/30.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor [cs:bp+di-1D49h],dh",
+      "results": [
+        {
+          "opcode": "30",
+          "idx": 0,
+          "name": "xor [cs:bp+di-1D49h],dh",
+          "hash": "064777440b131b34e40094e9a6ea28efd3a366e3",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "31",
+      "path": "/home/xor/vextest/80286/v1_real_mode/31.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor [ds:A324h],si",
+      "results": [
+        {
+          "opcode": "31",
+          "idx": 0,
+          "name": "xor [ds:A324h],si",
+          "hash": "da5a114e37a83d0975ef735fea2350003bac91ea",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "32",
+      "path": "/home/xor/vextest/80286/v1_real_mode/32.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor dh,[ds:bx+si+4]",
+      "results": [
+        {
+          "opcode": "32",
+          "idx": 0,
+          "name": "xor dh,[ds:bx+si+4]",
+          "hash": "40592f626619f9068ee38eeef63969dcf3dbb31a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "33",
+      "path": "/home/xor/vextest/80286/v1_real_mode/33.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor di,si",
+      "results": [
+        {
+          "opcode": "33",
+          "idx": 0,
+          "name": "xor di,si",
+          "hash": "bc45583a44ad7cbe6ac7bf388941d84e16b54b44",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "34",
+      "path": "/home/xor/vextest/80286/v1_real_mode/34.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor al,14h",
+      "results": [
+        {
+          "opcode": "34",
+          "idx": 0,
+          "name": "xor al,14h",
+          "hash": "cc3e4fed3695e542144a1abc57bb2767ae53a8c7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "35",
+      "path": "/home/xor/vextest/80286/v1_real_mode/35.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor ax,0",
+      "results": [
+        {
+          "opcode": "35",
+          "idx": 0,
+          "name": "xor ax,0",
+          "hash": "1eed4e8f1f08884c56a5661e921333045713c558",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "37",
+      "path": "/home/xor/vextest/80286/v1_real_mode/37.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "aaa",
+      "results": [
+        {
+          "opcode": "37",
+          "idx": 0,
+          "name": "aaa",
+          "hash": "4eccdec70243bb6ec51ddbbe4ccafb36a044bef9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "38",
+      "path": "/home/xor/vextest/80286/v1_real_mode/38.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp bh,bh",
+      "results": [
+        {
+          "opcode": "38",
+          "idx": 0,
+          "name": "cmp bh,bh",
+          "hash": "90854419d998e1653fbc4dc42863dd1b83e7ffd7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "39",
+      "path": "/home/xor/vextest/80286/v1_real_mode/39.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp [ss:bp+di],di",
+      "results": [
+        {
+          "opcode": "39",
+          "idx": 0,
+          "name": "cmp [ss:bp+di],di",
+          "hash": "5650ebd8ada0c66ae1585bd094fef5e71efaae00",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "3A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/3A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp al,bl",
+      "results": [
+        {
+          "opcode": "3A",
+          "idx": 0,
+          "name": "cmp al,bl",
+          "hash": "5f1fe8c449fff59ba0ba2c33f510e9cfbc93e430",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "3B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/3B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp bx,bx",
+      "results": [
+        {
+          "opcode": "3B",
+          "idx": 0,
+          "name": "cmp bx,bx",
+          "hash": "5d5c3f7654030b9b32a1c248aceee46ac0c9d5a5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "3C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/3C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp al,0",
+      "results": [
+        {
+          "opcode": "3C",
+          "idx": 0,
+          "name": "cmp al,0",
+          "hash": "6f9951b9ba78a69d531877155c3c743143411e2b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "3D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/3D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp ax,0",
+      "results": [
+        {
+          "opcode": "3D",
+          "idx": 0,
+          "name": "cmp ax,0",
+          "hash": "30aba5c2862d14bb22ccdb80fa76b3ae7415c1e4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "3F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/3F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "aas",
+      "results": [
+        {
+          "opcode": "3F",
+          "idx": 0,
+          "name": "aas",
+          "hash": "11769751bb0a8a1a8c2a7942a4f3aee960e88fa6",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "40",
+      "path": "/home/xor/vextest/80286/v1_real_mode/40.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc ax",
+      "results": [
+        {
+          "opcode": "40",
+          "idx": 0,
+          "name": "inc ax",
+          "hash": "e8e9c75286db965e480e11de6d83738d2beffd29",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "41",
+      "path": "/home/xor/vextest/80286/v1_real_mode/41.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc cx",
+      "results": [
+        {
+          "opcode": "41",
+          "idx": 0,
+          "name": "inc cx",
+          "hash": "3dece31a4c3f34e9b23c7a9c25d333bf95a329e1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "42",
+      "path": "/home/xor/vextest/80286/v1_real_mode/42.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc dx",
+      "results": [
+        {
+          "opcode": "42",
+          "idx": 0,
+          "name": "inc dx",
+          "hash": "86e083db6445fcb1c5a9e9e5cea51b8b75777c6d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "43",
+      "path": "/home/xor/vextest/80286/v1_real_mode/43.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc bx",
+      "results": [
+        {
+          "opcode": "43",
+          "idx": 0,
+          "name": "inc bx",
+          "hash": "e06789b340d85e2d8c9e583ab25efe8cc4b39bb2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "44",
+      "path": "/home/xor/vextest/80286/v1_real_mode/44.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc sp",
+      "results": [
+        {
+          "opcode": "44",
+          "idx": 0,
+          "name": "inc sp",
+          "hash": "0aff3de60411626046e0aa0c0cc9dc5ebe15171a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "45",
+      "path": "/home/xor/vextest/80286/v1_real_mode/45.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc bp",
+      "results": [
+        {
+          "opcode": "45",
+          "idx": 0,
+          "name": "inc bp",
+          "hash": "ece33e29dc39095c6b938716e6157ed214b0ee1b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "46",
+      "path": "/home/xor/vextest/80286/v1_real_mode/46.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc si",
+      "results": [
+        {
+          "opcode": "46",
+          "idx": 0,
+          "name": "inc si",
+          "hash": "8192268783a84430ce0bf38df6f0407ac102d1bc",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "47",
+      "path": "/home/xor/vextest/80286/v1_real_mode/47.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc di",
+      "results": [
+        {
+          "opcode": "47",
+          "idx": 0,
+          "name": "inc di",
+          "hash": "6c90d91e2c75071fc9a6b760396b87ab62b851df",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "48",
+      "path": "/home/xor/vextest/80286/v1_real_mode/48.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec ax",
+      "results": [
+        {
+          "opcode": "48",
+          "idx": 0,
+          "name": "dec ax",
+          "hash": "e4bab40f70835e0ff4f3df04bef17ec490325ae1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "49",
+      "path": "/home/xor/vextest/80286/v1_real_mode/49.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec cx",
+      "results": [
+        {
+          "opcode": "49",
+          "idx": 0,
+          "name": "dec cx",
+          "hash": "9069f5b874da2f0079bbe2cb988076d1c43c1d9c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec dx",
+      "results": [
+        {
+          "opcode": "4A",
+          "idx": 0,
+          "name": "dec dx",
+          "hash": "eb6750231bc67f6e56b4714893c74b1366354c19",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec bx",
+      "results": [
+        {
+          "opcode": "4B",
+          "idx": 0,
+          "name": "dec bx",
+          "hash": "406e0a1431663426c4d6a1581d8bf11acabde480",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec sp",
+      "results": [
+        {
+          "opcode": "4C",
+          "idx": 0,
+          "name": "dec sp",
+          "hash": "d9307f66467b1ca1b2ea54f116454c32095c3278",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec bp",
+      "results": [
+        {
+          "opcode": "4D",
+          "idx": 0,
+          "name": "dec bp",
+          "hash": "8519dbb51e7bfd5a5ca0b5c9c7d5e7ae0648981f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec si",
+      "results": [
+        {
+          "opcode": "4E",
+          "idx": 0,
+          "name": "dec si",
+          "hash": "dee9a7dd302695a5edad52aaa1406754017ce12c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "4F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/4F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec di",
+      "results": [
+        {
+          "opcode": "4F",
+          "idx": 0,
+          "name": "dec di",
+          "hash": "37b8fc1d1aa1a7c5c08bcb54dd96784b1c3e4b40",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "50",
+      "path": "/home/xor/vextest/80286/v1_real_mode/50.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push ax",
+      "results": [
+        {
+          "opcode": "50",
+          "idx": 0,
+          "name": "push ax",
+          "hash": "85c01f191d9fbbbefe73a04505086fa87b0ab745",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "51",
+      "path": "/home/xor/vextest/80286/v1_real_mode/51.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push cx",
+      "results": [
+        {
+          "opcode": "51",
+          "idx": 0,
+          "name": "push cx",
+          "hash": "943d8dee531ad780c315dc9c2afc1fb22938c608",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "52",
+      "path": "/home/xor/vextest/80286/v1_real_mode/52.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push dx",
+      "results": [
+        {
+          "opcode": "52",
+          "idx": 0,
+          "name": "push dx",
+          "hash": "a732568fd32bd44dc6afc06ee4b16e0ddaf67681",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "53",
+      "path": "/home/xor/vextest/80286/v1_real_mode/53.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push bx",
+      "results": [
+        {
+          "opcode": "53",
+          "idx": 0,
+          "name": "push bx",
+          "hash": "c02b532feda62e0cc9116bfb43fc05e5f986e48c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "54",
+      "path": "/home/xor/vextest/80286/v1_real_mode/54.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push sp",
+      "results": [
+        {
+          "opcode": "54",
+          "idx": 0,
+          "name": "push sp",
+          "hash": "bf5a9e10030ce691410f806c3dd0c244e88ffe36",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "55",
+      "path": "/home/xor/vextest/80286/v1_real_mode/55.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push bp",
+      "results": [
+        {
+          "opcode": "55",
+          "idx": 0,
+          "name": "push bp",
+          "hash": "e294351b0a9fb429fee32638f5ebd02ff5475cec",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "56",
+      "path": "/home/xor/vextest/80286/v1_real_mode/56.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push si",
+      "results": [
+        {
+          "opcode": "56",
+          "idx": 0,
+          "name": "push si",
+          "hash": "ddaf1c5625182296107bd8ce4d3cb00e57d9c976",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "57",
+      "path": "/home/xor/vextest/80286/v1_real_mode/57.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push di",
+      "results": [
+        {
+          "opcode": "57",
+          "idx": 0,
+          "name": "push di",
+          "hash": "83f2bae27e50565dfb3a3e259932918ee486566d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "58",
+      "path": "/home/xor/vextest/80286/v1_real_mode/58.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop ax",
+      "results": [
+        {
+          "opcode": "58",
+          "idx": 0,
+          "name": "pop ax",
+          "hash": "7dbef2a404f697587c7ab909240fb05211ec6311",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "59",
+      "path": "/home/xor/vextest/80286/v1_real_mode/59.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop cx",
+      "results": [
+        {
+          "opcode": "59",
+          "idx": 0,
+          "name": "pop cx",
+          "hash": "280b5bc3312b44d59e1a526aaa8b384c88be8c3d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop dx",
+      "results": [
+        {
+          "opcode": "5A",
+          "idx": 0,
+          "name": "pop dx",
+          "hash": "6fb65cc26159cfd762269a65afb82a7b35bc1453",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop bx",
+      "results": [
+        {
+          "opcode": "5B",
+          "idx": 0,
+          "name": "pop bx",
+          "hash": "b156e6180d8e7efd421190bcbbcfb8a208543475",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock pop sp",
+      "results": [
+        {
+          "opcode": "5C",
+          "idx": 0,
+          "name": "lock pop sp",
+          "hash": "86267364eb8b550918cd409d4bd6bb3b31f37a8c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop bp",
+      "results": [
+        {
+          "opcode": "5D",
+          "idx": 0,
+          "name": "pop bp",
+          "hash": "aa46b9828c0da8ec2c054141bfe98a35a7314d9e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop si",
+      "results": [
+        {
+          "opcode": "5E",
+          "idx": 0,
+          "name": "pop si",
+          "hash": "79c1907273efa86bebf4d6b9a529eb9ffeb86b63",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "5F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/5F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pop di",
+      "results": [
+        {
+          "opcode": "5F",
+          "idx": 0,
+          "name": "pop di",
+          "hash": "e466d61061b4fb7726f0d1d07d1779c92446c3bd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "60",
+      "path": "/home/xor/vextest/80286/v1_real_mode/60.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pusha",
+      "results": [
+        {
+          "opcode": "60",
+          "idx": 0,
+          "name": "pusha",
+          "hash": "41d752451c364cdfafce6c5317802a98e9df6bfd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "61",
+      "path": "/home/xor/vextest/80286/v1_real_mode/61.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "popa",
+      "results": [
+        {
+          "opcode": "61",
+          "idx": 0,
+          "name": "popa",
+          "hash": "b94cdcc3b48bbe5f6f12f6016aa86040cd4ee6ba",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "62",
+      "path": "/home/xor/vextest/80286/v1_real_mode/62.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "(bad) bound sp,dx",
+      "results": [
+        {
+          "opcode": "62",
+          "idx": 0,
+          "name": "(bad) bound sp,dx",
+          "hash": "84a428d45c71f1e12e32a79cbcc8f1cd17465b99",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "68",
+      "path": "/home/xor/vextest/80286/v1_real_mode/68.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push 7FA2h",
+      "results": [
+        {
+          "opcode": "68",
+          "idx": 0,
+          "name": "push 7FA2h",
+          "hash": "b1db9a6307d080c807a7354f8c532e9971e79343",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "69",
+      "path": "/home/xor/vextest/80286/v1_real_mode/69.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "imul ax,[ds:bx+di-7945h],F76h",
+      "results": [
+        {
+          "opcode": "69",
+          "idx": 0,
+          "name": "imul ax,[ds:bx+di-7945h],F76h",
+          "hash": "0a5d3b8908512d35bb5b129f775766c963c9a7fb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push 3Fh",
+      "results": [
+        {
+          "opcode": "6A",
+          "idx": 0,
+          "name": "push 3Fh",
+          "hash": "bc8a2921108d7a6572aadd3a470f94a7f062c13c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "imul di,[ss:bp-39D0h],40h",
+      "results": [
+        {
+          "opcode": "6B",
+          "idx": 0,
+          "name": "imul di,[ss:bp-39D0h],40h",
+          "hash": "d10a7dd5501d53b546124c29eea3db3de649b532",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rep insb",
+      "results": [
+        {
+          "opcode": "6C",
+          "idx": 0,
+          "name": "rep insb",
+          "hash": "8806b0d7f70941810a6c461c92909b2023a2fc6c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "repne insw",
+      "results": [
+        {
+          "opcode": "6D",
+          "idx": 0,
+          "name": "repne insw",
+          "hash": "fcc9d07a9e7dd0f1748a3d97d2ac9529e6523f67",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "repne outsb",
+      "results": [
+        {
+          "opcode": "6E",
+          "idx": 0,
+          "name": "repne outsb",
+          "hash": "5db84aa2eba3d796ab8e689ff7dc34c959ef8ddc",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "6F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/6F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "outsw",
+      "results": [
+        {
+          "opcode": "6F",
+          "idx": 0,
+          "name": "outsw",
+          "hash": "90ff1291578b73308be6f6d3b1b387e75277e1e0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "70",
+      "path": "/home/xor/vextest/80286/v1_real_mode/70.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jo short 5809h",
+      "results": [
+        {
+          "opcode": "70",
+          "idx": 0,
+          "name": "jo short 5809h",
+          "hash": "31474a1221d7612e535e4118e8e6110947493452",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "71",
+      "path": "/home/xor/vextest/80286/v1_real_mode/71.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jno short 9C7Ch",
+      "results": [
+        {
+          "opcode": "71",
+          "idx": 0,
+          "name": "jno short 9C7Ch",
+          "hash": "87abd43c3ad3d076bc3a5d1cf78eb5034f6cc83b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "72",
+      "path": "/home/xor/vextest/80286/v1_real_mode/72.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jb short 06FFh",
+      "results": [
+        {
+          "opcode": "72",
+          "idx": 0,
+          "name": "jb short 06FFh",
+          "hash": "9aac053c75ef4018edb1a423c52a0af93532153c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "73",
+      "path": "/home/xor/vextest/80286/v1_real_mode/73.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jae short A051h",
+      "results": [
+        {
+          "opcode": "73",
+          "idx": 0,
+          "name": "jae short A051h",
+          "hash": "effcd74d13e0b1271e696ab4a1217861378ba31d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "74",
+      "path": "/home/xor/vextest/80286/v1_real_mode/74.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "je short DBBDh",
+      "results": [
+        {
+          "opcode": "74",
+          "idx": 0,
+          "name": "je short DBBDh",
+          "hash": "2f63099df256bf2b182380e1cfe3af8ee2ae56f5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "75",
+      "path": "/home/xor/vextest/80286/v1_real_mode/75.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jne short B28Ch",
+      "results": [
+        {
+          "opcode": "75",
+          "idx": 0,
+          "name": "jne short B28Ch",
+          "hash": "a7a1d116399cee5be0f6eec248413da62706990d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "76",
+      "path": "/home/xor/vextest/80286/v1_real_mode/76.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jbe short 987Fh",
+      "results": [
+        {
+          "opcode": "76",
+          "idx": 0,
+          "name": "jbe short 987Fh",
+          "hash": "0ae7e5d4cf33c6d100bb85d06f1e65f5773b7ca1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "77",
+      "path": "/home/xor/vextest/80286/v1_real_mode/77.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ja short B4EFh",
+      "results": [
+        {
+          "opcode": "77",
+          "idx": 0,
+          "name": "ja short B4EFh",
+          "hash": "06d7855bb6fb842929a87f6db939f563f72788aa",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "78",
+      "path": "/home/xor/vextest/80286/v1_real_mode/78.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "js short 701Ch",
+      "results": [
+        {
+          "opcode": "78",
+          "idx": 0,
+          "name": "js short 701Ch",
+          "hash": "2602ec8155252029e7b40823f53c101e109e1fa9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "79",
+      "path": "/home/xor/vextest/80286/v1_real_mode/79.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jns short 6079h",
+      "results": [
+        {
+          "opcode": "79",
+          "idx": 0,
+          "name": "jns short 6079h",
+          "hash": "49c0ca40e61add8b46b3f0a89e58a6432baca76b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jp short 4647h",
+      "results": [
+        {
+          "opcode": "7A",
+          "idx": 0,
+          "name": "jp short 4647h",
+          "hash": "2dcb98a8eed50fde4f48ebddd665beb50d437b46",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jnp short 172Ah",
+      "results": [
+        {
+          "opcode": "7B",
+          "idx": 0,
+          "name": "jnp short 172Ah",
+          "hash": "6b234a02aafee6eea8e78458483cecbffd1feca0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jl short B14Ch",
+      "results": [
+        {
+          "opcode": "7C",
+          "idx": 0,
+          "name": "jl short B14Ch",
+          "hash": "c534058fa4587a536063b79eddc06535a07702af",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jge short 68B4h",
+      "results": [
+        {
+          "opcode": "7D",
+          "idx": 0,
+          "name": "jge short 68B4h",
+          "hash": "d321eed177e9cd156468197022b4b01f8ac72470",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jle short E77Fh",
+      "results": [
+        {
+          "opcode": "7E",
+          "idx": 0,
+          "name": "jle short E77Fh",
+          "hash": "247608906a47406e590aed4027bae8a558810d82",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "7F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/7F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jg short 4511h",
+      "results": [
+        {
+          "opcode": "7F",
+          "idx": 0,
+          "name": "jg short 4511h",
+          "hash": "748eac13bd077fc7e3a434750a90954a1ed24536",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add byte [ds:bx+124Eh],B3h",
+      "results": [
+        {
+          "opcode": "80.0",
+          "idx": 0,
+          "name": "add byte [ds:bx+124Eh],B3h",
+          "hash": "b6cdb931cbc1c31bbe88f0b0ab35f6a21a9ee958",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or byte [ss:bp+si+44h],7Bh",
+      "results": [
+        {
+          "opcode": "80.1",
+          "idx": 0,
+          "name": "or byte [ss:bp+si+44h],7Bh",
+          "hash": "d5e168f83b31141e2c39ee8d1c8119ac7903643f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc dh,51h",
+      "results": [
+        {
+          "opcode": "80.2",
+          "idx": 0,
+          "name": "adc dh,51h",
+          "hash": "ded34b2ef13104de7f7b13e9ab5f54f69a5676de",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb byte [ds:bx],F4h",
+      "results": [
+        {
+          "opcode": "80.3",
+          "idx": 0,
+          "name": "sbb byte [ds:bx],F4h",
+          "hash": "9920fa4213c452c427b4f1af2a2a7698116c6622",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and byte [cs:bp+si-52h],2",
+      "results": [
+        {
+          "opcode": "80.4",
+          "idx": 0,
+          "name": "and byte [cs:bp+si-52h],2",
+          "hash": "5fef76479d7a5dc8a8dc37d8a5f2d5a96cdffad2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub byte [ss:bp+di-21h],62h",
+      "results": [
+        {
+          "opcode": "80.5",
+          "idx": 0,
+          "name": "sub byte [ss:bp+di-21h],62h",
+          "hash": "d29fb26bcd5becafb3a8892d83d7ffe2df7fbde7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor byte [ds:bx],Ah",
+      "results": [
+        {
+          "opcode": "80.6",
+          "idx": 0,
+          "name": "xor byte [ds:bx],Ah",
+          "hash": "b34ead8042f24d3bbd85b4e78171b45703905a6b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "80.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/80.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp byte [ss:bp+di],41h",
+      "results": [
+        {
+          "opcode": "80.7",
+          "idx": 0,
+          "name": "cmp byte [ss:bp+di],41h",
+          "hash": "da9bdc5e7cca8bf71f9967d9a46febac24e9559a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add word [ds:bx+di],FE2Eh",
+      "results": [
+        {
+          "opcode": "81.0",
+          "idx": 0,
+          "name": "add word [ds:bx+di],FE2Eh",
+          "hash": "aa72c76165c205febb84685634684a035182be66",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or word [ds:bx+si+49h],432Bh",
+      "results": [
+        {
+          "opcode": "81.1",
+          "idx": 0,
+          "name": "or word [ds:bx+si+49h],432Bh",
+          "hash": "c54bbc9fd8f9346b7a5b760f2388fb73ab51422f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc di,984Ch",
+      "results": [
+        {
+          "opcode": "81.2",
+          "idx": 0,
+          "name": "adc di,984Ch",
+          "hash": "b9e704cf1f0db9ce02342973b4590cf343db7c72",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb word [ds:di+2130h],81BFh",
+      "results": [
+        {
+          "opcode": "81.3",
+          "idx": 0,
+          "name": "sbb word [ds:di+2130h],81BFh",
+          "hash": "cafbb54109226fb69ca98ce64654153e5da6545a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and ax,7BC1h",
+      "results": [
+        {
+          "opcode": "81.4",
+          "idx": 0,
+          "name": "and ax,7BC1h",
+          "hash": "0efb892c2aa741eca48dc55fdd7b4ea1f97318bc",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub word [ds:si+1DDFh],7693h",
+      "results": [
+        {
+          "opcode": "81.5",
+          "idx": 0,
+          "name": "sub word [ds:si+1DDFh],7693h",
+          "hash": "19e9e6d2b5452d43b270abbbbc73e56766b45a5a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor bp,C14Dh",
+      "results": [
+        {
+          "opcode": "81.6",
+          "idx": 0,
+          "name": "xor bp,C14Dh",
+          "hash": "b37aaa6dd8960e03c684f9b9b488c8ce6f42c045",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "81.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/81.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp word [ds:si],492Dh",
+      "results": [
+        {
+          "opcode": "81.7",
+          "idx": 0,
+          "name": "cmp word [ds:si],492Dh",
+          "hash": "f971e1981347d6ea819693fefe8407d863ac8a22",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add byte [ds:bx+si],BBh",
+      "results": [
+        {
+          "opcode": "82.0",
+          "idx": 0,
+          "name": "add byte [ds:bx+si],BBh",
+          "hash": "3f2796c59140ffad2345d8190f8cb6f7ec4a7100",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or dh,45h",
+      "results": [
+        {
+          "opcode": "82.1",
+          "idx": 0,
+          "name": "or dh,45h",
+          "hash": "d1d37423ef80248f68f33fb74abe3c89fea2e6bb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc byte [ss:bp+si],B1h",
+      "results": [
+        {
+          "opcode": "82.2",
+          "idx": 0,
+          "name": "adc byte [ss:bp+si],B1h",
+          "hash": "e6e3d356e7039e3b8d74c0e1df977643ba6622aa",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb byte [ds:bx+si-49h],47h",
+      "results": [
+        {
+          "opcode": "82.3",
+          "idx": 0,
+          "name": "sbb byte [ds:bx+si-49h],47h",
+          "hash": "60324d0e75fb9d5033dea7640920a81edbc273a6",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and byte [ds:bx+di+13h],7Fh",
+      "results": [
+        {
+          "opcode": "82.4",
+          "idx": 0,
+          "name": "and byte [ds:bx+di+13h],7Fh",
+          "hash": "8be233ee77130292e90cbb9247dfa06420e1fe08",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub byte [ds:bx+si],90h",
+      "results": [
+        {
+          "opcode": "82.5",
+          "idx": 0,
+          "name": "sub byte [ds:bx+si],90h",
+          "hash": "fff42897b9e491c64a8c79adf3099c1749f38485",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor byte [ds:bp+si-4Dh],96h",
+      "results": [
+        {
+          "opcode": "82.6",
+          "idx": 0,
+          "name": "xor byte [ds:bp+si-4Dh],96h",
+          "hash": "bbba0e0fdd7267468ceffc7f7b5be453de52b740",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "82.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/82.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp byte [ss:bp+si],90h",
+      "results": [
+        {
+          "opcode": "82.7",
+          "idx": 0,
+          "name": "cmp byte [ss:bp+si],90h",
+          "hash": "78304a2f68c09b4b5c4cc0665c5466bfc268d8ed",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "add word [ds:bx+di],2Dh",
+      "results": [
+        {
+          "opcode": "83.0",
+          "idx": 0,
+          "name": "add word [ds:bx+di],2Dh",
+          "hash": "e7915640b83754216aa6f4ba8c9944bb6b8c5bc4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "or word [ds:bx+si-4Bh],FFE7h",
+      "results": [
+        {
+          "opcode": "83.1",
+          "idx": 0,
+          "name": "or word [ds:bx+si-4Bh],FFE7h",
+          "hash": "18c40e3d0c11063699f188402ae53cd73124f311",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "adc bp,FFBCh",
+      "results": [
+        {
+          "opcode": "83.2",
+          "idx": 0,
+          "name": "adc bp,FFBCh",
+          "hash": "11145572e2a40b18367048b9bec4d5e8eac16db7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sbb word [ds:bx-60h],FFD4h",
+      "results": [
+        {
+          "opcode": "83.3",
+          "idx": 0,
+          "name": "sbb word [ds:bx-60h],FFD4h",
+          "hash": "f669bd331981611241657d120273d4746ced9a05",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "and sp,3Fh",
+      "results": [
+        {
+          "opcode": "83.4",
+          "idx": 0,
+          "name": "and sp,3Fh",
+          "hash": "58d2449747e944d4eeb3bb67471b7d1e5c43707f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sub word [ds:bx+si],FFC3h",
+      "results": [
+        {
+          "opcode": "83.5",
+          "idx": 0,
+          "name": "sub word [ds:bx+si],FFC3h",
+          "hash": "7318eb5f72d18b985d8d480994055fd12b2d2432",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xor di,1",
+      "results": [
+        {
+          "opcode": "83.6",
+          "idx": 0,
+          "name": "xor di,1",
+          "hash": "7c67f7dbbc8e44d750a4805e1b9a7c5b7d8a264a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "83.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/83.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmp word [ss:bp+si+68C7h],FFFDh",
+      "results": [
+        {
+          "opcode": "83.7",
+          "idx": 0,
+          "name": "cmp word [ss:bp+si+68C7h],FFFDh",
+          "hash": "473a62ab1d6ba67be7a433e66a3d0194b3bc0d8f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "84",
+      "path": "/home/xor/vextest/80286/v1_real_mode/84.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test [ds:bx+6FBCh],dl",
+      "results": [
+        {
+          "opcode": "84",
+          "idx": 0,
+          "name": "test [ds:bx+6FBCh],dl",
+          "hash": "a3636771012e536dda33b49d353e779cd589fefb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "85",
+      "path": "/home/xor/vextest/80286/v1_real_mode/85.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test [ss:bp+di+29h],si",
+      "results": [
+        {
+          "opcode": "85",
+          "idx": 0,
+          "name": "test [ss:bp+di+29h],si",
+          "hash": "3291e46f8e07ce6c9dd21865b2de5df9b548d51a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "86",
+      "path": "/home/xor/vextest/80286/v1_real_mode/86.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg ch,[ss:bp+si+68h]",
+      "results": [
+        {
+          "opcode": "86",
+          "idx": 0,
+          "name": "xchg ch,[ss:bp+si+68h]",
+          "hash": "655863d62462e86a477e48bc7cb8c0e93effa134",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "87",
+      "path": "/home/xor/vextest/80286/v1_real_mode/87.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg di,[ds:di]",
+      "results": [
+        {
+          "opcode": "87",
+          "idx": 0,
+          "name": "xchg di,[ds:di]",
+          "hash": "eb65e3ae7e2c04e115929edc43a7b3c83cd1be46",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "88",
+      "path": "/home/xor/vextest/80286/v1_real_mode/88.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bh,ah",
+      "results": [
+        {
+          "opcode": "88",
+          "idx": 0,
+          "name": "mov bh,ah",
+          "hash": "2d9f070679ab134edd15ea90c15613beecfb0346",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "89",
+      "path": "/home/xor/vextest/80286/v1_real_mode/89.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov [ds:bx+si-Dh],si",
+      "results": [
+        {
+          "opcode": "89",
+          "idx": 0,
+          "name": "mov [ds:bx+si-Dh],si",
+          "hash": "f93b718f090188034ef9fcd3f0b0e1f5b993d8e2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bl,[ds:bx+si+14h]",
+      "results": [
+        {
+          "opcode": "8A",
+          "idx": 0,
+          "name": "mov bl,[ds:bx+si+14h]",
+          "hash": "2a2d1c24de335335e20c80a918ac9a4c7b85fcd1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ax,bx",
+      "results": [
+        {
+          "opcode": "8B",
+          "idx": 0,
+          "name": "mov ax,bx",
+          "hash": "afabe3247b98a89355889518f798e47bad1ba503",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov [ds:bx+75FEh],ss",
+      "results": [
+        {
+          "opcode": "8C",
+          "idx": 0,
+          "name": "mov [ds:bx+75FEh],ss",
+          "hash": "ee813bb32d27e64baced606826a0df5867b49760",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lea di,[ds:bx+di-658Fh]",
+      "results": [
+        {
+          "opcode": "8D",
+          "idx": 0,
+          "name": "lea di,[ds:bx+di-658Fh]",
+          "hash": "ee527c7ea6be869d575f427f6ba80bf420dad67a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ss,[ds:di]",
+      "results": [
+        {
+          "opcode": "8E",
+          "idx": 0,
+          "name": "mov ss,[ds:di]",
+          "hash": "53bbe277ec9304a79130c50140c8a798ea322437",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "8F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/8F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "(bad) nop",
+      "results": [
+        {
+          "opcode": "8F",
+          "idx": 0,
+          "name": "(bad) nop",
+          "hash": "ab1088a2c74750c4d6bd749c9b11b917a9732a1e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "90",
+      "path": "/home/xor/vextest/80286/v1_real_mode/90.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "nop",
+      "results": [
+        {
+          "opcode": "90",
+          "idx": 0,
+          "name": "nop",
+          "hash": "76517bbb1b242ca7259f908e9a6c7da19cadf900",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "91",
+      "path": "/home/xor/vextest/80286/v1_real_mode/91.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg cx,ax",
+      "results": [
+        {
+          "opcode": "91",
+          "idx": 0,
+          "name": "xchg cx,ax",
+          "hash": "467833bed643fe0910be86fe7ec16076b11a9daf",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "92",
+      "path": "/home/xor/vextest/80286/v1_real_mode/92.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg dx,ax",
+      "results": [
+        {
+          "opcode": "92",
+          "idx": 0,
+          "name": "xchg dx,ax",
+          "hash": "da82fedbf83cbeca43739a78f9cd6d35893f9d70",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "93",
+      "path": "/home/xor/vextest/80286/v1_real_mode/93.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg bx,ax",
+      "results": [
+        {
+          "opcode": "93",
+          "idx": 0,
+          "name": "xchg bx,ax",
+          "hash": "3d1cc7a1a562d25f118a00c6f000fb620766a2d1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "94",
+      "path": "/home/xor/vextest/80286/v1_real_mode/94.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg sp,ax",
+      "results": [
+        {
+          "opcode": "94",
+          "idx": 0,
+          "name": "xchg sp,ax",
+          "hash": "a7571c3629c3a65aa505d8eb9bd8afc84ee82057",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "95",
+      "path": "/home/xor/vextest/80286/v1_real_mode/95.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg bp,ax",
+      "results": [
+        {
+          "opcode": "95",
+          "idx": 0,
+          "name": "xchg bp,ax",
+          "hash": "31080a88b72d214451634d6a90cc6c03d2884fc4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "96",
+      "path": "/home/xor/vextest/80286/v1_real_mode/96.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg si,ax",
+      "results": [
+        {
+          "opcode": "96",
+          "idx": 0,
+          "name": "xchg si,ax",
+          "hash": "7132b9b5bc80d750ca38324d48b07825eb5f61ca",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "97",
+      "path": "/home/xor/vextest/80286/v1_real_mode/97.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xchg di,ax",
+      "results": [
+        {
+          "opcode": "97",
+          "idx": 0,
+          "name": "xchg di,ax",
+          "hash": "e18f51d519355349c1da1474c24ca586e85b0412",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "98",
+      "path": "/home/xor/vextest/80286/v1_real_mode/98.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cbw",
+      "results": [
+        {
+          "opcode": "98",
+          "idx": 0,
+          "name": "cbw",
+          "hash": "adcbc75cc546b2cad5181f7d055d63a65a43937d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "99",
+      "path": "/home/xor/vextest/80286/v1_real_mode/99.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cwd",
+      "results": [
+        {
+          "opcode": "99",
+          "idx": 0,
+          "name": "cwd",
+          "hash": "36fc98323d4eb97b15071c6152fdddbae2b53648",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9A",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9A.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock call 934Ah:9410h",
+      "results": [
+        {
+          "opcode": "9A",
+          "idx": 0,
+          "name": "lock call 934Ah:9410h",
+          "hash": "47fa71401309b25280b4ae82ecd344be715d98ad",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9B",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9B.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "wait",
+      "results": [
+        {
+          "opcode": "9B",
+          "idx": 0,
+          "name": "wait",
+          "hash": "a6d5431d35889d02f585b461e529a27a330e20d5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9C",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9C.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "pushf",
+      "results": [
+        {
+          "opcode": "9C",
+          "idx": 0,
+          "name": "pushf",
+          "hash": "9a0a6f921b74553ab3cc971ef843a25cb5d4629d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9D",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9D.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "popf",
+      "results": [
+        {
+          "opcode": "9D",
+          "idx": 0,
+          "name": "popf",
+          "hash": "ab9a760a78288ee771251aead5c2f874d81ec4b8",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9E",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9E.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sahf",
+      "results": [
+        {
+          "opcode": "9E",
+          "idx": 0,
+          "name": "sahf",
+          "hash": "c4a0efbe14f764a3c2e4cc9a7cb7dd2198aff7e3",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "9F",
+      "path": "/home/xor/vextest/80286/v1_real_mode/9F.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lahf",
+      "results": [
+        {
+          "opcode": "9F",
+          "idx": 0,
+          "name": "lahf",
+          "hash": "72954cbe0414d4ca281a2f51172873da8123d49a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov al,[ds:BE9Eh]",
+      "results": [
+        {
+          "opcode": "A0",
+          "idx": 0,
+          "name": "mov al,[ds:BE9Eh]",
+          "hash": "a39f2e9188d360f14998f4b0496abcef804d4e65",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ax,[ds:5EA3h]",
+      "results": [
+        {
+          "opcode": "A1",
+          "idx": 0,
+          "name": "mov ax,[ds:5EA3h]",
+          "hash": "8d90f52ddc87f146f3e9eb6706cf264f6401206d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov [ds:3A35h],al",
+      "results": [
+        {
+          "opcode": "A2",
+          "idx": 0,
+          "name": "mov [ds:3A35h],al",
+          "hash": "3d489e9532fa1679662a4529a55feb0bc3def312",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov [ds:681Dh],ax",
+      "results": [
+        {
+          "opcode": "A3",
+          "idx": 0,
+          "name": "mov [ds:681Dh],ax",
+          "hash": "85b4841f6a939747f23a1ce7bfbd31985cec1063",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "repne movsb",
+      "results": [
+        {
+          "opcode": "A4",
+          "idx": 0,
+          "name": "repne movsb",
+          "hash": "0e4f49ce10723f226021725f95e877a2323db16a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "movsw",
+      "results": [
+        {
+          "opcode": "A5",
+          "idx": 0,
+          "name": "movsw",
+          "hash": "01ba73a05f67ea515d856282dcb1a65550df5263",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmpsb",
+      "results": [
+        {
+          "opcode": "A6",
+          "idx": 0,
+          "name": "cmpsb",
+          "hash": "467c40a447a517ec46286f71394aa39f5392d9c0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmpsw",
+      "results": [
+        {
+          "opcode": "A7",
+          "idx": 0,
+          "name": "cmpsw",
+          "hash": "c55ec4c487319bc771b0a6642dc68e5b1d7eae6e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test al,16h",
+      "results": [
+        {
+          "opcode": "A8",
+          "idx": 0,
+          "name": "test al,16h",
+          "hash": "8200412502a76f065656a25b0f5791cea9f9244e",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "A9",
+      "path": "/home/xor/vextest/80286/v1_real_mode/A9.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test ax,5156h",
+      "results": [
+        {
+          "opcode": "A9",
+          "idx": 0,
+          "name": "test ax,5156h",
+          "hash": "aef6d8f2dee7d93d9a262c7d3cd455439642804c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AA",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AA.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "stosb",
+      "results": [
+        {
+          "opcode": "AA",
+          "idx": 0,
+          "name": "stosb",
+          "hash": "63e9184963d91d05d609867116a03904f40a291b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AB",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AB.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "stosw",
+      "results": [
+        {
+          "opcode": "AB",
+          "idx": 0,
+          "name": "stosw",
+          "hash": "746de484c63731e8ceef6b16db80c884cc2ebcdf",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AC",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AC.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rep lodsb",
+      "results": [
+        {
+          "opcode": "AC",
+          "idx": 0,
+          "name": "rep lodsb",
+          "hash": "f06864f04e4869f395a9246af6d894f46b09bdfd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AD",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AD.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rep lodsw",
+      "results": [
+        {
+          "opcode": "AD",
+          "idx": 0,
+          "name": "rep lodsw",
+          "hash": "935c31187bd42d0ee58137dd49995bf0786ebea6",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AE",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AE.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "scasb",
+      "results": [
+        {
+          "opcode": "AE",
+          "idx": 0,
+          "name": "scasb",
+          "hash": "9699455ab18b9342e16abfc75a3ec62850b06125",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "AF",
+      "path": "/home/xor/vextest/80286/v1_real_mode/AF.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "scasw",
+      "results": [
+        {
+          "opcode": "AF",
+          "idx": 0,
+          "name": "scasw",
+          "hash": "82ebe5a2793b10f02f6994c2a03eaf440249d001",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov al,D7h",
+      "results": [
+        {
+          "opcode": "B0",
+          "idx": 0,
+          "name": "mov al,D7h",
+          "hash": "fba37122e55f9e67e221455d98f4eb0e7055e590",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov cl,D3h",
+      "results": [
+        {
+          "opcode": "B1",
+          "idx": 0,
+          "name": "mov cl,D3h",
+          "hash": "4a30a611fd38141b28d4f1049d45024e3d3c668a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov dl,E1h",
+      "results": [
+        {
+          "opcode": "B2",
+          "idx": 0,
+          "name": "mov dl,E1h",
+          "hash": "036ad06ba649db808a822d83e80ef06ceb4f46cd",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bl,D0h",
+      "results": [
+        {
+          "opcode": "B3",
+          "idx": 0,
+          "name": "mov bl,D0h",
+          "hash": "c5512c91189e1d319948af745a8160f6cff932c9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ah,90h",
+      "results": [
+        {
+          "opcode": "B4",
+          "idx": 0,
+          "name": "mov ah,90h",
+          "hash": "7ac9f949d5d83f50a022c5e5bc22e33cd2e1a408",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ch,B6h",
+      "results": [
+        {
+          "opcode": "B5",
+          "idx": 0,
+          "name": "mov ch,B6h",
+          "hash": "d7d5b0685dfa541fc3e9b4b878e7c35a43d03770",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov dh,8Ah",
+      "results": [
+        {
+          "opcode": "B6",
+          "idx": 0,
+          "name": "mov dh,8Ah",
+          "hash": "bdb443c094746790e1a4dce5477e3688e4289cb8",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bh,8",
+      "results": [
+        {
+          "opcode": "B7",
+          "idx": 0,
+          "name": "mov bh,8",
+          "hash": "908bc9db91faf49d800ef54e47e736a32ef3d8fb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov ax,AA50h",
+      "results": [
+        {
+          "opcode": "B8",
+          "idx": 0,
+          "name": "mov ax,AA50h",
+          "hash": "ae3908c74a7b83d62eab7c5760cfad4cbf73340b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "B9",
+      "path": "/home/xor/vextest/80286/v1_real_mode/B9.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov cx,E401h",
+      "results": [
+        {
+          "opcode": "B9",
+          "idx": 0,
+          "name": "mov cx,E401h",
+          "hash": "52020be21ce51bb30e81966f6e12fb41bb98c935",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BA",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BA.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov dx,A9Fh",
+      "results": [
+        {
+          "opcode": "BA",
+          "idx": 0,
+          "name": "mov dx,A9Fh",
+          "hash": "f63f1a6254875ddc7e5c02454bcabbbf7e596a1c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BB",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BB.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bx,68F7h",
+      "results": [
+        {
+          "opcode": "BB",
+          "idx": 0,
+          "name": "mov bx,68F7h",
+          "hash": "161a1cf3e24e728639ee453a34770769272bc54a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BC",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BC.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov sp,5548h",
+      "results": [
+        {
+          "opcode": "BC",
+          "idx": 0,
+          "name": "mov sp,5548h",
+          "hash": "8420b8b14e86f4d4f90d0daee543439e21dc3ea1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BD",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BD.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov bp,BAAFh",
+      "results": [
+        {
+          "opcode": "BD",
+          "idx": 0,
+          "name": "mov bp,BAAFh",
+          "hash": "b6210f412ac2a8df0943914f70277f61102da4bc",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BE",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BE.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov si,F05Bh",
+      "results": [
+        {
+          "opcode": "BE",
+          "idx": 0,
+          "name": "mov si,F05Bh",
+          "hash": "856410c9b30c4da9d4994f5839e3305c53567133",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "BF",
+      "path": "/home/xor/vextest/80286/v1_real_mode/BF.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov di,8A79h",
+      "results": [
+        {
+          "opcode": "BF",
+          "idx": 0,
+          "name": "mov di,8A79h",
+          "hash": "94af907381a2d9401dc9fd7292e728c761205604",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol ah,FFh",
+      "results": [
+        {
+          "opcode": "C0.0",
+          "idx": 0,
+          "name": "rol ah,FFh",
+          "hash": "07ea9e89da1c8644fe61c94d7d541bb5350e71d2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror byte [ds:bx+si-29h],25h",
+      "results": [
+        {
+          "opcode": "C0.1",
+          "idx": 0,
+          "name": "ror byte [ds:bx+si-29h],25h",
+          "hash": "31738c2786eb774e1fad38af5375ce08da5657f1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcl bh,73h",
+      "results": [
+        {
+          "opcode": "C0.2",
+          "idx": 0,
+          "name": "rcl bh,73h",
+          "hash": "a4ca0c56e28cc27497a57496735ea77e6c019219",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr byte [ds:si-38h],C1h",
+      "results": [
+        {
+          "opcode": "C0.3",
+          "idx": 0,
+          "name": "rcr byte [ds:si-38h],C1h",
+          "hash": "1b2edd7b2662c2512b4ea0acc29cd9a849550100",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl byte [ss:bp+si],4Ah",
+      "results": [
+        {
+          "opcode": "C0.4",
+          "idx": 0,
+          "name": "shl byte [ss:bp+si],4Ah",
+          "hash": "e6501a1380a44db12835be2912c8c8a9f1cede06",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr ch,9Fh",
+      "results": [
+        {
+          "opcode": "C0.5",
+          "idx": 0,
+          "name": "shr ch,9Fh",
+          "hash": "7e85d1ee9cca8399f15a25355012f18ee9958ddb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock sal bl,B0h",
+      "results": [
+        {
+          "opcode": "C0.6",
+          "idx": 0,
+          "name": "lock sal bl,B0h",
+          "hash": "2a7536c9836292cc954d8e6a8076f7e18d9c0097",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C0.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C0.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sar byte [ds:EDBFh],DDh",
+      "results": [
+        {
+          "opcode": "C0.7",
+          "idx": 0,
+          "name": "sar byte [ds:EDBFh],DDh",
+          "hash": "3f6c78fb359fbbb00dcb0498803ca5997eade20a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol word [ds:bx+20ECh],76h",
+      "results": [
+        {
+          "opcode": "C1.0",
+          "idx": 0,
+          "name": "rol word [ds:bx+20ECh],76h",
+          "hash": "c8c87ccf3e8c00e84d15d289437696eb9f18f9c7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror word [ss:bp+di],77h",
+      "results": [
+        {
+          "opcode": "C1.1",
+          "idx": 0,
+          "name": "ror word [ss:bp+di],77h",
+          "hash": "19eaa5a2a1113a307cc1ac2f4bffc1988247f812",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock rcl word [ds:bx+78h],67h",
+      "results": [
+        {
+          "opcode": "C1.2",
+          "idx": 0,
+          "name": "lock rcl word [ds:bx+78h],67h",
+          "hash": "5ff93da8ac19eba5f957ab54842c6446cbb134e0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr word [ds:bx-6Eh],3Fh",
+      "results": [
+        {
+          "opcode": "C1.3",
+          "idx": 0,
+          "name": "rcr word [ds:bx-6Eh],3Fh",
+          "hash": "ef379db34ccdc2f3bd0256561592db3ad128fb47",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl word [ss:bp+si-B3Bh],2Bh",
+      "results": [
+        {
+          "opcode": "C1.4",
+          "idx": 0,
+          "name": "shl word [ss:bp+si-B3Bh],2Bh",
+          "hash": "56a0dade4eba0453bd791d6fcf5b86fac4f5dde5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr word [ss:bp+di-1Dh],6",
+      "results": [
+        {
+          "opcode": "C1.5",
+          "idx": 0,
+          "name": "shr word [ss:bp+di-1Dh],6",
+          "hash": "a9598688620f50ab085ad0553d423e348ead1742",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sal word [ss:bp+di+6BDh],CBh",
+      "results": [
+        {
+          "opcode": "C1.6",
+          "idx": 0,
+          "name": "sal word [ss:bp+di+6BDh],CBh",
+          "hash": "4f612338ff4c540c65f3d9ef7a0c6bc5f55632ff",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C1.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C1.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sar word [ds:bx+si+7110h],Fh",
+      "results": [
+        {
+          "opcode": "C1.7",
+          "idx": 0,
+          "name": "sar word [ds:bx+si+7110h],Fh",
+          "hash": "32175bcd3c54ddc90fbb698ee17848319e7a2835",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ret D907h",
+      "results": [
+        {
+          "opcode": "C2",
+          "idx": 0,
+          "name": "ret D907h",
+          "hash": "140ebe1c3bf05d001b6d515a2797a85a830e2119",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ret",
+      "results": [
+        {
+          "opcode": "C3",
+          "idx": 0,
+          "name": "ret",
+          "hash": "8673e29a454ad3bdb2520bd66d97b147de2b05c9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "les ax,[ds:si-786Ch]",
+      "results": [
+        {
+          "opcode": "C4",
+          "idx": 0,
+          "name": "les ax,[ds:si-786Ch]",
+          "hash": "0c24f753b44ae3c957a1228b78b12bb4adb5f479",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lds sp,[ss:bp+si-5]",
+      "results": [
+        {
+          "opcode": "C5",
+          "idx": 0,
+          "name": "lds sp,[ss:bp+si-5]",
+          "hash": "e3aeec6ebe6f8b93caa631aeee611a3dff7b7a6d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "(bad) mov ch,F4h",
+      "results": [
+        {
+          "opcode": "C6",
+          "idx": 0,
+          "name": "(bad) mov ch,F4h",
+          "hash": "3744dfa0a1386ef97ddd25c67bad150ba05beb3b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mov word [ds:bx-7Bh],FFFFh",
+      "results": [
+        {
+          "opcode": "C7",
+          "idx": 0,
+          "name": "mov word [ds:bx-7Bh],FFFFh",
+          "hash": "89cdbbefd14f9d8688e3fd1db22fa1c644a698ad",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "enter 802Ch,B3h",
+      "results": [
+        {
+          "opcode": "C8",
+          "idx": 0,
+          "name": "enter 802Ch,B3h",
+          "hash": "aceb11f885923de010b27e23efebfd14fa0db4ee",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "C9",
+      "path": "/home/xor/vextest/80286/v1_real_mode/C9.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "leave",
+      "results": [
+        {
+          "opcode": "C9",
+          "idx": 0,
+          "name": "leave",
+          "hash": "9a64f0b343d07c6526fa1f25664ab31f1488f561",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CA",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CA.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "retf 6E14h",
+      "results": [
+        {
+          "opcode": "CA",
+          "idx": 0,
+          "name": "retf 6E14h",
+          "hash": "002313b72717d06c14cb1882b14dbd78bc4e70b1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CB",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CB.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "retf",
+      "results": [
+        {
+          "opcode": "CB",
+          "idx": 0,
+          "name": "retf",
+          "hash": "948cf6e5bef088536dc31ad2aeceb0de46e4de6b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CC",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CC.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock int3",
+      "results": [
+        {
+          "opcode": "CC",
+          "idx": 0,
+          "name": "lock int3",
+          "hash": "cece2a635489c3dea95ba4a2a25c7a374f61e4c4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CD",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CD.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "int 9Bh",
+      "results": [
+        {
+          "opcode": "CD",
+          "idx": 0,
+          "name": "int 9Bh",
+          "hash": "01dc45b4a1d7e123348da68e9f81710ff3f463e9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CE",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CE.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "into",
+      "results": [
+        {
+          "opcode": "CE",
+          "idx": 0,
+          "name": "into",
+          "hash": "296af64b822d68775d3db1f158cbe5c39ec56c32",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "CF",
+      "path": "/home/xor/vextest/80286/v1_real_mode/CF.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "iret",
+      "results": [
+        {
+          "opcode": "CF",
+          "idx": 0,
+          "name": "iret",
+          "hash": "3964ee3acec16baa2cbda71ae0332cfe64aace1f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol dl,1",
+      "results": [
+        {
+          "opcode": "D0.0",
+          "idx": 0,
+          "name": "rol dl,1",
+          "hash": "cbfeb5b2b5150e4909118eb50d93ede41bfe8538",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror byte [ss:bp+di-72DDh],1",
+      "results": [
+        {
+          "opcode": "D0.1",
+          "idx": 0,
+          "name": "ror byte [ss:bp+di-72DDh],1",
+          "hash": "948079e6a03ebc4372d72d8a26b2f1cad201d039",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcl byte [ds:bp+si],1",
+      "results": [
+        {
+          "opcode": "D0.2",
+          "idx": 0,
+          "name": "rcl byte [ds:bp+si],1",
+          "hash": "e28bb2a34caacb8e3a3d8ea7a6d84284b1f83def",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr dl,1",
+      "results": [
+        {
+          "opcode": "D0.3",
+          "idx": 0,
+          "name": "rcr dl,1",
+          "hash": "737b1eeeca62bb92cccd2e824a76168011792bb1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl byte [ds:bx+si+7Fh],1",
+      "results": [
+        {
+          "opcode": "D0.4",
+          "idx": 0,
+          "name": "shl byte [ds:bx+si+7Fh],1",
+          "hash": "5d939ed4a81abab0ebe2f028c43453febf58c87a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr byte [ss:bp-40h],1",
+      "results": [
+        {
+          "opcode": "D0.5",
+          "idx": 0,
+          "name": "shr byte [ss:bp-40h],1",
+          "hash": "08b3cf87512224d2e0280440375516b13132c9d8",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sal byte [ss:bx+di+31h],1",
+      "results": [
+        {
+          "opcode": "D0.6",
+          "idx": 0,
+          "name": "sal byte [ss:bx+di+31h],1",
+          "hash": "3b91832c9b720d5535580ee655d660f2bdac5b2f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D0.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D0.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "lock sar byte [ss:bp+di-75Ch],1",
+      "results": [
+        {
+          "opcode": "D0.7",
+          "idx": 0,
+          "name": "lock sar byte [ss:bp+di-75Ch],1",
+          "hash": "5beb6a4ef5c096a3f70cfceec24d44678de52502",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol word [ss:bp+di-40F5h],1",
+      "results": [
+        {
+          "opcode": "D1.0",
+          "idx": 0,
+          "name": "rol word [ss:bp+di-40F5h],1",
+          "hash": "f6b69bc8bdfed7bd1dd7235ea5e694f9811b418f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror word [ds:bx],1",
+      "results": [
+        {
+          "opcode": "D1.1",
+          "idx": 0,
+          "name": "ror word [ds:bx],1",
+          "hash": "3858eac0261c0a7d48abec677857626713156132",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcl word [es:bx+si+7C6Fh],1",
+      "results": [
+        {
+          "opcode": "D1.2",
+          "idx": 0,
+          "name": "rcl word [es:bx+si+7C6Fh],1",
+          "hash": "62ec0b5ee4c5f4e8f8f743888191d7aa6cdfd737",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr word [ss:si],1",
+      "results": [
+        {
+          "opcode": "D1.3",
+          "idx": 0,
+          "name": "rcr word [ss:si],1",
+          "hash": "eb54106ab4b51ba187572f48434db46f9d8e4385",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl word [ss:bp+si+63h],1",
+      "results": [
+        {
+          "opcode": "D1.4",
+          "idx": 0,
+          "name": "shl word [ss:bp+si+63h],1",
+          "hash": "3597712bc2819b7d01ddc5cfce9ad4dfa83c5dc7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr word [ds:bx],1",
+      "results": [
+        {
+          "opcode": "D1.5",
+          "idx": 0,
+          "name": "shr word [ds:bx],1",
+          "hash": "4fcb8ac45556cca5add359fff00b790c985d63af",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sal word [ds:si],1",
+      "results": [
+        {
+          "opcode": "D1.6",
+          "idx": 0,
+          "name": "sal word [ds:si],1",
+          "hash": "345bd268a744c6e714d5110f0a515b15c36e5663",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D1.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D1.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sar word [ss:bp+si+979h],1",
+      "results": [
+        {
+          "opcode": "D1.7",
+          "idx": 0,
+          "name": "sar word [ss:bp+si+979h],1",
+          "hash": "51bd70ac1ba0ea356036c0890b0d6cba92bce9a9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol byte [ds:bx+si+5B6Fh],cl",
+      "results": [
+        {
+          "opcode": "D2.0",
+          "idx": 0,
+          "name": "rol byte [ds:bx+si+5B6Fh],cl",
+          "hash": "849ac602cadf7aa231b985da656ad37e12c185c2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror byte [ds:bx-75h],cl",
+      "results": [
+        {
+          "opcode": "D2.1",
+          "idx": 0,
+          "name": "ror byte [ds:bx-75h],cl",
+          "hash": "8aa15b046d4bf124c5c3d6fcbd089c64e47c6903",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcl byte [ds:49Ch],cl",
+      "results": [
+        {
+          "opcode": "D2.2",
+          "idx": 0,
+          "name": "rcl byte [ds:49Ch],cl",
+          "hash": "c2cd08f7513fcc5af0ee65d6271aff94000d115b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr byte [ds:si],cl",
+      "results": [
+        {
+          "opcode": "D2.3",
+          "idx": 0,
+          "name": "rcr byte [ds:si],cl",
+          "hash": "42fcabed1e28ea019ab9efaa4d6cbe416f81965b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl byte [ss:bp+si+1D6Bh],cl",
+      "results": [
+        {
+          "opcode": "D2.4",
+          "idx": 0,
+          "name": "shl byte [ss:bp+si+1D6Bh],cl",
+          "hash": "07d5a21d6610577d340e9a3d8a699bde7f3af69f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr dl,cl",
+      "results": [
+        {
+          "opcode": "D2.5",
+          "idx": 0,
+          "name": "shr dl,cl",
+          "hash": "e720448c5baf072c5906ea5dee7093ab81b7a10b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sal byte [ds:E841h],cl",
+      "results": [
+        {
+          "opcode": "D2.6",
+          "idx": 0,
+          "name": "sal byte [ds:E841h],cl",
+          "hash": "b5811d27b1d08f23647c21603d9a63abe72f5f1d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D2.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D2.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sar byte [ss:bp-1Bh],cl",
+      "results": [
+        {
+          "opcode": "D2.7",
+          "idx": 0,
+          "name": "sar byte [ss:bp-1Bh],cl",
+          "hash": "0b9b4481f28181f230528a1cc07c6ed9fe8ceca6",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rol word [ds:BFF0h],cl",
+      "results": [
+        {
+          "opcode": "D3.0",
+          "idx": 0,
+          "name": "rol word [ds:BFF0h],cl",
+          "hash": "49a85cc3caef17fe539529f65c9197e57595ea7c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "ror word [ds:bx],cl",
+      "results": [
+        {
+          "opcode": "D3.1",
+          "idx": 0,
+          "name": "ror word [ds:bx],cl",
+          "hash": "1679ed7c47690c9e4bc6fbcf4d81a6456c97ccb8",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcl word [ds:68E5h],cl",
+      "results": [
+        {
+          "opcode": "D3.2",
+          "idx": 0,
+          "name": "rcl word [ds:68E5h],cl",
+          "hash": "0a75ecbd0d742242a5c58cbb35d0fe77b8900679",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "rcr word [ds:bx+si-6164h],cl",
+      "results": [
+        {
+          "opcode": "D3.3",
+          "idx": 0,
+          "name": "rcr word [ds:bx+si-6164h],cl",
+          "hash": "d5107628ec8d661223994eefd99ccf987e12b90a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shl word [ds:si-1C4Dh],cl",
+      "results": [
+        {
+          "opcode": "D3.4",
+          "idx": 0,
+          "name": "shl word [ds:si-1C4Dh],cl",
+          "hash": "69df0df536c4177ef820c2630c6be8766880baf5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "shr ax,cl",
+      "results": [
+        {
+          "opcode": "D3.5",
+          "idx": 0,
+          "name": "shr ax,cl",
+          "hash": "d44a3e758d0b649b424db0cee70e00912260053b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sal word [ds:bx+73h],cl",
+      "results": [
+        {
+          "opcode": "D3.6",
+          "idx": 0,
+          "name": "sal word [ds:bx+73h],cl",
+          "hash": "87483ab9a8ab6e218e8057d73ef3fa66cdddb6d1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D3.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D3.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sar di,cl",
+      "results": [
+        {
+          "opcode": "D3.7",
+          "idx": 0,
+          "name": "sar di,cl",
+          "hash": "4f060f3ad6ebdbdcd1131f07ea3049e8bbaecd80",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "aam 8Fh",
+      "results": [
+        {
+          "opcode": "D4",
+          "idx": 0,
+          "name": "aam 8Fh",
+          "hash": "4e96c93859e7e7a8d25251ab18dc6b97d428bbfb",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "aad 33h",
+      "results": [
+        {
+          "opcode": "D5",
+          "idx": 0,
+          "name": "aad 33h",
+          "hash": "9e6cbaf6b368d95baa830412c39c821a711b4e3f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "salc",
+      "results": [
+        {
+          "opcode": "D6",
+          "idx": 0,
+          "name": "salc",
+          "hash": "a74481504cf63b0e7b4292399ef0e2ce88f0af79",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "xlatb",
+      "results": [
+        {
+          "opcode": "D7",
+          "idx": 0,
+          "name": "xlatb",
+          "hash": "251160f7afa1b507d83f38f53caa97a9124ff388",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "D8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/D8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "esc [ds:di+22h]",
+      "results": [
+        {
+          "opcode": "D8",
+          "idx": 0,
+          "name": "esc [ds:di+22h]",
+          "hash": "60a45ad4ef265a15d979730d05213ab85f650bc9",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "loopne 7E16h",
+      "results": [
+        {
+          "opcode": "E0",
+          "idx": 0,
+          "name": "loopne 7E16h",
+          "hash": "195e7c543677d6c5da219109f5a5da174e929231",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "loope EFB9h",
+      "results": [
+        {
+          "opcode": "E1",
+          "idx": 0,
+          "name": "loope EFB9h",
+          "hash": "afab7c1b1cd092c92b3aee201229015dc331b3d6",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "loop A638h",
+      "results": [
+        {
+          "opcode": "E2",
+          "idx": 0,
+          "name": "loop A638h",
+          "hash": "95e561a8f1efa2334a1cac23d41fcb573fbbcf73",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jcxz 93EDh",
+      "results": [
+        {
+          "opcode": "E3",
+          "idx": 0,
+          "name": "jcxz 93EDh",
+          "hash": "466e2df88324f5979010a6b31490b6b1e04ec9aa",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "in al,FFh",
+      "results": [
+        {
+          "opcode": "E4",
+          "idx": 0,
+          "name": "in al,FFh",
+          "hash": "61941e2c23740c39a5e8ef8c374186a4a85c4f7a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "in ax,7Dh",
+      "results": [
+        {
+          "opcode": "E5",
+          "idx": 0,
+          "name": "in ax,7Dh",
+          "hash": "9b4c37bcf827e51e501dc3f66e856c230fc75f66",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "out B5h,al",
+      "results": [
+        {
+          "opcode": "E6",
+          "idx": 0,
+          "name": "out B5h,al",
+          "hash": "7618e90ef745a673f766ee6963da71a171e349fc",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "out Ch,ax",
+      "results": [
+        {
+          "opcode": "E7",
+          "idx": 0,
+          "name": "out Ch,ax",
+          "hash": "1d9d9dc8a934f98c559ac00e195c3cf44839b30b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "call B847h",
+      "results": [
+        {
+          "opcode": "E8",
+          "idx": 0,
+          "name": "call B847h",
+          "hash": "6aeda31dcf291274aef0b144d22278033423547f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "E9",
+      "path": "/home/xor/vextest/80286/v1_real_mode/E9.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jmp 6CEDh",
+      "results": [
+        {
+          "opcode": "E9",
+          "idx": 0,
+          "name": "jmp 6CEDh",
+          "hash": "a707bf770dea369360a4e7d4494045af48d8a850",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "EA",
+      "path": "/home/xor/vextest/80286/v1_real_mode/EA.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jmp 3632h:57D0h",
+      "results": [
+        {
+          "opcode": "EA",
+          "idx": 0,
+          "name": "jmp 3632h:57D0h",
+          "hash": "9e128dfc9cd7078ec7e8f05450f2f6bdca65689d",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "EB",
+      "path": "/home/xor/vextest/80286/v1_real_mode/EB.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jmp short 1EE5h",
+      "results": [
+        {
+          "opcode": "EB",
+          "idx": 0,
+          "name": "jmp short 1EE5h",
+          "hash": "037a36142dfb40c9acae4abf1f25979855578fa2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "EC",
+      "path": "/home/xor/vextest/80286/v1_real_mode/EC.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "in al,dx",
+      "results": [
+        {
+          "opcode": "EC",
+          "idx": 0,
+          "name": "in al,dx",
+          "hash": "3076bb0b623b8648413293a87c3b1e9783cd9b3f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "ED",
+      "path": "/home/xor/vextest/80286/v1_real_mode/ED.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "in ax,dx",
+      "results": [
+        {
+          "opcode": "ED",
+          "idx": 0,
+          "name": "in ax,dx",
+          "hash": "0da8fd009549582eb5d19bc760cd4041bfe753f4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "EE",
+      "path": "/home/xor/vextest/80286/v1_real_mode/EE.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "out dx,al",
+      "results": [
+        {
+          "opcode": "EE",
+          "idx": 0,
+          "name": "out dx,al",
+          "hash": "0bae1f574b40a2d6fe3bb9b9a9b3388d010e2c82",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "EF",
+      "path": "/home/xor/vextest/80286/v1_real_mode/EF.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "out dx,ax",
+      "results": [
+        {
+          "opcode": "EF",
+          "idx": 0,
+          "name": "out dx,ax",
+          "hash": "14f3b808d08b83bbdb94c3acf1d8a6cadf621e86",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "hlt",
+      "results": [
+        {
+          "opcode": "F4",
+          "idx": 0,
+          "name": "hlt",
+          "hash": "2dd6900100be682caade614f4b74e3de78035e82",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cmc",
+      "results": [
+        {
+          "opcode": "F5",
+          "idx": 0,
+          "name": "cmc",
+          "hash": "daa313c84a5b1baced20e8e615da07336fcf7548",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test byte [ds:bx-44FAh],6",
+      "results": [
+        {
+          "opcode": "F6.0",
+          "idx": 0,
+          "name": "test byte [ds:bx-44FAh],6",
+          "hash": "fc3280ee2e674d5913065713adc6b4d64d87ca84",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test byte [ds:bx+Ah],13h",
+      "results": [
+        {
+          "opcode": "F6.1",
+          "idx": 0,
+          "name": "test byte [ds:bx+Ah],13h",
+          "hash": "a8567760d3ebbe2e3e4bf09633da9f6eb2d1bc55",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "not byte [ss:bp+30h]",
+      "results": [
+        {
+          "opcode": "F6.2",
+          "idx": 0,
+          "name": "not byte [ss:bp+30h]",
+          "hash": "8519c89b8b725039762942de924d5210d0228351",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "neg bh",
+      "results": [
+        {
+          "opcode": "F6.3",
+          "idx": 0,
+          "name": "neg bh",
+          "hash": "e94c8108351c07223006792f7b7799947679b370",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mul byte [ds:bx+di]",
+      "results": [
+        {
+          "opcode": "F6.4",
+          "idx": 0,
+          "name": "mul byte [ds:bx+di]",
+          "hash": "14086984314c2f090491531d4e98856a9b52ea4b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "imul byte [ds:bx+di+59h]",
+      "results": [
+        {
+          "opcode": "F6.5",
+          "idx": 0,
+          "name": "imul byte [ds:bx+di+59h]",
+          "hash": "0e64fd6f32fbd3ead2d0e37dfec9ef6c3d7f3944",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "div byte [ds:si+3D3Bh]",
+      "results": [
+        {
+          "opcode": "F6.6",
+          "idx": 0,
+          "name": "div byte [ds:si+3D3Bh]",
+          "hash": "0b796f0cf88c29174f23f6515809f5eb5683e57c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F6.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F6.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "idiv cl",
+      "results": [
+        {
+          "opcode": "F6.7",
+          "idx": 0,
+          "name": "idiv cl",
+          "hash": "71949e249df932c6b3576666ab89f1eb035daa01",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test word [ss:bp+di],9A0Fh",
+      "results": [
+        {
+          "opcode": "F7.0",
+          "idx": 0,
+          "name": "test word [ss:bp+di],9A0Fh",
+          "hash": "ec579cdc8f9dee22586b07b082705ecf7f53125c",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "test word [ds:bx+si-4883h],42E4h",
+      "results": [
+        {
+          "opcode": "F7.1",
+          "idx": 0,
+          "name": "test word [ds:bx+si-4883h],42E4h",
+          "hash": "8690bb90f06710618348d860866758184186540b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "not word [ds:si-5Bh]",
+      "results": [
+        {
+          "opcode": "F7.2",
+          "idx": 0,
+          "name": "not word [ds:si-5Bh]",
+          "hash": "74e066057e0e7473720747284e1caccd095aaf58",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "neg word [cs:bp+si+4Fh]",
+      "results": [
+        {
+          "opcode": "F7.3",
+          "idx": 0,
+          "name": "neg word [cs:bp+si+4Fh]",
+          "hash": "593ec2fb920bf57a03e4b74e8ee700bedd360042",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "mul word [ds:bx+53h]",
+      "results": [
+        {
+          "opcode": "F7.4",
+          "idx": 0,
+          "name": "mul word [ds:bx+53h]",
+          "hash": "9233ee0ca8af36e282c80bab5ff41e2e2c364eac",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "imul word [cs:bx+si-51Ah]",
+      "results": [
+        {
+          "opcode": "F7.5",
+          "idx": 0,
+          "name": "imul word [cs:bx+si-51Ah]",
+          "hash": "34204ed989f3d886ad1a46ecdd9063f98209e964",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "div sp",
+      "results": [
+        {
+          "opcode": "F7.6",
+          "idx": 0,
+          "name": "div sp",
+          "hash": "57c0241a5ddc99674efc5be1bc2ca0720cc572b2",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F7.7",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F7.7.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "idiv di",
+      "results": [
+        {
+          "opcode": "F7.7",
+          "idx": 0,
+          "name": "idiv di",
+          "hash": "e633e996b55cc72b3c91362d7bf54169e02edd0a",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F8",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F8.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "clc",
+      "results": [
+        {
+          "opcode": "F8",
+          "idx": 0,
+          "name": "clc",
+          "hash": "7ab7a515eac896507941b7d2d93b5b925aa63f29",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "F9",
+      "path": "/home/xor/vextest/80286/v1_real_mode/F9.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "stc",
+      "results": [
+        {
+          "opcode": "F9",
+          "idx": 0,
+          "name": "stc",
+          "hash": "61ad82be5d2e4221a049910e5a47dbd9eff926e5",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FA",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FA.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cli",
+      "results": [
+        {
+          "opcode": "FA",
+          "idx": 0,
+          "name": "cli",
+          "hash": "34712bc3ea689babca0ec7fec7d644fc34a30773",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FB",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FB.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "sti",
+      "results": [
+        {
+          "opcode": "FB",
+          "idx": 0,
+          "name": "sti",
+          "hash": "1d390ffba2fb7fac8d59d2addb486c0bcdba4cb1",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FC",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FC.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "cld",
+      "results": [
+        {
+          "opcode": "FC",
+          "idx": 0,
+          "name": "cld",
+          "hash": "e867404342df00507348a244c3502242db561920",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FD",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FD.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "std",
+      "results": [
+        {
+          "opcode": "FD",
+          "idx": 0,
+          "name": "std",
+          "hash": "9c417cd5060c0cb2633d868e949ced00589591a0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FE.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FE.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc byte [ds:bx+di+35h]",
+      "results": [
+        {
+          "opcode": "FE.0",
+          "idx": 0,
+          "name": "inc byte [ds:bx+di+35h]",
+          "hash": "f1553bb76f145173e7df7743eec07fe20ab29a63",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FE.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FE.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec byte [ss:bp+71h]",
+      "results": [
+        {
+          "opcode": "FE.1",
+          "idx": 0,
+          "name": "dec byte [ss:bp+71h]",
+          "hash": "6cb45d2c43f5e0d84c3b55c4ab42f87acbecf60f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.0",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.0.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "inc word [ds:bx+si+29h]",
+      "results": [
+        {
+          "opcode": "FF.0",
+          "idx": 0,
+          "name": "inc word [ds:bx+si+29h]",
+          "hash": "56a75f50bdd173b578746ca34bc059aabe65a36f",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.1",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.1.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "dec word [cs:bp+si+7269h]",
+      "results": [
+        {
+          "opcode": "FF.1",
+          "idx": 0,
+          "name": "dec word [cs:bp+si+7269h]",
+          "hash": "4782d3a1a5ef400d3e65854cb558f71071be38a0",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.2",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.2.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "call word [ds:di-153Eh]",
+      "results": [
+        {
+          "opcode": "FF.2",
+          "idx": 0,
+          "name": "call word [ds:di-153Eh]",
+          "hash": "40d8af77b87c39fa9cea21c80a0162827c254232",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.3",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.3.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "call far [ds:di]",
+      "results": [
+        {
+          "opcode": "FF.3",
+          "idx": 0,
+          "name": "call far [ds:di]",
+          "hash": "95fe6fcb577bcd8ec2cead88828730e31e0e0418",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.4",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.4.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jmp word [ds:si-61CFh]",
+      "results": [
+        {
+          "opcode": "FF.4",
+          "idx": 0,
+          "name": "jmp word [ds:si-61CFh]",
+          "hash": "9fb860eb0a5356b9871ed0b8ad1a195e46aa816b",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.5",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.5.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "jmp far [ss:bp+si+39h]",
+      "results": [
+        {
+          "opcode": "FF.5",
+          "idx": 0,
+          "name": "jmp far [ss:bp+si+39h]",
+          "hash": "aab147cde58b3f4ee42f80141aa44f44ba73fbc4",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    },
+    {
+      "opcode": "FF.6",
+      "path": "/home/xor/vextest/80286/v1_real_mode/FF.6.MOO.gz",
+      "cpu": "C286",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "sample_name": "push word [ds:bx-7Fh]",
+      "results": [
+        {
+          "opcode": "FF.6",
+          "idx": 0,
+          "name": "push word [ds:bx-7Fh]",
+          "hash": "74b28fe3b4e04c7a590858558edd827f5599fcc7",
+          "passed": true,
+          "skipped": false,
+          "error": null,
+          "mismatches": []
+        }
+      ]
+    }
+  ],
+  "total_files": 326,
+  "total_cases": 326,
+  "passed_cases": 326,
+  "failed_cases": 0,
+  "skipped_cases": 0
+}

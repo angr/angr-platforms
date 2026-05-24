@@ -1,0 +1,142 @@
+[
+  {
+    "id": "ISOD",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "small",
+    "optimization": "/Od",
+    "binary": "ISOD.EXE",
+    "object": "ISOD.OBJ",
+    "cod": "ISOD.COD",
+    "map": "ISOD.MAP"
+  },
+  {
+    "id": "ISOT",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "small",
+    "optimization": "/Ot",
+    "binary": "ISOT.EXE",
+    "object": "ISOT.OBJ",
+    "cod": "ISOT.COD",
+    "map": "ISOT.MAP"
+  },
+  {
+    "id": "ISOX",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "small",
+    "optimization": "/Ox",
+    "binary": "ISOX.EXE",
+    "object": "ISOX.OBJ",
+    "cod": "ISOX.COD",
+    "map": "ISOX.MAP"
+  },
+  {
+    "id": "IMOD",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "medium",
+    "optimization": "/Od",
+    "binary": "IMOD.EXE",
+    "object": "IMOD.OBJ",
+    "cod": "IMOD.COD",
+    "map": "IMOD.MAP"
+  },
+  {
+    "id": "IMOT",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "medium",
+    "optimization": "/Ot",
+    "binary": "IMOT.EXE",
+    "object": "IMOT.OBJ",
+    "cod": "IMOT.COD",
+    "map": "IMOT.MAP"
+  },
+  {
+    "id": "IMOX",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "medium",
+    "optimization": "/Ox",
+    "binary": "IMOX.EXE",
+    "object": "IMOX.OBJ",
+    "cod": "IMOX.COD",
+    "map": "IMOX.MAP"
+  },
+  {
+    "id": "ILOD",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "large",
+    "optimization": "/Od",
+    "binary": "ILOD.EXE",
+    "object": "ILOD.OBJ",
+    "cod": "ILOD.COD",
+    "map": "ILOD.MAP"
+  },
+  {
+    "id": "ILOT",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "large",
+    "optimization": "/Ot",
+    "binary": "ILOT.EXE",
+    "object": "ILOT.OBJ",
+    "cod": "ILOT.COD",
+    "map": "ILOT.MAP"
+  },
+  {
+    "id": "IHOD",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "huge",
+    "optimization": "/Od",
+    "binary": "IHOD.EXE",
+    "object": "IHOD.OBJ",
+    "cod": "IHOD.COD",
+    "map": "IHOD.MAP"
+  },
+  {
+    "id": "IHOT",
+    "format": "exe",
+    "compiler": "msc510",
+    "source": "IDEMO.C",
+    "memory_model": "huge",
+    "optimization": "/Ot",
+    "binary": "IHOT.EXE",
+    "object": "IHOT.OBJ",
+    "cod": "IHOT.COD",
+    "map": "IHOT.MAP"
+  },
+  {
+    "id": "ICOMDO",
+    "format": "com",
+    "compiler": "uasm",
+    "source": "ICOMDO.ASM",
+    "memory_model": "tiny",
+    "optimization": "n/a",
+    "binary": "ICOMDO.COM",
+    "listing": "ICOMDO.LST"
+  },
+  {
+    "id": "ICOMBI",
+    "format": "com",
+    "compiler": "uasm",
+    "source": "ICOMBI.ASM",
+    "memory_model": "tiny",
+    "optimization": "n/a",
+    "binary": "ICOMBI.COM",
+    "listing": "ICOMBI.LST"
+  }
+]

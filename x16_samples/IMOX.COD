@@ -1,0 +1,265 @@
+;	Static Name Aliases
+;
+;	$S242_g_info	EQU	g_info
+	TITLE   IDEMO.C
+	NAME    IDEMO
+
+	.8087
+IDEMO_TEXT	SEGMENT  WORD PUBLIC 'CODE'
+IDEMO_TEXT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME  CS: IDEMO_TEXT, DS: DGROUP, SS: DGROUP
+EXTRN	__acrtused:ABS
+EXTRN	_int86:FAR
+EXTRN	_int86x:FAR
+EXTRN	_cprintf:FAR
+_DATA      SEGMENT
+$SG257	DB	'dos=%u bios=%u mode=%u',  0dH,  0aH,  00H
+_DATA      ENDS
+_BSS      SEGMENT
+$S242_g_info	DW 06H DUP (?)
+_BSS      ENDS
+IDEMO_TEXT      SEGMENT
+	ASSUME	CS: IDEMO_TEXT
+;|*** #include <dos.h>
+;|*** #include <conio.h>
+;|*** 
+;|*** struct sample_info {
+;|***     unsigned dos_version;
+;|***     unsigned bios_kb;
+;|***     unsigned video_mode;
+;|***     unsigned cursor_shape;
+;|***     unsigned int21_segment;
+;|***     unsigned int21_offset;
+;|*** };
+;|*** 
+;|*** static struct sample_info g_info;
+;|*** 
+;|*** static unsigned fold_values(unsigned a, unsigned b) {
+; Line 15
+fold_values	PROC FAR
+	*** 000000	55 			push	bp
+	*** 000001	8b ec 			mov	bp,sp
+	*** 000003	83 ec 02 		sub	sp,2
+;	a = 6
+;	b = 8
+;	c = -2
+;|***     unsigned c;
+;|***     c = (a << 1) + b;
+; Line 17
+	*** 000006	8b 46 06 		mov	ax,WORD PTR [bp+6]	;a
+	*** 000009	d1 e0 			shl	ax,1
+	*** 00000b	03 46 08 		add	ax,WORD PTR [bp+8]	;b
+	*** 00000e	89 46 fe 		mov	WORD PTR [bp-2],ax	;c
+;|***     if (c > 1000) {
+; Line 18
+	*** 000011	3d e8 03 		cmp	ax,1000
+	*** 000014	76 06 			jbe	$I248
+;|***         c -= 123;
+; Line 19
+	*** 000016	83 6e fe 7b 		sub	WORD PTR [bp-2],123	;c
+;|***     } else {
+; Line 20
+	*** 00001a	eb 04 			jmp	SHORT $I249
+					$I248:
+;|***         c += 7;
+; Line 21
+	*** 00001c	83 46 fe 07 		add	WORD PTR [bp-2],7	;c
+;|***     }
+; Line 22
+					$I249:
+;|***     return c;
+; Line 23
+	*** 000020	8b 46 fe 		mov	ax,WORD PTR [bp-2]	;c
+	*** 000023	8b e5 			mov	sp,bp
+	*** 000025	5d 			pop	bp
+	*** 000026	cb 			ret	
+	*** 000027	90 			nop	
+
+fold_values	ENDP
+;|*** }
+;|*** 
+;|*** static void query_interrupts(void) {
+; Line 26
+query_interrupts	PROC FAR
+	*** 000028	55 			push	bp
+	*** 000029	8b ec 			mov	bp,sp
+	*** 00002b	83 ec 24 		sub	sp,36
+;	inregs = -22
+;	outregs = -36
+;	sregs = -8
+;|***     union REGS inregs;
+;|***     union REGS outregs;
+;|***     struct SREGS sregs;
+;|*** 
+;|***     inregs.h.ah = 0x30;
+; Line 31
+	*** 00002e	c6 46 eb 30 		mov	BYTE PTR [bp-21],48
+;|***     int86(0x21, &inregs, &outregs);
+; Line 32
+	*** 000032	8d 46 dc 		lea	ax,WORD PTR [bp-36]	;outregs
+	*** 000035	50 			push	ax
+	*** 000036	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;inregs
+	*** 000039	50 			push	ax
+	*** 00003a	b8 21 00 		mov	ax,33
+	*** 00003d	50 			push	ax
+	*** 00003e	9a 00 00 00 00 		call	FAR PTR _int86
+	*** 000043	83 c4 06 		add	sp,6
+;|***     g_info.dos_version = ((unsigned)outregs.h.ah << 8) | outregs.h.al;
+; Line 33
+	*** 000046	8a 66 dd 		mov	ah,BYTE PTR [bp-35]
+	*** 000049	2a c0 			sub	al,al
+	*** 00004b	8a 4e dc 		mov	cl,BYTE PTR [bp-36]	;outregs
+	*** 00004e	2a ed 			sub	ch,ch
+	*** 000050	0b c1 			or	ax,cx
+	*** 000052	a3 00 00 		mov	WORD PTR $S242_g_info,ax
+;|*** 
+;|***     inregs.h.ah = 0x0F;
+; Line 35
+	*** 000055	c6 46 eb 0f 		mov	BYTE PTR [bp-21],15
+;|***     int86(0x10, &inregs, &outregs);
+; Line 36
+	*** 000059	8d 46 dc 		lea	ax,WORD PTR [bp-36]	;outregs
+	*** 00005c	50 			push	ax
+	*** 00005d	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;inregs
+	*** 000060	50 			push	ax
+	*** 000061	b8 10 00 		mov	ax,16
+	*** 000064	50 			push	ax
+	*** 000065	9a 00 00 00 00 		call	FAR PTR _int86
+	*** 00006a	83 c4 06 		add	sp,6
+;|***     g_info.video_mode = outregs.h.al;
+; Line 37
+	*** 00006d	8a 46 dc 		mov	al,BYTE PTR [bp-36]	;outregs
+	*** 000070	2a e4 			sub	ah,ah
+	*** 000072	a3 04 00 		mov	WORD PTR $S242_g_info+4,ax
+;|*** 
+;|***     int86(0x12, &inregs, &outregs);
+; Line 39
+	*** 000075	8d 46 dc 		lea	ax,WORD PTR [bp-36]	;outregs
+	*** 000078	50 			push	ax
+	*** 000079	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;inregs
+	*** 00007c	50 			push	ax
+	*** 00007d	b8 12 00 		mov	ax,18
+	*** 000080	50 			push	ax
+	*** 000081	9a 00 00 00 00 		call	FAR PTR _int86
+	*** 000086	83 c4 06 		add	sp,6
+;|***     g_info.bios_kb = outregs.x.ax;
+; Line 40
+	*** 000089	8b 46 dc 		mov	ax,WORD PTR [bp-36]	;outregs
+	*** 00008c	a3 02 00 		mov	WORD PTR $S242_g_info+2,ax
+;|*** 
+;|***     inregs.h.ah = 0x03;
+; Line 42
+	*** 00008f	c6 46 eb 03 		mov	BYTE PTR [bp-21],3
+;|***     inregs.h.bh = 0;
+; Line 43
+	*** 000093	c6 46 ed 00 		mov	BYTE PTR [bp-19],0
+;|***     int86(0x10, &inregs, &outregs);
+; Line 44
+	*** 000097	8d 46 dc 		lea	ax,WORD PTR [bp-36]	;outregs
+	*** 00009a	50 			push	ax
+	*** 00009b	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;inregs
+	*** 00009e	50 			push	ax
+	*** 00009f	b8 10 00 		mov	ax,16
+	*** 0000a2	50 			push	ax
+	*** 0000a3	9a 00 00 00 00 		call	FAR PTR _int86
+	*** 0000a8	83 c4 06 		add	sp,6
+;|***     g_info.cursor_shape = outregs.x.cx;
+; Line 45
+	*** 0000ab	8b 46 e0 		mov	ax,WORD PTR [bp-32]
+	*** 0000ae	a3 06 00 		mov	WORD PTR $S242_g_info+6,ax
+;|*** 
+;|***     inregs.h.ah = 0x35;
+; Line 47
+	*** 0000b1	c6 46 eb 35 		mov	BYTE PTR [bp-21],53
+;|***     inregs.h.al = 0x21;
+; Line 48
+	*** 0000b5	c6 46 ea 21 		mov	BYTE PTR [bp-22],33	;inregs
+;|***     int86x(0x21, &inregs, &outregs, &sregs);
+; Line 49
+	*** 0000b9	8d 46 f8 		lea	ax,WORD PTR [bp-8]	;sregs
+	*** 0000bc	50 			push	ax
+	*** 0000bd	8d 46 dc 		lea	ax,WORD PTR [bp-36]	;outregs
+	*** 0000c0	50 			push	ax
+	*** 0000c1	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;inregs
+	*** 0000c4	50 			push	ax
+	*** 0000c5	b8 21 00 		mov	ax,33
+	*** 0000c8	50 			push	ax
+	*** 0000c9	9a 00 00 00 00 		call	FAR PTR _int86x
+	*** 0000ce	83 c4 08 		add	sp,8
+;|***     g_info.int21_segment = sregs.es;
+; Line 50
+	*** 0000d1	8b 46 f8 		mov	ax,WORD PTR [bp-8]	;sregs
+	*** 0000d4	a3 08 00 		mov	WORD PTR $S242_g_info+8,ax
+;|***     g_info.int21_offset = outregs.x.bx;
+; Line 51
+	*** 0000d7	8b 46 de 		mov	ax,WORD PTR [bp-34]
+	*** 0000da	a3 0a 00 		mov	WORD PTR $S242_g_info+10,ax
+;|*** }
+; Line 52
+	*** 0000dd	8b e5 			mov	sp,bp
+	*** 0000df	5d 			pop	bp
+	*** 0000e0	cb 			ret	
+	*** 0000e1	90 			nop	
+
+query_interrupts	ENDP
+;|*** 
+;|*** static void show_summary(void) {
+; Line 54
+show_summary	PROC FAR
+;|***     cprintf("dos=%u bios=%u mode=%u\r\n",
+;|***         g_info.dos_version,
+;|***         g_info.bios_kb,
+;|***         g_info.video_mode);
+; Line 58
+	*** 0000e2	ff 36 04 00 		push	WORD PTR $S242_g_info+4
+	*** 0000e6	ff 36 02 00 		push	WORD PTR $S242_g_info+2
+	*** 0000ea	ff 36 00 00 		push	WORD PTR $S242_g_info
+	*** 0000ee	b8 00 00 		mov	ax,OFFSET DGROUP:$SG257
+	*** 0000f1	50 			push	ax
+	*** 0000f2	9a 00 00 00 00 		call	FAR PTR _cprintf
+	*** 0000f7	83 c4 08 		add	sp,8
+;|*** }
+; Line 59
+	*** 0000fa	cb 			ret	
+	*** 0000fb	90 			nop	
+
+show_summary	ENDP
+;|*** 
+;|*** int main(void) {
+; Line 61
+	PUBLIC	_main
+_main	PROC FAR
+;|***     query_interrupts();
+; Line 62
+	*** 0000fc	0e 			push	cs
+	*** 0000fd	e8 00 00 		call	query_interrupts
+;|***     show_summary();
+; Line 63
+	*** 000100	0e 			push	cs
+	*** 000101	e8 00 00 		call	show_summary
+;|***     return fold_values(g_info.video_mode, g_info.bios_kb & 0xFF);
+; Line 64
+	*** 000104	a0 02 00 		mov	al,BYTE PTR $S242_g_info+2
+	*** 000107	2a e4 			sub	ah,ah
+	*** 000109	50 			push	ax
+	*** 00010a	ff 36 04 00 		push	WORD PTR $S242_g_info+4
+	*** 00010e	0e 			push	cs
+	*** 00010f	e8 00 00 		call	fold_values
+	*** 000112	83 c4 04 		add	sp,4
+	*** 000115	cb 			ret	
+
+_main	ENDP
+IDEMO_TEXT	ENDS
+END
+;|*** }

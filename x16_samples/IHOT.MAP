@@ -1,0 +1,206 @@
+
+ Start  Stop   Length Name                   Class
+ 00000H 0011FH 00120H IDEMO_TEXT             CODE
+ 00120H 01228H 01109H _TEXT                  CODE
+ 0122AH 0122AH 00000H C_ETEXT                ENDCODE
+ 01230H 01271H 00042H NULL                   BEGDATA
+ 01272H 01AF3H 00882H _DATA                  DATA
+ 01AF4H 01B01H 0000EH CDATA                  DATA
+ 01B02H 01B02H 00000H XIFB                   DATA
+ 01B02H 01B02H 00000H XIF                    DATA
+ 01B02H 01B02H 00000H XIFE                   DATA
+ 01B02H 01B02H 00000H XIB                    DATA
+ 01B02H 01B02H 00000H XI                     DATA
+ 01B02H 01B02H 00000H XIE                    DATA
+ 01B02H 01B02H 00000H XPB                    DATA
+ 01B02H 01B02H 00000H XP                     DATA
+ 01B02H 01B02H 00000H XPE                    DATA
+ 01B02H 01B02H 00000H XCB                    DATA
+ 01B02H 01B02H 00000H XC                     DATA
+ 01B02H 01B02H 00000H XCE                    DATA
+ 01B02H 01B02H 00000H XCFB                   DATA
+ 01B02H 01B02H 00000H XCF                    DATA
+ 01B02H 01B02H 00000H XCFE                   DATA
+ 01B02H 01B03H 00002H CONST                  CONST
+ 01B04H 01B0BH 00008H HDR                    MSG
+ 01B0CH 01BD9H 000CEH MSG                    MSG
+ 01BDAH 01BDBH 00002H PAD                    MSG
+ 01BDCH 01BDCH 00001H EPAD                   MSG
+ 01BDEH 01D79H 0019CH _BSS                   BSS
+ 01D7AH 01D7AH 00000H XOB                    BSS
+ 01D7AH 01D7AH 00000H XO                     BSS
+ 01D7AH 01D7AH 00000H XOE                    BSS
+ 01D80H 0257FH 00800H STACK                  STACK
+
+ Origin   Group
+ 0123:0   DGROUP
+
+  Address         Publics by Name
+
+ 0123:0110       STKHQQ
+ 0012:066E       _cprintf
+ 0123:09AE       _edata
+ 0123:0B50       _end
+ 0123:00F6       _environ
+ 0123:00CD       _errno
+ 0012:01A2       _exit
+ 0012:05E6       _int86
+ 0012:0FFE       _int86x
+ 0000:0106       _main
+ 0012:1096       _putch
+ 0012:05C4       _strlen
+ 0012:05DC       _ultoa
+ 0123:010C       __aaltstkovr
+ 0123:00B2       __abrkp
+ 0123:0062       __abrktb
+ 0123:00B2       __abrktbe
+ 0123:00B4       __acfinfo
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+ 0123:0108       __adbgmsg
+ 0123:0060       __aexit_rtn
+ 0123:00C1       __aintdiv
+ 0012:00C9       __amsg_exit
+ 0123:005C       __asizds
+ 0123:08AE       __asizeC
+ 0123:08AF       __asizeD
+ 0012:0010       __astart
+ 0123:005E       __atopsp
+ 0123:052A       __buferr
+ 0123:012A       __bufin
+ 0123:032A       __bufout
+ 0123:0896       __cfltcvt_tab
+ 0123:0100       __child
+ 0012:026A       __chkstk
+ 0012:00DE       __cinit
+ 0012:00BA       __cintDIV
+ 0012:10A6       __cltoasub
+ 0012:0200       __ctermsub
+ 0012:10B3       __cxtoa
+ 0123:00D8       __doserrno
+ 0012:0570       __dosret0
+ 0012:0583       __dosretax
+ 0012:0578       __dosreturn
+ 0123:00D5       __dosvermajor
+ 0123:00D6       __dosverminor
+ 0012:01B9       __exit
+ 0123:00C5       __fac
+ 0012:0240       __FF_MSGBANNER
+ 0123:08C6       __fpinit
+ 0012:0264       __fptrap
+ 0123:0103       __intno
+ 0123:072A       __iob
+ 0123:081A       __iob2
+ 0123:0892       __lastiob
+ 0012:0590       __maperror
+ 0012:052E       __myalloc
+ 0123:00DA       __nfile
+ 0012:04D8       __NMSG_TEXT
+ 0012:0503       __NMSG_WRITE
+ 0012:028E       __nullcheck
+ 0123:00D8       __oserr
+ 0123:00DC       __osfile
+ 0123:00D5       __osmajor
+ 0123:00D6       __osminor
+ 0123:00D7       __osmode
+ 0123:00D5       __osversion
+ 0123:0102       __ovlflag
+ 0123:0104       __ovlvec
+ 0123:00FA       __pgmptr
+ 0123:00D3       __psp
+ 0123:00D1       __pspadr
+ 0012:02B4       __setargv
+ 0012:045C       __setenvp
+ 0123:08AC       __sigintoff
+ 0123:08AA       __sigintseg
+ 0123:00CF       __umaskval
+ 0123:00F0       ___argc
+ 0123:00F2       ___argv
+
+  Address         Publics by Value
+
+ 0000:0106       _main
+ 0012:0010       __astart
+ 0012:00BA       __cintDIV
+ 0012:00C9       __amsg_exit
+ 0012:00DE       __cinit
+ 0012:01A2       _exit
+ 0012:01B9       __exit
+ 0012:0200       __ctermsub
+ 0012:0240       __FF_MSGBANNER
+ 0012:0264       __fptrap
+ 0012:026A       __chkstk
+ 0012:028E       __nullcheck
+ 0012:02B4       __setargv
+ 0012:045C       __setenvp
+ 0012:04D8       __NMSG_TEXT
+ 0012:0503       __NMSG_WRITE
+ 0012:052E       __myalloc
+ 0012:0570       __dosret0
+ 0012:0578       __dosreturn
+ 0012:0583       __dosretax
+ 0012:0590       __maperror
+ 0012:05C4       _strlen
+ 0012:05DC       _ultoa
+ 0012:05E6       _int86
+ 0012:066E       _cprintf
+ 0012:0FFE       _int86x
+ 0012:1096       _putch
+ 0012:10A6       __cltoasub
+ 0012:10B3       __cxtoa
+ 0123:005C       __asizds
+ 0123:005E       __atopsp
+ 0123:0060       __aexit_rtn
+ 0123:0062       __abrktb
+ 0123:00B2       __abrkp
+ 0123:00B2       __abrktbe
+ 0123:00B4       __acfinfo
+ 0123:00C1       __aintdiv
+ 0123:00C5       __fac
+ 0123:00CD       _errno
+ 0123:00CF       __umaskval
+ 0123:00D1       __pspadr
+ 0123:00D3       __psp
+ 0123:00D5       __osmajor
+ 0123:00D5       __dosvermajor
+ 0123:00D5       __osversion
+ 0123:00D6       __dosverminor
+ 0123:00D6       __osminor
+ 0123:00D7       __osmode
+ 0123:00D8       __doserrno
+ 0123:00D8       __oserr
+ 0123:00DA       __nfile
+ 0123:00DC       __osfile
+ 0123:00F0       ___argc
+ 0123:00F2       ___argv
+ 0123:00F6       _environ
+ 0123:00FA       __pgmptr
+ 0123:0100       __child
+ 0123:0102       __ovlflag
+ 0123:0103       __intno
+ 0123:0104       __ovlvec
+ 0123:0108       __adbgmsg
+ 0123:010C       __aaltstkovr
+ 0123:0110       STKHQQ
+ 0123:012A       __bufin
+ 0123:032A       __bufout
+ 0123:052A       __buferr
+ 0123:072A       __iob
+ 0123:081A       __iob2
+ 0123:0892       __lastiob
+ 0123:0896       __cfltcvt_tab
+ 0123:08AA       __sigintseg
+ 0123:08AC       __sigintoff
+ 0123:08AE       __asizeC
+ 0123:08AF       __asizeD
+ 0123:08C6       __fpinit
+ 0123:09AE       _edata
+ 0123:0B50       _end
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+
+Program entry point at 0012:0010
+
+Segments              31
+Groups                1
+Bytes in symbol table  7594

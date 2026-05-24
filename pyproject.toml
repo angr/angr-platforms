@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "angr_platforms"
+version = "0.1"
+description = "A collection of extra platforms for angr"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "angr==9.2.205",
+    "archinfo==9.2.205",
+    "cle==9.2.205",
+    "claripy==9.2.205",
+    "pyvex==9.2.205",
+    "capstone==5.0.6",
+    "z3-solver==4.13.0.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=9,<10",
+    "keystone-engine==0.9.2",
+]
+dev = [
+    "pytest>=9,<10",
+    "keystone-engine==0.9.2",
+    "mypy",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+include = [
+    "angr_platforms/X86_16/*.py",
+    "tests/test_x86_16*.py",
+    "tests/conftest.py",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E402"]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+log_cli = false
+log_level = "CRITICAL"
+
+[tool.mypy]
+python_version = "3.10"
+files = [
+    "angr_platforms/X86_16",
+    "tests/test_x86_16_smoketest.py",
+    "tests/test_x86_16_cod_samples.py",
+    "tests/test_x86_16_dos_mz_loader.py",
+    "tests/test_x86_16_sample_matrix.py",
+    "tests/test_x86_16_runtime_samples.py",
+    "tests/test_x86_16_compare_semantics.py",
+    "tests/conftest.py",
+]
+ignore_missing_imports = true
+check_untyped_defs = true
+pretty = true
+show_error_codes = true
+warn_unused_ignores = true
+exclude = [
+    "build/",
+    "dist/",
+    "angr_platforms.egg-info/",
+]
+
+[tool.setuptools.packages.find]
+include = ["angr_platforms*"]
+exclude = ["tests*", "tutorial*", "x16_samples*", "test_programs*"]

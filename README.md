@@ -28,3 +28,21 @@ Through these mechanisms, you can write new architectural descriptions, laoders 
 
 A set of tutorials, providing a walkthrough of these components, how they interact, and how to write them, can be found here: https://github.com/angr/angr-platforms/tree/master/tutorial
 
+## Installation
+
+The packaging metadata now pins the tested angr stack directly in `pyproject.toml`.
+
+Runtime install:
+
+```bash
+python -m pip install .
+```
+
+Test and development install:
+
+```bash
+python -m pip install ".[test]"
+python -m pip install ".[dev]"
+```
+
+The `test` extra includes `pytest` and `keystone-engine`, which are required by the x86-16 regression suite.

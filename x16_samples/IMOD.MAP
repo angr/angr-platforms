@@ -1,0 +1,207 @@
+
+ Start  Stop   Length Name                   Class
+ 00000H 00147H 00148H IDEMO_TEXT             CODE
+ 00148H 010D8H 00F91H _TEXT                  CODE
+ 010DAH 010DAH 00000H C_ETEXT                ENDCODE
+ 010E0H 01121H 00042H NULL                   BEGDATA
+ 01122H 0134DH 0022CH _DATA                  DATA
+ 0134EH 0135BH 0000EH CDATA                  DATA
+ 0135CH 0135CH 00000H XIFB                   DATA
+ 0135CH 0135CH 00000H XIF                    DATA
+ 0135CH 0135CH 00000H XIFE                   DATA
+ 0135CH 0135CH 00000H XIB                    DATA
+ 0135CH 0135CH 00000H XI                     DATA
+ 0135CH 0135CH 00000H XIE                    DATA
+ 0135CH 0135CH 00000H XPB                    DATA
+ 0135CH 0135CH 00000H XP                     DATA
+ 0135CH 0135CH 00000H XPE                    DATA
+ 0135CH 0135CH 00000H XCB                    DATA
+ 0135CH 0135CH 00000H XC                     DATA
+ 0135CH 0135CH 00000H XCE                    DATA
+ 0135CH 0135CH 00000H XCFB                   DATA
+ 0135CH 0135CH 00000H XCF                    DATA
+ 0135CH 0135CH 00000H XCFE                   DATA
+ 0135CH 0135CH 00000H CONST                  CONST
+ 0135CH 01363H 00008H HDR                    MSG
+ 01364H 01431H 000CEH MSG                    MSG
+ 01432H 01433H 00002H PAD                    MSG
+ 01434H 01434H 00001H EPAD                   MSG
+ 01436H 01463H 0002EH _BSS                   BSS
+ 01464H 01464H 00000H XOB                    BSS
+ 01464H 01464H 00000H XO                     BSS
+ 01464H 01464H 00000H XOE                    BSS
+ 01470H 01A6FH 00600H c_common               BSS
+ 01A70H 0226FH 00800H STACK                  STACK
+
+ Origin   Group
+ 010E:0   DGROUP
+
+  Address         Publics by Name
+
+ 010E:010C       STKHQQ
+ 0014:0646       _cprintf
+ 010E:0356       _edata
+ 010E:0990       _end
+ 010E:00F4       _environ
+ 010E:00CD       _errno
+ 0014:01A2       _exit
+ 0014:05C6       _int86
+ 0014:0E94       _int86x
+ 0000:011A       _main
+ 0014:0F2A       _putch
+ 0014:05A0       _strlen
+ 0014:05BC       _ultoa
+ 010E:0108       __aaltstkovr
+ 010E:00B2       __abrkp
+ 010E:0062       __abrktb
+ 010E:00B2       __abrktbe
+ 010E:00B4       __acfinfo
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+ 010E:0104       __adbgmsg
+ 010E:0060       __aexit_rtn
+ 010E:00C1       __aintdiv
+ 0014:00C9       __amsg_exit
+ 010E:005C       __asizds
+ 010E:0258       __asizeC
+ 010E:0259       __asizeD
+ 0014:0018       __astart
+ 010E:005E       __atopsp
+ 010E:0790       __buferr
+ 010E:0590       __bufin
+ 010E:0390       __bufout
+ 010E:0240       __cfltcvt_tab
+ 010E:00FC       __child
+ 0014:026A       __chkstk
+ 0014:00DE       __cinit
+ 0014:00BA       __cintDIV
+ 0014:0F3A       __cltoasub
+ 0014:0200       __ctermsub
+ 0014:0F46       __cxtoa
+ 010E:00D8       __doserrno
+ 0014:054C       __dosret0
+ 0014:055F       __dosretax
+ 0014:0554       __dosreturn
+ 010E:00D5       __dosvermajor
+ 010E:00D6       __dosverminor
+ 0014:01B9       __exit
+ 010E:00C5       __fac
+ 0014:0240       __FF_MSGBANNER
+ 010E:0270       __fpinit
+ 0014:0264       __fptrap
+ 010E:00FF       __intno
+ 010E:0126       __iob
+ 010E:01C6       __iob2
+ 010E:023E       __lastiob
+ 0014:056C       __maperror
+ 0014:050A       __myalloc
+ 010E:00DA       __nfile
+ 0014:04B4       __NMSG_TEXT
+ 0014:04DF       __NMSG_WRITE
+ 0014:028E       __nullcheck
+ 010E:00D8       __oserr
+ 010E:00DC       __osfile
+ 010E:00D5       __osmajor
+ 010E:00D6       __osminor
+ 010E:00D7       __osmode
+ 010E:00D5       __osversion
+ 010E:00FE       __ovlflag
+ 010E:0100       __ovlvec
+ 010E:00F6       __pgmptr
+ 010E:00D3       __psp
+ 010E:00D1       __pspadr
+ 0014:02B4       __setargv
+ 0014:0446       __setenvp
+ 010E:0256       __sigintoff
+ 010E:0254       __sigintseg
+ 010E:00CF       __umaskval
+ 010E:00F0       ___argc
+ 010E:00F2       ___argv
+
+  Address         Publics by Value
+
+ 0000:011A       _main
+ 0014:0018       __astart
+ 0014:00BA       __cintDIV
+ 0014:00C9       __amsg_exit
+ 0014:00DE       __cinit
+ 0014:01A2       _exit
+ 0014:01B9       __exit
+ 0014:0200       __ctermsub
+ 0014:0240       __FF_MSGBANNER
+ 0014:0264       __fptrap
+ 0014:026A       __chkstk
+ 0014:028E       __nullcheck
+ 0014:02B4       __setargv
+ 0014:0446       __setenvp
+ 0014:04B4       __NMSG_TEXT
+ 0014:04DF       __NMSG_WRITE
+ 0014:050A       __myalloc
+ 0014:054C       __dosret0
+ 0014:0554       __dosreturn
+ 0014:055F       __dosretax
+ 0014:056C       __maperror
+ 0014:05A0       _strlen
+ 0014:05BC       _ultoa
+ 0014:05C6       _int86
+ 0014:0646       _cprintf
+ 0014:0E94       _int86x
+ 0014:0F2A       _putch
+ 0014:0F3A       __cltoasub
+ 0014:0F46       __cxtoa
+ 010E:005C       __asizds
+ 010E:005E       __atopsp
+ 010E:0060       __aexit_rtn
+ 010E:0062       __abrktb
+ 010E:00B2       __abrkp
+ 010E:00B2       __abrktbe
+ 010E:00B4       __acfinfo
+ 010E:00C1       __aintdiv
+ 010E:00C5       __fac
+ 010E:00CD       _errno
+ 010E:00CF       __umaskval
+ 010E:00D1       __pspadr
+ 010E:00D3       __psp
+ 010E:00D5       __osmajor
+ 010E:00D5       __dosvermajor
+ 010E:00D5       __osversion
+ 010E:00D6       __dosverminor
+ 010E:00D6       __osminor
+ 010E:00D7       __osmode
+ 010E:00D8       __doserrno
+ 010E:00D8       __oserr
+ 010E:00DA       __nfile
+ 010E:00DC       __osfile
+ 010E:00F0       ___argc
+ 010E:00F2       ___argv
+ 010E:00F4       _environ
+ 010E:00F6       __pgmptr
+ 010E:00FC       __child
+ 010E:00FE       __ovlflag
+ 010E:00FF       __intno
+ 010E:0100       __ovlvec
+ 010E:0104       __adbgmsg
+ 010E:0108       __aaltstkovr
+ 010E:010C       STKHQQ
+ 010E:0126       __iob
+ 010E:01C6       __iob2
+ 010E:023E       __lastiob
+ 010E:0240       __cfltcvt_tab
+ 010E:0254       __sigintseg
+ 010E:0256       __sigintoff
+ 010E:0258       __asizeC
+ 010E:0259       __asizeD
+ 010E:0270       __fpinit
+ 010E:0356       _edata
+ 010E:0390       __bufout
+ 010E:0590       __bufin
+ 010E:0790       __buferr
+ 010E:0990       _end
+ 0000:9876  Abs  __acrtmsg
+ 0000:9876  Abs  __acrtused
+
+Program entry point at 0014:0018
+
+Segments              32
+Groups                1
+Bytes in symbol table  7646
