@@ -1,7 +1,7 @@
 import os
 
 import angr
-import claripy
+import angr.claripy as claripy
 
 from angr_platforms.bpf import *
 from angr_platforms.bpf.lift_bpf import MAX_INSTR_ID

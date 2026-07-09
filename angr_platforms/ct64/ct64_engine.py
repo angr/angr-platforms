@@ -1,5 +1,5 @@
 import angr
-import claripy
+import angr.claripy as claripy
 
 class CT64KMixin(angr.engines.SuccessorsEngine):
     def process_successors(self, successors, **kwargs):

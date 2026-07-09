@@ -1,7 +1,6 @@
 import os
 
 import angr
-import claripy
 
 from angr_platforms.risc_v import *
 
@@ -17,8 +16,8 @@ def test_schoolbook_multiplication():
 
     startState = proj.factory.call_state(targetAddress)
 
-    A = claripy.BVS("A",32)
-    B = claripy.BVS("B",32)
+    A = angr.claripy.BVS("A",32)
+    B = angr.claripy.BVS("B",32)
     startState.memory.store(startState.regs.a0, A)
     startState.memory.store(startState.regs.a1, B)
 
