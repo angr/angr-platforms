@@ -4,8 +4,10 @@ A module for testing tricore lifter.
 """
 import os
 import unittest
+
 import angr
-import claripy
+from angr.claripy import BVS
+
 from angr_platforms.tricore import *  # pylint: disable=[wildcard-import, unused-wildcard-import]
 
 TEST_PROGRAMS_BASE = str(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'test_programs', 'tricore'))
@@ -51,7 +53,7 @@ class TestAngrOnTricore(unittest.TestCase):
         proj.hook(0xa10061e0, angr.SIM_PROCEDURES['linux_kernel']['read']())
 
         ea = state.regs.sp + 15
-        password = claripy.BVS('password', 8*8)
+        password = BVS('password', 8*8)
         state.memory.store(ea, password)
 
         state.regs.a4 = ea
@@ -78,7 +80,7 @@ class TestAngrOnTricore(unittest.TestCase):
         proj.hook(0xa10061e0, angr.SIM_PROCEDURES['linux_kernel']['read']())
 
         ea = state.regs.sp + 7
-        password = claripy.BVS('password', 8*8)
+        password = BVS('password', 8*8)
         state.memory.store(ea, password)
 
         sm = proj.factory.simulation_manager(state)
@@ -103,7 +105,7 @@ class TestAngrOnTricore(unittest.TestCase):
         proj.hook(0xa10006c8, angr.SIM_PROCEDURES['libc']['printf']())
 
         ea = state.regs.sp + 0x1c
-        password = claripy.BVS('password', 8*8)
+        password = BVS('password', 8*8)
         state.memory.store(ea, password)
 
         state.regs.a4 = ea
@@ -127,7 +129,7 @@ class TestAngrOnTricore(unittest.TestCase):
         state = proj.factory.blank_state(addr=0xa10004c0)
 
         ea = state.regs.sp + 0x1c
-        password = claripy.BVS('password', 8*8)
+        password = BVS('password', 8*8)
         state.memory.store(ea, password)
 
         state.regs.a4 = ea
@@ -150,9 +152,9 @@ class TestAngrOnTricore(unittest.TestCase):
 
         state = proj.factory.blank_state(addr=0xa10005ae)
 
-        d1 = claripy.BVS('d1', 8*4)
-        d2 = claripy.BVS('d2', 8*4)
-        d3 = claripy.BVS('d3', 8*4)
+        d1 = BVS('d1', 8*4)
+        d2 = BVS('d2', 8*4)
+        d3 = BVS('d3', 8*4)
         state.regs.d1 = d1
         state.regs.d2 = d2
         state.regs.d3 = d3
@@ -176,8 +178,8 @@ class TestAngrOnTricore(unittest.TestCase):
 
         state = proj.factory.blank_state(addr=0xa100044a)
 
-        user_input0 = claripy.BVS('user_input0', 8*4)
-        user_input1 = claripy.BVS('user_input1', 8*4)
+        user_input0 = BVS('user_input0', 8*4)
+        user_input1 = BVS('user_input1', 8*4)
         state.memory.store(state.regs.a10 + 8, user_input0)
         state.memory.store(state.regs.a10 + 12, user_input1)
 
@@ -199,10 +201,10 @@ class TestAngrOnTricore(unittest.TestCase):
 
         state = proj.factory.blank_state(addr=0xa10004c4)
 
-        user_input0 = claripy.BVS('user_input0', 8*8)
-        user_input1 = claripy.BVS('user_input1', 8*8)
-        user_input2 = claripy.BVS('user_input2', 8*8)
-        user_input3 = claripy.BVS('user_input3', 8*8)
+        user_input0 = BVS('user_input0', 8*8)
+        user_input1 = BVS('user_input1', 8*8)
+        user_input2 = BVS('user_input2', 8*8)
+        user_input3 = BVS('user_input3', 8*8)
         state.memory.store(0xa10088f0, user_input0)
         state.memory.store(0xa10088f8, user_input1)
         state.memory.store(0xa1008900, user_input2)
@@ -229,8 +231,8 @@ class TestAngrOnTricore(unittest.TestCase):
 
         state = proj.factory.blank_state(addr=0xa10004f2)
 
-        user_input0 = claripy.BVS('user_input0', 8*8)
-        user_input1 = claripy.BVS('user_input1', 8*8)
+        user_input0 = BVS('user_input0', 8*8)
+        user_input1 = BVS('user_input1', 8*8)
 
         state.memory.store(0xa100894c, 0x11111111)
         state.memory.store(0xa1008944, 0x22222222)
@@ -257,7 +259,7 @@ class TestAngrOnTricore(unittest.TestCase):
 
         self.assertEqual(proj.arch.name, 'TRICORE')
 
-        password = claripy.BVS('password', 8*16)
+        password = BVS('password', 8*16)
 
         state = proj.factory.blank_state(addr=0xa10004d6)
         state.memory.store(0xa1008900, state.memory.load(0xa1007b8e, 16))

@@ -8,7 +8,7 @@ from angr.calling_conventions import (
 )
 from angr.simos import SimUserland, register_simos
 from angr.sim_procedure import SimProcedure
-from claripy import BVS, BVV
+from angr.claripy import BVS, BVV
 
 from . import ArchExtendedBPF
 

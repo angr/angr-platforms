@@ -1,6 +1,5 @@
 import logging
 import angr
-import claripy
 
 l = logging.getLogger(__name__)
 
@@ -99,7 +98,7 @@ class BFMixin(angr.engines.SuccessorsEngine):
                 successors.add_successor(
                     the_end,
                     state.ip,
-                    claripy.true(),
+                    angr.claripy.true(),
                     "Ijk_Exit",
                     add_guard=False,
                     exit_stmt_idx=-1,
@@ -129,7 +128,7 @@ class BFMixin(angr.engines.SuccessorsEngine):
                 newstate = state.copy()
                 newstate.regs.inout = 1  # Set this to 0 to cause a write syscall
                 newstate.ip = state.ip + 1
-                successors.add_successor(newstate, newstate.ip, claripy.true(), "Ijk_Syscall",
+                successors.add_successor(newstate, newstate.ip, angr.claripy.true(), "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end a basic block.
                 break
@@ -138,7 +137,7 @@ class BFMixin(angr.engines.SuccessorsEngine):
                 new_state = state.copy()
                 new_state.regs.inout = 0  # This must be 0 when we do a syscall to get a read!
                 new_state.ip = state.ip + 1
-                successors.add_successor(new_state, new_state.ip, claripy.true(), "Ijk_Syscall",
+                successors.add_successor(new_state, new_state.ip, angr.claripy.true(), "Ijk_Syscall",
                                          add_guard=False, exit_stmt_idx=-1, exit_ins_addr=state.ip, source=my_block)
                 # Syscalls, even fake ones like this, end the basic block
                 break

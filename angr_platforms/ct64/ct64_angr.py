@@ -3,8 +3,9 @@ import struct
 
 import angr
 import archinfo
-import claripy
 import cle
+
+from angr.claripy import And, BVV
 
 from .ct64_engine import UberEngineWithCT64K
 
@@ -93,12 +94,12 @@ class SimCT64K(angr.SimOS):
 
     def state_entry(self, *args, **kwargs):
         state = self.state_blank(*args, **kwargs)
-        state.memory.store(3, claripy.BVV(0, (0x200 - 3)*16))
-        state.memory.store(0x300, claripy.BVV(0, (0x1000 - 0x300)*16))
+        state.memory.store(3, BVV(0, (0x200 - 3)*16))
+        state.memory.store(0x300, BVV(0, (0x1000 - 0x300)*16))
         return state
 
     def _hard_checker(self, state, addr):
-        crange = claripy.And(addr >= 0x200, addr < 0x300)
+        crange = And(addr >= 0x200, addr < 0x300)
         if not state.solver.satisfiable(extra_constraints=(crange,)):
             return None
 
@@ -131,7 +132,7 @@ angr.simos.register_simos('ct64k', SimCT64K)
 
 # output
 def hard_200_rd(state):
-    return claripy.BVV(0, 16)
+    return BVV(0, 16)
 
 def hard_200_wr(state, v):
     state.posix.fd[1].write_data(v)
