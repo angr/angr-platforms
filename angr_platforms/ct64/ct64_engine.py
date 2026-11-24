@@ -229,7 +229,7 @@ class JQ(InstructionJump):
     def __init__(self, *args):
         super(JQ, self).__init__(*args)
 
-        if claripy.is_true(self.rm) == 0 and claripy.is_true(self.mem == 0):
+        if claripy.is_true(self.rm == 0) and claripy.is_true(self.mem == 0):
             self.NAME = 'HF'
 
     def condition(self, state):
